@@ -59,8 +59,8 @@ class _ReceivePageIdleState extends State<ReceivePage>{
             Flexible(
                 child: ListView(
                     children: <Widget>[
-                      const ReceiveListItem(icon: Icon(Icons.image), name: "name", size: "1024kb"),
-                      const ReceiveListItem(icon: Icon(Icons.image), name: "name", size: "1024kb"),
+                      const ReceiveListItem(icon_data: Icons.image, name: "name", size: "1024kb"),
+                      const ReceiveListItem(icon_data: Icons.image, name: "name", size: "1024kb"),
                       
                     ],
                   )

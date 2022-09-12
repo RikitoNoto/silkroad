@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class ReceiveListItem extends StatelessWidget{
   const ReceiveListItem({
-    required this.icon,
+    required this.icon_data,
     required this.name,
     required this.size,
     super.key,
   });
 
-  final Widget icon;
+  final IconData icon_data;
   final String name;
   final String size;
 
@@ -30,11 +30,27 @@ class ReceiveListItem extends StatelessWidget{
             child: IntrinsicHeight(
               child: Row(
                 children: [
-                  icon,
+                  FractionallySizedBox(
+                    heightFactor: 1.0,
+
+                    child: Icon(icon_data,
+//                      size: ,
+                    ),
+                  ),
                   SizedBox(
                     width: 10,
                   ),
-                  Text(name),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
                   SizedBox(
                     width: 10,
                   ),
