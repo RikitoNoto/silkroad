@@ -16,11 +16,10 @@ class ReceivePage extends StatefulWidget {
 class _DebugListModel<E> {
   _DebugListModel({
     required this.listKey,
-    Iterable<E>? initialItems,
-  }) : _items = List<E>.from(initialItems ?? <E>[]);
+  });
 
   final GlobalKey<AnimatedListState> listKey;
-  List<E> _items;
+  final List<E> _items = <E>[];
 
   AnimatedListState? get _animatedList => listKey.currentState;
 
@@ -68,7 +67,6 @@ class _ReceivePageState extends State<ReceivePage>{
     super.initState();
     _debugList = _DebugListModel<int>(
       listKey: _listKey,
-      initialItems: <int>[1, 2],
     );
   }
 
@@ -122,7 +120,7 @@ class _ReceivePageState extends State<ReceivePage>{
     int _index = _debugList.length%_debugItems.length;
     return ReceiveListItem(
       iconData: _debugItems[_index].iconData,
-      name: _debugItems[_index].name,
+      name: _debugItems[_index].name+index.toString(),
       size: _debugItems[_index].size,
       sender: _debugItems[_index].sender,
       animation: animation
@@ -169,6 +167,7 @@ class _ReceivePageState extends State<ReceivePage>{
               //     ],
               //   )
               child: AnimatedList(
+                key: _listKey,
                 itemBuilder: _buildItem,
               ),
             ),
