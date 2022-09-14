@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:silkroad/receive/views/AnimatedPlayPauseButton.dart';
 import 'receive_list_item.dart';
 
 // 受信画面描画クラス
@@ -154,10 +155,11 @@ class _ReceivePageState extends State<ReceivePage>{
                   ),
 
                   // ポート解放ボタン
-                  ElevatedButton(
-                    onPressed: ()=>{},
-                    child: const Text("OPEN")
-                  ),
+//                  ElevatedButton(
+//                    onPressed: ()=>{},
+//                    child: const Text("OPEN")
+//                  ),
+                  const AnimatedPlayPauseButton(),
                 ],
               ),
             ),
