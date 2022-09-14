@@ -120,7 +120,6 @@ class _ReceivePageState extends State<ReceivePage>{
 
   Widget _buildItem(BuildContext context, int index, Animation<double> animation)
   {
-    // int _index = _debugList.length%_debugItems.length;
     return ReceiveListItem(
       iconData: _debugList[index].iconData,
       name: _debugList[index].name,
