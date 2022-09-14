@@ -50,7 +50,7 @@ class _debugListItemStruct{
 
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
-  late _DebugListModel<int> _debugList;
+  late _DebugListModel<_debugListItemStruct> _debugList;
   final List<_debugListItemStruct> _debugItems = [
     const _debugListItemStruct(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
     const _debugListItemStruct(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
@@ -61,11 +61,13 @@ class _ReceivePageState extends State<ReceivePage>{
     const _debugListItemStruct(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
     const _debugListItemStruct(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
   ];
+  int _debugItemIndex = 0;
+
 
   @override
   void initState() {
     super.initState();
-    _debugList = _DebugListModel<int>(
+    _debugList = _DebugListModel<_debugListItemStruct>(
       listKey: _listKey,
     );
   }
@@ -107,7 +109,8 @@ class _ReceivePageState extends State<ReceivePage>{
 
   void _debugInsertItem()
   {
-    _debugList.insert(0, _debugList.length);
+    _debugList.insert(0, _debugItems[_debugList.length%_debugItems.length]);
+    _debugItemIndex++;
   }
 
   void _debugRemoveItem()
@@ -117,12 +120,12 @@ class _ReceivePageState extends State<ReceivePage>{
 
   Widget _buildItem(BuildContext context, int index, Animation<double> animation)
   {
-    int _index = _debugList.length%_debugItems.length;
+    // int _index = _debugList.length%_debugItems.length;
     return ReceiveListItem(
-      iconData: _debugItems[_index].iconData,
-      name: _debugItems[_index].name+index.toString(),
-      size: _debugItems[_index].size,
-      sender: _debugItems[_index].sender,
+      iconData: _debugList[index].iconData,
+      name: _debugList[index].name,
+      size: _debugList[index].size,
+      sender: _debugList[index].sender,
       animation: animation
     );
   }
@@ -136,36 +139,32 @@ class _ReceivePageState extends State<ReceivePage>{
         child: Column(
           children: [
             // 入力欄
-            Row(
-              children: <Widget>[
-                // パスワード入力欄
-                const Expanded(
-                  child: TextField(
-                    maxLines: 1,
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                children: <Widget>[
+                  // パスワード入力欄
+                  const Expanded(
+                    child: TextField(
+                      maxLines: 1,
+                    ),
                   ),
-                ),
 
-                const SizedBox(
-                  width: 30,
-                ),
+                  const SizedBox(
+                    width: 30,
+                  ),
 
-                // ポート解放ボタン
-                ElevatedButton(
-                  onPressed: ()=>{},
-                  child: const Text("OPEN")
-                ),
-              ],
+                  // ポート解放ボタン
+                  ElevatedButton(
+                    onPressed: ()=>{},
+                    child: const Text("OPEN")
+                  ),
+                ],
+              ),
             ),
 
             // 受信リスト
             Flexible(
-              // child: ListView(
-              //     children: <Widget>[
-              //       const ReceiveListItem(iconData: Icons.image, name: "name", size: 1024, sender: "UUUUUUUUUUUUUUUUUUUUUUU",),
-              //       const ReceiveListItem(iconData: Icons.image, name: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", size: 1024, sender: "unknown",),
-              //
-              //     ],
-              //   )
               child: AnimatedList(
                 key: _listKey,
                 itemBuilder: _buildItem,
