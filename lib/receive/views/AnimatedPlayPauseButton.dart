@@ -12,7 +12,7 @@ class _AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
       with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
-  double? _progress = null;
+  double? _progress = 0;
 
   @override
   void initState() {
@@ -20,7 +20,7 @@ class _AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
