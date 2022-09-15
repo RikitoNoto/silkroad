@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+enum AnimatedPlayPause{
+  play,
+  pause,
+}
+
+typedef AnimatedPlayPauseCallback = Function(AnimatedPlayPause);
+
 class AnimatedPlayPauseButton extends StatefulWidget{
-  const AnimatedPlayPauseButton({super.key});
+  const AnimatedPlayPauseButton({
+    this.onTap,
+    super.key
+  });
+  final AnimatedPlayPauseCallback? onTap;
 
   @override
   _AnimatedPlayPauseButtonState createState() => _AnimatedPlayPauseButtonState();
@@ -53,15 +64,22 @@ class _AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
 
   void _onPressed ()
   {
+    AnimatedPlayPause currentState = AnimatedPlayPause.pause;
     setState(() {
       if(_progress == null){
         _controller.reverse();
         _progress = 0;
+        currentState = AnimatedPlayPause.pause;
       }else{
         _controller.forward();
         _progress = null;
+        currentState = AnimatedPlayPause.play;
       }
     });
+
+    if(widget.onTap != null){
+      widget.onTap!(currentState);
+    }
 
   }
 
