@@ -57,6 +57,8 @@ class _ReceiveListModel<E> {
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late _ReceiveListModel<ReceiveItemInfo> _receiveList;
+  bool _isInputable = true;
+
   final List<ReceiveItemInfo> _debugReceiveItems = [
     const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
     const ReceiveItemInfo(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
@@ -167,7 +169,7 @@ class _ReceivePageState extends State<ReceivePage>{
                 ),
 
                 // ポート解放ボタン
-                const AnimatedPlayPauseButton(),
+                AnimatedPlayPauseButton(onTap: _onPlaypauseTap,),
               ],
             ),
           ),
@@ -186,11 +188,27 @@ class _ReceivePageState extends State<ReceivePage>{
 
   Widget _buildPasswordField()
   {
-    return const Expanded(
+    return Expanded(
       child: TextField(
+        decoration: const InputDecoration(
+          labelText: "Password",
+        ),
         maxLines: 1,
+        enabled: _isInputable,
       ),
     );
+  }
+
+  void _onPlaypauseTap(AnimatedPlayPause state)
+  {
+    setState(() {
+      if(state == AnimatedPlayPause.play){
+        _isInputable = false;
+      }else{
+        _isInputable = true;
+      }
+
+    });
   }
 }
 
