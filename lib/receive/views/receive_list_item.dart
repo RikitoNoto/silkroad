@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -29,6 +28,7 @@ mixin _ListItemBuilder{
 
   /// アイテムデコレーション
   static const BoxDecoration _decorationItem = BoxDecoration(
+    color: _itemBackgroundColor,
     border: Border(
         bottom: BorderSide(
           color: Colors.black,
@@ -178,26 +178,6 @@ mixin _ListItemBuilder{
 ///
 /// 受信リストアイテムクラス
 ///
-// class ReceiveListItem extends StatefulWidget{
-//   const ReceiveListItem({
-//     required this.iconData,
-//     required this.name,
-//     required this.size,
-//     required this.sender,
-//     super.key,
-//   });
-//
-//   final IconData iconData;            /// アイコンデータ
-//   final String name;                  /// ファイル名
-//   final int size;                     /// ファイルサイズ
-//   final String sender;                /// 送信者名
-//
-//   @override
-//   State<ReceiveListItem> createState() => _ReceiveListItemState();
-//
-// }
-
-
 class ReceiveListItem extends StatelessWidget{
   ReceiveListItem({
     required this.iconData,

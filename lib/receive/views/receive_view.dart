@@ -1,6 +1,4 @@
 // 受信画面
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/receive/views/AnimatedPlayPauseButton.dart';
@@ -69,8 +67,6 @@ class _ReceivePageState extends State<ReceivePage>{
     const ReceiveItemInfo(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
     const ReceiveItemInfo(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
   ];
-  int _debugItemIndex = 0;
-
 
   @override
   void initState() {
@@ -95,16 +91,16 @@ class _ReceivePageState extends State<ReceivePage>{
 
   List<Widget> _getDebugActions()
   {
-    List<Widget> debug_actions = [];
+    List<Widget> debugActions = [];
     if(kDebugMode){
-      debug_actions.add(
+      debugActions.add(
         IconButton(
           icon: const Icon(Icons.add_circle),
           onPressed: _debugInsertItem,
         )
       );
 
-      debug_actions.add(
+      debugActions.add(
         IconButton(
             icon: const Icon(Icons.remove_circle),
             onPressed: _debugRemoveItem,
@@ -112,14 +108,13 @@ class _ReceivePageState extends State<ReceivePage>{
       );
     }
 
-    return debug_actions;
+    return debugActions;
   }
 
 
   void _debugInsertItem()
   {
     _receiveList.insert(_receiveList.length, _debugReceiveItems[_receiveList.length%_debugReceiveItems.length]);
-    _debugItemIndex++;
   }
 
   void _debugRemoveItem()
@@ -157,42 +152,44 @@ class _ReceivePageState extends State<ReceivePage>{
   {
     return Container(
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            // 入力欄
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Row(
-                children: <Widget>[
-                  // パスワード入力欄
-                  const Expanded(
-                    child: TextField(
-                      maxLines: 1,
-                    ),
-                  ),
+      child: Column(
+        children: [
+          // 入力欄
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: <Widget>[
+                // パスワード入力欄
+                _buildPasswordField(),
 
-                  const SizedBox(
-                    width: 30,
-                  ),
+                const SizedBox(
+                  width: 30,
+                ),
 
-                  // ポート解放ボタン
-                  const AnimatedPlayPauseButton(),
-                ],
-              ),
+                // ポート解放ボタン
+                const AnimatedPlayPauseButton(),
+              ],
             ),
+          ),
 
-            // 受信リスト
-            Flexible(
-              child: AnimatedList(
-                key: _listKey,
-                itemBuilder: _buildItem,
-              ),
+          // 受信リスト
+          Flexible(
+            child: AnimatedList(
+              key: _listKey,
+              itemBuilder: _buildItem,
             ),
-          ]
-        )
+          ),
+        ]
       )
+    );
+  }
+
+  Widget _buildPasswordField()
+  {
+    return const Expanded(
+      child: TextField(
+        maxLines: 1,
+      ),
     );
   }
 }
