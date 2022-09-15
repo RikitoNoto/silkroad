@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/receive/views/AnimatedPlayPauseButton.dart';
 import 'receive_list_item.dart';
+import '../receive_item_info.dart';
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -14,19 +15,38 @@ class ReceivePage extends StatefulWidget {
   State<ReceivePage> createState() => _ReceivePageState();
 }
 
-class _DebugListModel<E> {
-  _DebugListModel({
+typedef _RemovedItemBuilder<T> = Widget Function(
+    T item, BuildContext context, Animation<double> animation);
+
+class _ReceiveListModel<E> {
+  _ReceiveListModel({
     required this.listKey,
+    required this.removedItemBuilder,
   });
 
   final GlobalKey<AnimatedListState> listKey;
   final List<E> _items = <E>[];
+  final _RemovedItemBuilder<E> removedItemBuilder;
 
   AnimatedListState? get _animatedList => listKey.currentState;
+  static const _durationDefault = Duration(milliseconds: 1000);
 
-  void insert(int index, E item) {
+  void insert(int index, E item, {Duration duration = _durationDefault}) {
     _items.insert(index, item);
-    _animatedList!.insertItem(index);
+    _animatedList!.insertItem(index, duration: duration);
+  }
+
+  E removeAt(int index) {
+    final E removedItem = _items.removeAt(index);
+    if (removedItem != null) {
+      _animatedList!.removeItem(
+        index,
+            (BuildContext context, Animation<double> animation) {
+          return removedItemBuilder(removedItem, context, animation);
+        },
+      );
+    }
+    return removedItem;
   }
 
   int get length => _items.length;
@@ -36,31 +56,18 @@ class _DebugListModel<E> {
   int indexOf(E item) => _items.indexOf(item);
 }
 
-class _debugListItemStruct{
-  const _debugListItemStruct({
-    required this.iconData,
-    required this.name,
-    required this.size,
-    required this.sender,
-  });
-  final IconData iconData;
-  final String name;
-  final int size;
-  final String sender;
-}
-
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
-  late _DebugListModel<_debugListItemStruct> _debugList;
-  final List<_debugListItemStruct> _debugItems = [
-    const _debugListItemStruct(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
-    const _debugListItemStruct(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
-    const _debugListItemStruct(iconData: Icons.add_task, name: "task", size: 679, sender: "adder"),
-    const _debugListItemStruct(iconData: Icons.wifi_tethering_error_outlined, name: "error", size: 7, sender: "buglover"),
-    const _debugListItemStruct(iconData: Icons.volume_mute_sharp, name: "volume", size: 1000, sender: "pin"),
-    const _debugListItemStruct(iconData: Icons.video_stable, name: "video", size: 6797, sender: "ummm"),
-    const _debugListItemStruct(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
-    const _debugListItemStruct(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
+  late _ReceiveListModel<ReceiveItemInfo> _receiveList;
+  final List<ReceiveItemInfo> _debugReceiveItems = [
+    const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
+    const ReceiveItemInfo(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
+    const ReceiveItemInfo(iconData: Icons.add_task, name: "task", size: 679, sender: "adder"),
+    const ReceiveItemInfo(iconData: Icons.wifi_tethering_error_outlined, name: "error", size: 7, sender: "buglover"),
+    const ReceiveItemInfo(iconData: Icons.volume_mute_sharp, name: "volume", size: 1000, sender: "pin"),
+    const ReceiveItemInfo(iconData: Icons.video_stable, name: "video", size: 6797, sender: "ummm"),
+    const ReceiveItemInfo(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
+    const ReceiveItemInfo(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
   ];
   int _debugItemIndex = 0;
 
@@ -68,8 +75,9 @@ class _ReceivePageState extends State<ReceivePage>{
   @override
   void initState() {
     super.initState();
-    _debugList = _DebugListModel<_debugListItemStruct>(
+    _receiveList = _ReceiveListModel<ReceiveItemInfo>(
       listKey: _listKey,
+      removedItemBuilder: _removeItem,
     );
   }
 
@@ -110,23 +118,38 @@ class _ReceivePageState extends State<ReceivePage>{
 
   void _debugInsertItem()
   {
-    _debugList.insert(0, _debugItems[_debugList.length%_debugItems.length]);
+    _receiveList.insert(_receiveList.length, _debugReceiveItems[_receiveList.length%_debugReceiveItems.length]);
     _debugItemIndex++;
   }
 
   void _debugRemoveItem()
   {
-
+    if(_receiveList.length > 0){
+      setState(() {
+        _receiveList.removeAt(0);
+      });
+    }
   }
 
   Widget _buildItem(BuildContext context, int index, Animation<double> animation)
   {
     return ReceiveListItem(
-      iconData: _debugList[index].iconData,
-      name: _debugList[index].name,
-      size: _debugList[index].size,
-      sender: _debugList[index].sender,
-      animation: animation
+      iconData: _receiveList[index].iconData,
+      name: _receiveList[index].name,
+      size: _receiveList[index].size,
+      sender: _receiveList[index].sender,
+      animation: animation,
+    );
+  }
+
+  Widget _removeItem(ReceiveItemInfo item, BuildContext context, Animation<double> animation)
+  {
+    return ReceiveListItemRemoving(
+        iconData: item.iconData,
+        name: item.name,
+        size: item.size,
+        sender: item.sender,
+        animation: animation
     );
   }
 
@@ -155,10 +178,6 @@ class _ReceivePageState extends State<ReceivePage>{
                   ),
 
                   // ポート解放ボタン
-//                  ElevatedButton(
-//                    onPressed: ()=>{},
-//                    child: const Text("OPEN")
-//                  ),
                   const AnimatedPlayPauseButton(),
                 ],
               ),
