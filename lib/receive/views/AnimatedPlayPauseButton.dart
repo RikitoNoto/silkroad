@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 enum AnimatedPlayPause{
   play,
@@ -16,10 +15,10 @@ class AnimatedPlayPauseButton extends StatefulWidget{
   final AnimatedPlayPauseCallback? onTap;
 
   @override
-  _AnimatedPlayPauseButtonState createState() => _AnimatedPlayPauseButtonState();
+  AnimatedPlayPauseButtonState createState() => AnimatedPlayPauseButtonState();
 }
 
-class _AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
+class AnimatedPlayPauseButtonState extends State<AnimatedPlayPauseButton>
       with SingleTickerProviderStateMixin {
 
   late AnimationController _controller;
