@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/password_action_field.dart';
+import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 
@@ -13,50 +14,9 @@ class ReceivePage extends StatefulWidget {
   State<ReceivePage> createState() => _ReceivePageState();
 }
 
-typedef _RemovedItemBuilder<T> = Widget Function(
-    T item, BuildContext context, Animation<double> animation);
-
-class _ReceiveListModel<E> {
-  _ReceiveListModel({
-    required this.listKey,
-    required this.removedItemBuilder,
-  });
-
-  final GlobalKey<AnimatedListState> listKey;
-  final List<E> _items = <E>[];
-  final _RemovedItemBuilder<E> removedItemBuilder;
-
-  AnimatedListState? get _animatedList => listKey.currentState;
-  static const _durationDefault = Duration(milliseconds: 1000);
-
-  void insert(int index, E item, {Duration duration = _durationDefault}) {
-    _items.insert(index, item);
-    _animatedList!.insertItem(index, duration: duration);
-  }
-
-  E removeAt(int index) {
-    final E removedItem = _items.removeAt(index);
-    if (removedItem != null) {
-      _animatedList!.removeItem(
-        index,
-            (BuildContext context, Animation<double> animation) {
-          return removedItemBuilder(removedItem, context, animation);
-        },
-      );
-    }
-    return removedItem;
-  }
-
-  int get length => _items.length;
-
-  E operator [](int index) => _items[index];
-
-  int indexOf(E item) => _items.indexOf(item);
-}
-
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
-  late _ReceiveListModel<ReceiveItemInfo> _receiveList;
+  late AnimatedListItemModel<ReceiveItemInfo> _receiveList;
 
   final List<ReceiveItemInfo> _debugReceiveItems = [
     const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
@@ -72,7 +32,7 @@ class _ReceivePageState extends State<ReceivePage>{
   @override
   void initState() {
     super.initState();
-    _receiveList = _ReceiveListModel<ReceiveItemInfo>(
+    _receiveList = AnimatedListItemModel<ReceiveItemInfo>(
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
