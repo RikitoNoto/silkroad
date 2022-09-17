@@ -6,26 +6,6 @@ import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const ReceivePage(),
-    );
-  }
-}
-
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
   const ReceivePage({super.key});
