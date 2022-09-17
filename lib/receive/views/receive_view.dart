@@ -1,9 +1,30 @@
 // 受信画面
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:silkroad/receive/views/AnimatedPlayPauseButton.dart';
+import 'package:silkroad/utils/views/password_action_field.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
+import 'package:silkroad/utils/views/alternate_action_button.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const ReceivePage(),
+    );
+  }
+}
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -157,21 +178,10 @@ class _ReceivePageState extends State<ReceivePage>{
       child: Column(
         children: [
           // 入力欄
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              children: <Widget>[
-                // パスワード入力欄
-                _buildPasswordField(),
-
-                const SizedBox(
-                  width: 30,
-                ),
-
-                // ポート解放ボタン
-                AnimatedPlayPauseButton(onTap: _onPlaypauseTap,),
-              ],
-            ),
+          PasswordActionField(
+            startIcon: Icons.play_arrow,
+            endIcon: Icons.pause,
+            onTap: _onPlayPauseTap
           ),
 
           // 受信リスト
@@ -186,23 +196,10 @@ class _ReceivePageState extends State<ReceivePage>{
     );
   }
 
-  Widget _buildPasswordField()
-  {
-    return Expanded(
-      child: TextField(
-        decoration: const InputDecoration(
-          labelText: "Password",
-        ),
-        maxLines: 1,
-        enabled: _isInputable,
-      ),
-    );
-  }
-
-  void _onPlaypauseTap(AnimatedPlayPause state)
+  void _onPlayPauseTap(AlternateActionStatus state)
   {
     setState(() {
-      if(state == AnimatedPlayPause.play){
+      if(state == AlternateActionStatus.active){
         _isInputable = false;
       }else{
         _isInputable = true;
