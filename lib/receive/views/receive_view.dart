@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/password_action_field.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
-import 'package:silkroad/utils/views/alternate_action_button.dart';
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -58,7 +57,6 @@ class _ReceiveListModel<E> {
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late _ReceiveListModel<ReceiveItemInfo> _receiveList;
-  bool _isInputable = true;
 
   final List<ReceiveItemInfo> _debugReceiveItems = [
     const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
@@ -158,10 +156,9 @@ class _ReceivePageState extends State<ReceivePage>{
       child: Column(
         children: [
           // 入力欄
-          PasswordActionField(
+          const PasswordActionField(
             startIcon: Icons.play_arrow,
             endIcon: Icons.pause,
-            onTap: _onPlayPauseTap
           ),
 
           // 受信リスト
@@ -174,18 +171,6 @@ class _ReceivePageState extends State<ReceivePage>{
         ]
       )
     );
-  }
-
-  void _onPlayPauseTap(AlternateActionStatus state)
-  {
-    setState(() {
-      if(state == AlternateActionStatus.active){
-        _isInputable = false;
-      }else{
-        _isInputable = true;
-      }
-
-    });
   }
 }
 
