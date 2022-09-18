@@ -5,7 +5,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 /// 受信リストアイテムビルダー
 ///
 mixin _ListItemBuilder{
-  static const double _deviceNameWidth = 64.0;           /// サイズ&送信者列 横幅
   static const Color _itemBackgroundColor = Colors.white;   /// アイテム背景色
   static const Color _itemForegroundColor = Colors.black;   /// アイテム内文字色
 
@@ -26,10 +25,10 @@ mixin _ListItemBuilder{
   static const BoxDecoration _decorationItem = BoxDecoration(
     color: _itemBackgroundColor,
     border: Border(
-        bottom: BorderSide(
-          color: Colors.black,
-          width: 1,
-        )
+      bottom: BorderSide(
+        color: Colors.black,
+        width: 1,
+      ),
     ),
   );
 
