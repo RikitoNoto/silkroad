@@ -9,23 +9,6 @@ import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import '../send_item_info.dart';
 import 'send_list_item.dart';
 
-void main() => runApp(const DebugApp());
-
-class DebugApp extends StatelessWidget {
-  const DebugApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const SendPage(),
-    );
-  }
-}
 // 送信画面描画クラス
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
