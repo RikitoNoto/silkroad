@@ -9,6 +9,24 @@ import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import '../send_item_info.dart';
 import 'send_list_item.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const SendPage(),
+    );
+  }
+}
+
 // 送信画面描画クラス
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
@@ -116,11 +134,11 @@ class _SendPageState extends State<SendPage>{
         child: Column(
             children: [
               // 入力欄
-              const PasswordActionField(
-                startIcon: Icons.play_arrow,
-                endIcon: Icons.pause,
-              ),
-
+              // const PasswordActionField(
+              //   startIcon: Icons.play_arrow,
+              //   endIcon: Icons.pause,
+              // ),
+              _buildIpField(context),
               _buildFileSelector(),
 
               // 受信リスト
@@ -132,6 +150,32 @@ class _SendPageState extends State<SendPage>{
               ),
             ]
         )
+    );
+  }
+
+  Widget _buildIpField(BuildContext context)
+  {
+    return Container(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          children: <Widget>[
+            // パスワード入力欄
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(
+                labelText: "Ipaddress",
+                ),
+                maxLines: 1,
+                // enabled: _enableField,
+              ),
+            ),
+
+
+          ],
+        ),
+      ),
     );
   }
 
