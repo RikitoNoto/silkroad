@@ -1,6 +1,8 @@
 // 送信画面
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:silkroad/utils/views/password_action_field.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import '../send_item_info.dart';
@@ -111,11 +113,6 @@ class _SendPageState extends State<SendPage>{
       receiver: _sendList[index].receiver,
       animation: animation,
     );
-    //   SendListItem(
-    //   deviceName: _sendList[index].deviceName,
-    //   receiver: _sendList[index].receiver,
-    //   animation: animation,
-    // );
   }
 
   Widget _removeItem(SendItemInfo item, BuildContext context, Animation<double> animation)
@@ -137,6 +134,30 @@ class _SendPageState extends State<SendPage>{
               const PasswordActionField(
                 startIcon: Icons.play_arrow,
                 endIcon: Icons.pause,
+              ),
+
+              Row(
+                children: [
+                  const Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text("No select"),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: ElevatedButton.icon(
+                      label: const Text("select file"),
+                      icon: const Icon(Icons.search),
+                      onPressed: () async {
+                        FilePickerResult? result = await FilePicker.platform.pickFiles();
+                        if (result != null) {
+                          File file = File(result.files.single.path!);
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
 
               // 受信リスト

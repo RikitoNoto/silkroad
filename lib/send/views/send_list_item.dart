@@ -110,17 +110,14 @@ mixin _ListItemBuilder{
 
   static Widget _buildDeviceName(String sender)
   {
-    return Flexible(
-      flex: 5,
-      child: Container(
-        padding: const EdgeInsets.only(top: 2),
-        alignment: Alignment.topRight,
-        child: Text(sender,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.right,
-          style: _deviceNameTextStyle,
-        ),
+    return Container(
+      padding: const EdgeInsets.only(top: 2),
+      alignment: Alignment.topRight,
+      child: Text(sender,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.right,
+        style: _deviceNameTextStyle,
       ),
     );
   }
