@@ -1,5 +1,6 @@
 // 送信画面
 import 'dart:io';
+import 'package:path/path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -36,6 +37,7 @@ class SendPage extends StatefulWidget {
 class _SendPageState extends State<SendPage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<SendItemInfo> _sendList;
+  String _selectFile = "No select";
 
   final List<SendItemInfo> _debugSendItems = [
     const SendItemInfo(deviceName: "system", receiver: "update"),
@@ -136,29 +138,7 @@ class _SendPageState extends State<SendPage>{
                 endIcon: Icons.pause,
               ),
 
-              Row(
-                children: [
-                  const Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("No select"),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: ElevatedButton.icon(
-                      label: const Text("select file"),
-                      icon: const Icon(Icons.search),
-                      onPressed: () async {
-                        FilePickerResult? result = await FilePicker.platform.pickFiles();
-                        if (result != null) {
-                          File file = File(result.files.single.path!);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
+              _buildFileSelector(),
 
               // 受信リスト
               Flexible(
@@ -169,6 +149,43 @@ class _SendPageState extends State<SendPage>{
               ),
             ]
         )
+    );
+  }
+
+  Widget _buildFileSelector()
+  {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.only(left: 10),
+            decoration: const BoxDecoration(
+            ),
+            child: Text(
+              _selectFile,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ElevatedButton.icon(
+            label: const Text("select file"),
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              FilePickerResult? result = await FilePicker.platform.pickFiles();
+              if (result != null) {
+                File file = File(result.files.single.path!);
+                setState(() {
+                  _selectFile = basename(file.path);
+                });
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

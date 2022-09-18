@@ -12,7 +12,7 @@ mixin _ListItemBuilder{
   /// テキストスタイル： 受信者
   static const TextStyle _receiverTextStyle = TextStyle(
     color: _itemForegroundColor,
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
   );
 
@@ -41,14 +41,10 @@ mixin _ListItemBuilder{
       child: Container(
         decoration: _decorationItem,
         child: IntrinsicHeight(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
               _buildReceiver(receiver),
-              SizedBox(
-                width: _deviceNameWidth,
-                child: _buildDeviceName(deviceName),   // 送信者
-              ),
+              _buildDeviceName(deviceName),
             ],
           ),
         ),
@@ -63,7 +59,6 @@ mixin _ListItemBuilder{
       children: [
         SlidableAction(
           // An action can be bigger than the others.
-          flex: 4,
           onPressed: (BuildContext context) => {},
           backgroundColor: Colors.red,
           foregroundColor: Colors.white,
@@ -96,7 +91,8 @@ mixin _ListItemBuilder{
   {
     return Flexible(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        alignment: Alignment.topLeft,
         child: Text(
           name,
           maxLines: 1,
@@ -111,12 +107,12 @@ mixin _ListItemBuilder{
   static Widget _buildDeviceName(String sender)
   {
     return Container(
-      padding: const EdgeInsets.only(top: 2),
-      alignment: Alignment.topRight,
+      padding: const EdgeInsets.only(top: 2, left: 20, bottom: 5),
+      alignment: Alignment.bottomLeft,
       child: Text(sender,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.left,
         style: _deviceNameTextStyle,
       ),
     );
