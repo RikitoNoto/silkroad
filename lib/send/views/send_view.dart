@@ -1,13 +1,8 @@
 // 送信画面
 import 'dart:io';
 import 'package:path/path.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:silkroad/utils/views/password_action_field.dart';
-import 'package:silkroad/utils/views/animated_list_item_model.dart';
-import '../send_item_info.dart';
-import 'send_list_item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,122 +31,11 @@ class SendPage extends StatefulWidget {
 }
 
 class _SendPageState extends State<SendPage>{
-  final _listKey = GlobalKey<AnimatedListState>();
-  late AnimatedListItemModel<SendItemInfo> _sendList;
   String _selectFile = "No select";
+  // TextEditingController _ipTextcontroller = TextEditingController(text: '0.0.0.0');
+  // TextEditingController _fileNameTextcontroller = TextEditingController(text: 'no select file');
+  // TextEditingController _fileSizeTextcontroller = TextEditingController(text: '0byte');
 
-  final List<SendItemInfo> _debugSendItems = [
-    const SendItemInfo(deviceName: "system", receiver: "update"),
-    const SendItemInfo(deviceName: "moderator", receiver: "adder"),
-    const SendItemInfo(deviceName: "task", receiver: "adder"),
-    const SendItemInfo(deviceName: "error", receiver: "buglover"),
-    const SendItemInfo(deviceName: "volume", receiver: "pin"),
-    const SendItemInfo(deviceName: "video", receiver: "ummm"),
-    const SendItemInfo(deviceName: "turn", receiver: "right"),
-    const SendItemInfo(deviceName: "timer", receiver: "cool"),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _sendList = AnimatedListItemModel<SendItemInfo>(
-      listKey: _listKey,
-      removedItemBuilder: _removeItem,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Send"),
-          actions: _getDebugActions(),
-        ),
-
-        body: _buildBody(context)
-    );
-  }
-
-  List<Widget> _getDebugActions()
-  {
-    List<Widget> debugActions = [];
-    if(kDebugMode){
-      debugActions.add(
-          IconButton(
-            icon: const Icon(Icons.add_circle),
-            onPressed: _debugInsertItem,
-          )
-      );
-
-      debugActions.add(
-        IconButton(
-          icon: const Icon(Icons.remove_circle),
-          onPressed: _debugRemoveItem,
-        ),
-      );
-    }
-
-    return debugActions;
-  }
-
-
-  void _debugInsertItem()
-  {
-    _sendList.insert(_sendList.length, _debugSendItems[_sendList.length%_debugSendItems.length]);
-  }
-
-  void _debugRemoveItem()
-  {
-    if(_sendList.length > 0){
-      setState(() {
-        _sendList.removeAt(0);
-      });
-    }
-  }
-
-  Widget _buildItem(BuildContext context, int index, Animation<double> animation)
-  {
-    return SendListItem(
-      deviceName: _sendList[index].deviceName,
-      receiver: _sendList[index].receiver,
-      animation: animation,
-    );
-  }
-
-  Widget _removeItem(SendItemInfo item, BuildContext context, Animation<double> animation)
-  {
-    return SendListItemRemoving(
-        deviceName: item.deviceName,
-        receiver: item.receiver,
-        animation: animation
-    );
-  }
-
-  Widget _buildBody(BuildContext context)
-  {
-    return Container(
-        color: Colors.white,
-        child: Column(
-            children: [
-              // 入力欄
-              // const PasswordActionField(
-              //   startIcon: Icons.play_arrow,
-              //   endIcon: Icons.pause,
-              // ),
-              _buildIpField(context),
-              _buildFileSelector(),
-
-              // 受信リスト
-              Flexible(
-                child: AnimatedList(
-                  key: _listKey,
-                  itemBuilder: _buildItem,
-                ),
-              ),
-            ]
-        )
-    );
-  }
 
   static const String _ipFieldLabelText = 'Receiver Ipaddress';
   static const double _ipFieldOutPadding = 10.0;
@@ -159,6 +43,62 @@ class _SendPageState extends State<SendPage>{
     fontWeight: FontWeight.bold,
     fontSize: 24,
   );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Send"),
+        ),
+
+        body: _buildBody(context)
+    );
+  }
+
+
+  Widget _buildBody(BuildContext context)
+  {
+    return Container(
+        color: Colors.white,
+        child: Column(
+            children: [
+              _buildIpField(context), // IPアドレスフィールド
+              _buildFileSelector(),   // ファイルセレクター
+              // _buildItemInfo(),       // ファイル情報
+            ]
+        )
+    );
+  }
+
+  // Widget _buildItemInfo()
+  // {
+  //   return Expanded(
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Column(
+  //         mainAxisAlignment: MainAxisAlignment.start,
+  //         children: [
+  //           _buildItemInfoContent(icon: Icons.language_rounded, controller: _ipTextcontroller),     // ip
+  //           _buildItemInfoContent(icon: Icons.file_present, controller: _fileNameTextcontroller),   // file name
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+  //
+  // Widget _buildItemInfoContent({required IconData? icon, required TextEditingController controller})
+  // {
+  //   return TextField(
+  //     textAlignVertical: TextAlignVertical.center,
+  //     textAlign: TextAlign.left,
+  //     enabled: false,
+  //     readOnly: true,
+  //     controller: controller,
+  //     decoration: InputDecoration(
+  //       prefixIcon: Icon(icon),
+  //     ),
+  //   );
+  // }
 
   Widget _buildIpField(BuildContext context)
   {
@@ -228,11 +168,24 @@ class _SendPageState extends State<SendPage>{
             padding: const EdgeInsets.only(left: 10),
             decoration: const BoxDecoration(
             ),
-            child: Text(
-              _selectFile,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.left,
+            child: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Icon(
+                    Icons.file_present,
+                    color: Colors.grey,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    _selectFile,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
