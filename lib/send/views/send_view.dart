@@ -32,10 +32,6 @@ class SendPage extends StatefulWidget {
 
 class _SendPageState extends State<SendPage>{
   String _selectFile = "No select";
-  // TextEditingController _ipTextcontroller = TextEditingController(text: '0.0.0.0');
-  // TextEditingController _fileNameTextcontroller = TextEditingController(text: 'no select file');
-  // TextEditingController _fileSizeTextcontroller = TextEditingController(text: '0byte');
-
 
   static const String _ipFieldLabelText = 'Receiver Ipaddress';
   static const double _ipFieldOutPadding = 10.0;
@@ -69,36 +65,6 @@ class _SendPageState extends State<SendPage>{
         )
     );
   }
-
-  // Widget _buildItemInfo()
-  // {
-  //   return Expanded(
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.start,
-  //         children: [
-  //           _buildItemInfoContent(icon: Icons.language_rounded, controller: _ipTextcontroller),     // ip
-  //           _buildItemInfoContent(icon: Icons.file_present, controller: _fileNameTextcontroller),   // file name
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // Widget _buildItemInfoContent({required IconData? icon, required TextEditingController controller})
-  // {
-  //   return TextField(
-  //     textAlignVertical: TextAlignVertical.center,
-  //     textAlign: TextAlign.left,
-  //     enabled: false,
-  //     readOnly: true,
-  //     controller: controller,
-  //     decoration: InputDecoration(
-  //       prefixIcon: Icon(icon),
-  //     ),
-  //   );
-  // }
 
   Widget _buildIpField(BuildContext context)
   {
