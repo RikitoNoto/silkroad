@@ -153,27 +153,67 @@ class _SendPageState extends State<SendPage>{
     );
   }
 
+  static const String _ipFieldLabelText = 'Receiver Ipaddress';
+  static const double _ipFieldOutPadding = 10.0;
+  static const TextStyle _ipFieldCommaTextStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 24,
+  );
+
   Widget _buildIpField(BuildContext context)
   {
     return Container(
+      padding: const EdgeInsets.all(_ipFieldOutPadding),
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          children: <Widget>[
-            // パスワード入力欄
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                labelText: "Ipaddress",
-                ),
-                maxLines: 1,
-                // enabled: _enableField,
-              ),
-            ),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: _ipFieldLabelText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              _buildOctetField(),
+              _buildComma(),
+              _buildOctetField(),
+              _buildComma(),
+              _buildOctetField(),
+              _buildComma(),
+              _buildOctetField(textInputAction: TextInputAction.done),
+            ],
+          ),
+        ),
+        // ),
+      ),
+    );
+  }
 
+  Widget _buildComma()
+  {
+    return Container(
+      alignment: Alignment.bottomCenter,
+      child: const Text(
+        ".",
+        textAlign: TextAlign.center,
+        style: _ipFieldCommaTextStyle,
+      ),
+    );
+  }
 
-          ],
+  Widget _buildOctetField({textInputAction=TextInputAction.next})
+  {
+    return Expanded(
+      child: SizedBox(
+        height: 30,
+        child: TextField(
+          textInputAction: textInputAction,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 10),
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 1,
         ),
       ),
     );
