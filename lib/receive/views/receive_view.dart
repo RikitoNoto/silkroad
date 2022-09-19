@@ -1,10 +1,29 @@
 // 受信画面
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/views/password_action_field.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const ReceivePage(),
+    );
+  }
+}
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -116,11 +135,24 @@ class _ReceivePageState extends State<ReceivePage>{
       child: Column(
         children: [
           // 入力欄
-          const PasswordActionField(
-            startIcon: Icons.play_arrow,
-            endIcon: Icons.pause,
+          // const PasswordActionField(
+          //   startIcon: Icons.play_arrow,
+          //   endIcon: Icons.pause,
+          // ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "0.0.0.0",
+                ),
+              ),
+              AlternateActionButton(
+                startIcon: Icons.play_arrow,
+                endIcon: Icons.pause,
+                onTap: _ontap,
+              ),
+            ],
           ),
-
           // 受信リスト
           Flexible(
             child: AnimatedList(
@@ -131,6 +163,13 @@ class _ReceivePageState extends State<ReceivePage>{
         ]
       )
     );
+  }
+
+  void _ontap(AlternateActionStatus status)
+  {
+    // setState(() {
+    //
+    // });
   }
 }
 

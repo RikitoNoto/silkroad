@@ -4,24 +4,6 @@ import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const SendPage(),
-    );
-  }
-}
-
 // 送信画面描画クラス
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
