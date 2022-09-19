@@ -135,21 +135,35 @@ class _ReceivePageState extends State<ReceivePage>{
       child: Column(
         children: [
           // 入力欄
-          // const PasswordActionField(
-          //   startIcon: Icons.play_arrow,
-          //   endIcon: Icons.pause,
-          // ),
           Row(
             children: [
               Expanded(
-                child: Text(
-                  "0.0.0.0",
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.language),
+                      labelText: "Ipaddress",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Expanded(
+                      child: Text(
+                        "0.0.0.0",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
+
               AlternateActionButton(
                 startIcon: Icons.play_arrow,
                 endIcon: Icons.pause,
-                onTap: _ontap,
               ),
             ],
           ),
@@ -163,13 +177,6 @@ class _ReceivePageState extends State<ReceivePage>{
         ]
       )
     );
-  }
-
-  void _ontap(AlternateActionStatus status)
-  {
-    // setState(() {
-    //
-    // });
   }
 }
 
