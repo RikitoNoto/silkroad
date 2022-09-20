@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   animate_icons:
   file_picker:
+  provider: ^6.0.2
 
 dev_dependencies:
   flutter_test:
