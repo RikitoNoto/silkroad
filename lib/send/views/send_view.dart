@@ -25,11 +25,18 @@ class _SendPageState extends State<SendPage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Send"),
-        ),
+      appBar: AppBar(
+        title: const Text("Send"),
+      ),
 
-        body: _buildBody(context)
+      body: _buildBody(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: ()=>{
+
+        },
+        tooltip: 'Send',
+        child: const Icon(Icons.send),
+      ),
     );
   }
 
@@ -42,7 +49,6 @@ class _SendPageState extends State<SendPage>{
             children: [
               _buildIpField(context), // IPアドレスフィールド
               _buildFileSelector(),   // ファイルセレクター
-              // _buildItemInfo(),       // ファイル情報
             ]
         )
     );
