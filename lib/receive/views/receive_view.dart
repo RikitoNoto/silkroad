@@ -2,28 +2,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
-import 'package:silkroad/utils/views/password_action_field.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const ReceivePage(),
-    );
-  }
-}
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -142,26 +123,28 @@ class _ReceivePageState extends State<ReceivePage>{
                   padding: const EdgeInsets.all(10.0),
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.language),
-                      labelText: "Ipaddress",
+                      fillColor: Colors.lightBlue[50],
+                      filled: true,
+                      prefixIcon: const Icon(Icons.language),
+                      labelText: "My Ipaddress",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                    child: Expanded(
-                      child: Text(
+                    // child: Expanded(
+                      child: const Text(
                         "0.0.0.0",
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: Colors.black,
                           fontSize: 24,
                         ),
                       ),
-                    ),
+                    // ),
                   ),
                 ),
               ),
 
-              AlternateActionButton(
+              const AlternateActionButton(
                 startIcon: Icons.play_arrow,
                 endIcon: Icons.pause,
               ),
