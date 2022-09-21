@@ -4,19 +4,20 @@ import 'package:network_info_plus/network_info_plus.dart';
 class ReceiveProvider with ChangeNotifier {
   static NetworkInfo networkInfo = NetworkInfo();
 
-  ReceiveProvider()
-  {
-    setIpaddress();
+  ReceiveProvider() {
+    _fetchIpAddress();
   }
 
-  void setIpaddress() async
-  {
-    _ipaddress = await networkInfo.getWifiIP();
+  void _fetchIpAddress() async {
+    _ipAddress = await networkInfo.getWifiIP();
   }
 
-  String? _ipaddress;
+  late String? _ipAddress;
 
-  String? get ipaddress{
-    return _ipaddress;
+  String get ipAddress{
+    if(_ipAddress == null){
+      return "";
+    }
+    return _ipAddress!;
   }
 }
