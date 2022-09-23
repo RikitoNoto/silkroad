@@ -47,6 +47,9 @@ class TcpHost{
       connection.close();
     });
     _server_socket?.close();
+
+    _connections.clear();
+    _server_socket = null;
   }
 
   void send(Socket connection, Uint8List data){
