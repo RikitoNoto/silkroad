@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'host_if.dart';
 
-typedef ConnectionCallback = Function(Socket socket);
-typedef ReceiveCallback = Function(Socket socket, Uint8List data);
 
-class TcpHost{
+class TcpHost implements HostIF{
   TcpHost({
     required this.ipAddress,
     required this.port,
@@ -19,6 +18,7 @@ class TcpHost{
   ServerSocket? _server_socket;
   List<Socket> _connections = <Socket>[];           // connecting socket list
 
+  @override
   Future<void> listen() async{
 
     try{
@@ -42,6 +42,7 @@ class TcpHost{
     return Future(()=>{});
   }
 
+  @override
   void close(){
     _connections.forEach((connection) {
       connection.close();
@@ -52,6 +53,7 @@ class TcpHost{
     _server_socket = null;
   }
 
+  @override
   void send(Socket connection, Uint8List data){
     connection.write(data);
   }

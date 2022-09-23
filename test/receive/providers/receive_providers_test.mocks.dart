@@ -4,11 +4,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
+import 'dart:io' as _i6;
+import 'dart:typed_data' as _i7;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:network_info_plus/network_info_plus.dart' as _i2;
 import 'package:network_info_plus_platform_interface/network_info_plus_platform_interface.dart'
     as _i4;
+import 'package:silkroad/comm/tcp_host.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -108,4 +111,56 @@ class MockNetworkInfo extends _i1.Mock implements _i2.NetworkInfo {
             returnValue: _i3.Future<_i4.LocationAuthorizationStatus>.value(
                 _i4.LocationAuthorizationStatus.notDetermined),
           ) as _i3.Future<_i4.LocationAuthorizationStatus>);
+}
+
+/// A class which mocks [TcpHost].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockTcpHost extends _i1.Mock implements _i5.TcpHost {
+  MockTcpHost() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  String get ipAddress => (super.noSuchMethod(
+        Invocation.getter(#ipAddress),
+        returnValue: '',
+      ) as String);
+  @override
+  int get port => (super.noSuchMethod(
+        Invocation.getter(#port),
+        returnValue: 0,
+      ) as int);
+  @override
+  _i3.Future<void> listen() => (super.noSuchMethod(
+        Invocation.method(
+          #listen,
+          [],
+        ),
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
+  @override
+  void close() => super.noSuchMethod(
+        Invocation.method(
+          #close,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void send(
+    _i6.Socket? connection,
+    _i7.Uint8List? data,
+  ) =>
+      super.noSuchMethod(
+        Invocation.method(
+          #send,
+          [
+            connection,
+            data,
+          ],
+        ),
+        returnValueForMissingStub: null,
+      );
 }
