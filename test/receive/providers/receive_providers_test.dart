@@ -64,7 +64,7 @@ void portTest(MockNetworkInfo networkInfoMock, MockTcpHost mockHost) {
     int portSpy = 0;
 
     setUp((){
-      ipAddressSpy = "";
+      ipAddressSpy = null;
       portSpy = 0;
 
       provider = ReceiveProvider(builder: ({
@@ -80,11 +80,24 @@ void portTest(MockNetworkInfo networkInfoMock, MockTcpHost mockHost) {
 
     test('should be open port when call the open method', () async{
       when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value("192.168.1.1"));
-      when(mockHost.listen()).thenAnswer((_)=>Future<String?>.value("192.168.1.1"));
+      when(mockHost.listen()).thenAnswer((_)=>Future<void>.value(()=>{}));
       verifyNever(mockHost.listen());
-      await provider!.open();
+      bool result = await provider!.open();
       verify(mockHost.listen());
       expect(ipAddressSpy, "192.168.1.1");
+      expect(portSpy, ReceiveProvider.portNo);
+      expect(result, true);
+    });
+
+    test('should be not open port when did not get ip address', () async{
+      when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(null));
+      when(mockHost.listen()).thenAnswer((_)=>Future<void>.value(()=>{}));
+      verifyNever(mockHost.listen());
+      bool result = await provider!.open();
+      verifyNever(mockHost.listen());
+      expect(ipAddressSpy, null);
+      expect(portSpy, 0);
+      expect(result, false);
     });
   });
 }

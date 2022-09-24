@@ -11,6 +11,7 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 });
 
 class ReceiveProvider with ChangeNotifier {
+  static const portNo = 32099;
   static NetworkInfo networkInfo = NetworkInfo();
   late final ReceiveHostFactoryFunc builder;
   String? _ipAddress;
@@ -29,24 +30,16 @@ class ReceiveProvider with ChangeNotifier {
   ReceiveProvider({ReceiveHostFactoryFunc builder = _build}) {
     this.builder = builder;
     _fetchIpAddress();
-    // if(_ipAddress != null){
-    //   _hostComm = this.builder(ipAddress: _ipAddress!, port: 1);
-    // }
   }
 
-  Future<void> open() async{
-    // if(_hostComm == null){
-    //   _fetchIpAddress();
-    //   while(_ipAddress == null){}
-    //
-    //   _hostComm = builder(ipAddress: _ipAddress!, port: 1);
-    // }
+  Future<bool> open() async{
 
     _ipAddress ??= await networkInfo.getWifiIP();
 
-    _hostComm = builder(ipAddress: _ipAddress!, port: 1);
+    _hostComm = builder(ipAddress: _ipAddress!, port: portNo);
 
     _hostComm!.listen();
+    return true;
   }
 
   void _fetchIpAddress() async {
