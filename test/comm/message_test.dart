@@ -18,12 +18,17 @@ void commandConvertTest() {
   group('command convert test from message', () {
     test('should be return none command when receive empty string', () async {
       Message message = Message.convert(convertCommand(command: ''));
-      expect(Command.none, message.command);
+      expect(message.command, Command.none);
     });
 
     test('should be return sendfile command when receive send file string', () async {
       Message message = Message.convert(convertCommand(command: 'SEND_FILE'));
-      expect(Command.sendFile, message.command);
+      expect(message.command, Command.sendFile);
+    });
+
+    test('should be return none command when receive send file string', () async {
+      Message message = Message.convert(convertCommand(command: 'SEND_FILE'));
+      expect(message is SendFile, isTrue);
     });
   });
 }
