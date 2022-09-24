@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:silkroad/comm/host_if.dart';
@@ -36,10 +38,22 @@ class ReceiveProvider with ChangeNotifier {
 
     _ipAddress ??= await networkInfo.getWifiIP();
 
-    _hostComm = builder(ipAddress: _ipAddress!, port: portNo);
+    if(_ipAddress == null){
+      return false;
+    }
+
+    _hostComm = builder(ipAddress: _ipAddress!, port: portNo, receiveCallback: _onReceive);
 
     _hostComm!.listen();
     return true;
+  }
+
+  void close(){
+    _hostComm?.close();
+  }
+
+  void _onReceive(Socket socket, Uint8List data) {
+
   }
 
   void _fetchIpAddress() async {

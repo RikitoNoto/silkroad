@@ -6,6 +6,9 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -20,13 +23,16 @@ import 'receive_providers_test.mocks.dart';
 
 @GenerateMocks([NetworkInfo])
 @GenerateMocks([TcpHost])
+@GenerateMocks([Socket])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MockNetworkInfo networkInfoMock = MockNetworkInfo();;
   MockTcpHost mockHost = MockTcpHost();
+  MockSocket mockSocket = MockSocket();
 
   ipAddressTest(networkInfoMock);
   portTest(networkInfoMock, mockHost);
+  callbackActionTest(networkInfoMock, mockHost, mockSocket);
 }
 
 void checkIpAddress(MockNetworkInfo mock, String? returnValue, String expectAddress) async {
@@ -56,48 +62,102 @@ void ipAddressTest(MockNetworkInfo networkInfoMock) {
   });
 }
 
+ReceiveProvider? provider;
+String? ipAddressSpy;
+ReceiveCallback? receiveCallbackSpy;
+int portSpy = 0;
+void setupSpyComm(MockTcpHost mockHost){
+  ipAddressSpy = null;
+  portSpy = 0;
+  receiveCallbackSpy = null;
+
+  provider = ReceiveProvider(builder: ({
+    required String ipAddress,
+    required int port,
+    ConnectionCallback? connectionCallback,
+    ReceiveCallback? receiveCallback}){
+    ipAddressSpy = ipAddress;
+    portSpy = port;
+    receiveCallbackSpy = receiveCallback;
+    return mockHost;
+  });
+}
+
+Future<bool> openPort(String? ip, int port, MockNetworkInfo networkInfoMock){
+  when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(ip));
+  return provider!.open();
+}
+
+Future<void> checkOpenPort(String? ip, int port, bool retval, bool isCalled, MockNetworkInfo networkInfoMock, MockTcpHost mockHost) async{
+
+  when(mockHost.listen()).thenAnswer((_)=>Future<void>.value(()=>{}));
+  verifyNever(mockHost.listen());
+  bool result = await openPort(ip, port, networkInfoMock);
+  if(isCalled) {
+    verify(mockHost.listen());
+  }else{
+    verifyNever(mockHost.listen());
+  }
+
+  expect(ipAddressSpy, ip);
+  expect(portSpy, port);
+  expect(result, retval);
+}
+
 void portTest(MockNetworkInfo networkInfoMock, MockTcpHost mockHost) {
   group('port open and close test', () {
     ReceiveProvider.networkInfo = networkInfoMock;
-    ReceiveProvider? provider;
-    String? ipAddressSpy;
-    int portSpy = 0;
-
-    setUp((){
-      ipAddressSpy = null;
-      portSpy = 0;
-
-      provider = ReceiveProvider(builder: ({
-          required String ipAddress,
-          required int port,
-          ConnectionCallback? connectionCallback,
-          ReceiveCallback? receiveCallback}){
-        ipAddressSpy = ipAddress;
-        portSpy = port;
-        return mockHost;
-      });
-    });
 
     test('should be open port when call the open method', () async{
-      when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value("192.168.1.1"));
-      when(mockHost.listen()).thenAnswer((_)=>Future<void>.value(()=>{}));
-      verifyNever(mockHost.listen());
-      bool result = await provider!.open();
-      verify(mockHost.listen());
-      expect(ipAddressSpy, "192.168.1.1");
-      expect(portSpy, ReceiveProvider.portNo);
-      expect(result, true);
+      setupSpyComm(mockHost);
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, networkInfoMock, mockHost);
     });
 
     test('should be not open port when did not get ip address', () async{
-      when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(null));
-      when(mockHost.listen()).thenAnswer((_)=>Future<void>.value(()=>{}));
-      verifyNever(mockHost.listen());
-      bool result = await provider!.open();
-      verifyNever(mockHost.listen());
-      expect(ipAddressSpy, null);
-      expect(portSpy, 0);
-      expect(result, false);
+      setupSpyComm(mockHost);
+      await checkOpenPort(null, 0, false, false, networkInfoMock, mockHost);
+    });
+
+    test('should be close port when call the close method', () async{
+      setupSpyComm(mockHost);
+      when(mockHost.close()).thenAnswer((_)=>null);
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, networkInfoMock, mockHost);
+      verifyNever(mockHost.close());
+      provider!.close();
+      verify(mockHost.close());
     });
   });
 }
+
+void callbackActionTest(MockNetworkInfo networkInfoMock, MockTcpHost mockHost, MockSocket mockSocket) {
+  group('callback action test', () {
+    ReceiveProvider.networkInfo = networkInfoMock;
+
+    test('should be no action when receive empty string', () async{
+      setupSpyComm(mockHost);
+      await openPort("192.168.1.1", ReceiveProvider.portNo, networkInfoMock);
+      if(receiveCallbackSpy != null){
+        Object? obj;
+        when(mockSocket.write(obj)).thenReturn(null);
+        receiveCallbackSpy!(mockSocket, Uint8List(0));
+        verifyNever(mockSocket.write(obj));
+      }else{
+        fail("did not set receive callback.");
+      }
+    });
+
+    test('should be action when receive command SENDFILE', () async{
+      // setupSpyComm(mockHost);
+      // await openPort("192.168.1.1", ReceiveProvider.portNo, networkInfoMock);
+      // if(receiveCallbackSpy != null){
+      //   Object? obj;
+      //   when(mockSocket.write(obj)).thenReturn(null);
+      //   receiveCallbackSpy!(mockSocket, Uint8List(0));
+      //   verifyNever(mockSocket.write(obj));
+      // }else{
+      //   fail("did not set receive callback.");
+      // }
+    });
+  });
+}
+
