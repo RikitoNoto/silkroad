@@ -4,9 +4,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
 import 'package:silkroad/receive/repository/receive_item.dart';
 
+@GenerateMocks([Uint8List])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   accessorTest();
@@ -68,8 +71,28 @@ void sizeTest(){
     });
 
     test('should be return size 1024 when 1024 chars', () {
+      ReceiveItem item = createItem(data: 'A'*1024);
+      expect(item.size, 1024);
+    });
+
+    test('should be get size string 0B when empty data', () {
+      ReceiveItem item = createItem(data: '');
+      expect(item.sizeStr, '0B');
+    });
+
+    test('should be get size string 1B when one char', () {
       ReceiveItem item = createItem(data: 'A');
-      expect(item.size, 1);
+      expect(item.sizeStr, '1B');
+    });
+
+    test('should be get size string 1KB when 1024 chars', () {
+      ReceiveItem item = createItem(data: 'A'*1024);
+      expect(item.sizeStr, '1KB');
+    });
+
+    test('should be get size string 3KB when 4095 chars', () {
+      ReceiveItem item = createItem(data: 'A'*4095);
+      expect(item.sizeStr, '3KB');
     });
   });
 }
