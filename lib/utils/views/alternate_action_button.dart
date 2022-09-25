@@ -61,6 +61,9 @@ class AlternateActionButtonState extends State<AlternateActionButton>{
     if(widget.onTap != null){
       widget.onTap!(AlternateActionStatus.active);
     }
+    setState((){
+
+    });
     return true;
   }
 
@@ -70,6 +73,9 @@ class AlternateActionButtonState extends State<AlternateActionButton>{
     if(widget.onTap != null){
       widget.onTap!(AlternateActionStatus.inactive);
     }
+    setState((){
+
+    });
     return true;
   }
 
