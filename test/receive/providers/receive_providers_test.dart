@@ -21,10 +21,10 @@ import 'package:silkroad/comm/tcp_host.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'receive_providers_test.mocks.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
-import 'package:silkroad/receive/receive_item_info.dart';
+import 'package:silkroad/receive/repository/receive_item.dart';
 
 
-late AnimatedListItemModel<ReceiveItemInfo> receiveList;
+late AnimatedListItemModel<ReceiveItem> receiveList;
 
 @GenerateMocks([NetworkInfo])
 @GenerateMocks([TcpHost])
@@ -34,9 +34,9 @@ void main() {
   MockNetworkInfo networkInfoMock = MockNetworkInfo();;
   MockTcpHost mockHost = MockTcpHost();
   MockSocket mockSocket = MockSocket();
-  receiveList = AnimatedListItemModel<ReceiveItemInfo>(
+  receiveList = AnimatedListItemModel<ReceiveItem>(
     listKey: GlobalKey<AnimatedListState>(),
-    removedItemBuilder: (ReceiveItemInfo item, BuildContext context, Animation<double> animation) => Text(''),
+    removedItemBuilder: (ReceiveItem item, BuildContext context, Animation<double> animation) => Text(''),
   );
 
   ipAddressTest(networkInfoMock);

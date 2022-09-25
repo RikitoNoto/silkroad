@@ -7,7 +7,7 @@ import 'package:silkroad/comm/host_if.dart';
 import 'package:silkroad/comm/tcp_host.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
-import 'package:silkroad/receive/receive_item_info.dart';
+import 'package:silkroad/receive/repository/receive_item.dart';
 
 typedef ReceiveHostFactoryFunc = HostIF Function({
   required String ipAddress,
@@ -59,10 +59,10 @@ class ReceiveProvider with ChangeNotifier {
     Message message = Message.convert(data);
 
     if(message is SendFile){
-      ReceiveItemInfo item = ReceiveItemInfo(
+      ReceiveItem item = ReceiveItem(
         iconData: Icons.text_snippet_outlined,
         name: message.getDataStr(SendFile.dataIndexName),
-        size: 0,
+        data: Uint8List(0),
         sender: socket.toString(),
       );
       _receiveList.insert(_receiveList.length, item);

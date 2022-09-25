@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'receive_list_item.dart';
-import '../receive_item_info.dart';
+import '../repository/receive_item.dart';
 
 // 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
@@ -16,23 +16,23 @@ class ReceivePage extends StatefulWidget {
 
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
-  late AnimatedListItemModel<ReceiveItemInfo> _receiveList;
+  late AnimatedListItemModel<ReceiveItem> _receiveList;
 
-  final List<ReceiveItemInfo> _debugReceiveItems = [
-    const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
-    const ReceiveItemInfo(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
-    const ReceiveItemInfo(iconData: Icons.add_task, name: "task", size: 679, sender: "adder"),
-    const ReceiveItemInfo(iconData: Icons.wifi_tethering_error_outlined, name: "error", size: 7, sender: "buglover"),
-    const ReceiveItemInfo(iconData: Icons.volume_mute_sharp, name: "volume", size: 1000, sender: "pin"),
-    const ReceiveItemInfo(iconData: Icons.video_stable, name: "video", size: 6797, sender: "ummm"),
-    const ReceiveItemInfo(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
-    const ReceiveItemInfo(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
+  final List<ReceiveItem> _debugReceiveItems = [
+    ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(0), sender: "update"),
+    ReceiveItem(iconData: Icons.add_moderator, name: "moderator", data: Uint8List(0), sender: "adder"),
+    ReceiveItem(iconData: Icons.add_task, name: "task", data: Uint8List(0), sender: "adder"),
+    ReceiveItem(iconData: Icons.wifi_tethering_error_outlined, name: "error", data: Uint8List(0), sender: "buglover"),
+    ReceiveItem(iconData: Icons.volume_mute_sharp, name: "volume", data: Uint8List(0), sender: "pin"),
+    ReceiveItem(iconData: Icons.video_stable, name: "video", data: Uint8List(0), sender: "ummm"),
+    ReceiveItem(iconData: Icons.turn_sharp_right, name: "turn", data: Uint8List(0), sender: "right"),
+    ReceiveItem(iconData: Icons.timer_10, name: "timer", data: Uint8List(0), sender: "cool"),
   ];
 
   @override
   void initState() {
     super.initState();
-    _receiveList = AnimatedListItemModel<ReceiveItemInfo>(
+    _receiveList = AnimatedListItemModel<ReceiveItem>(
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
@@ -98,7 +98,7 @@ class _ReceivePageState extends State<ReceivePage>{
     );
   }
 
-  Widget _removeItem(ReceiveItemInfo item, BuildContext context, Animation<double> animation)
+  Widget _removeItem(ReceiveItem item, BuildContext context, Animation<double> animation)
   {
     return ReceiveListItemRemoving(
         iconData: item.iconData,
