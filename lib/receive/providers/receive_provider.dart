@@ -1,9 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:silkroad/comm/host_if.dart';
 import 'package:silkroad/comm/tcp_host.dart';
+import 'package:silkroad/comm/message.dart';
+import 'package:silkroad/utils/models/animated_list_item_model.dart';
+import 'package:silkroad/receive/receive_item_info.dart';
 
 typedef ReceiveHostFactoryFunc = HostIF Function({
   required String ipAddress,
@@ -13,11 +17,15 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 });
 
 class ReceiveProvider with ChangeNotifier {
+  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList {
+    _fetchIpAddress();
+  }
   static const portNo = 32099;
   static NetworkInfo networkInfo = NetworkInfo();
-  late final ReceiveHostFactoryFunc builder;
+  final ReceiveHostFactoryFunc builder;
   String? _ipAddress;
   HostIF? _hostComm;
+  final AnimatedListItemModel _receiveList;
 
 
   static HostIF _build({
@@ -27,11 +35,6 @@ class ReceiveProvider with ChangeNotifier {
     ReceiveCallback? receiveCallback
   }){
     return TcpHost(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
-  }
-
-  ReceiveProvider({ReceiveHostFactoryFunc builder = _build}) {
-    this.builder = builder;
-    _fetchIpAddress();
   }
 
   Future<bool> open() async{
@@ -53,7 +56,17 @@ class ReceiveProvider with ChangeNotifier {
   }
 
   void _onReceive(Socket socket, Uint8List data) {
+    Message message = Message.convert(data);
 
+    if(message is SendFile){
+      ReceiveItemInfo item = ReceiveItemInfo(
+        iconData: Icons.text_snippet_outlined,
+        name: message.getDataStr(SendFile.dataIndexName),
+        size: 0,
+        sender: socket.toString(),
+      );
+      _receiveList.insert(_receiveList.length, item);
+    }
   }
 
   void _fetchIpAddress() async {

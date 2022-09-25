@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
-import 'package:silkroad/utils/views/animated_list_item_model.dart';
+import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 

@@ -18,13 +18,13 @@ class AnimatedListItemModel<E> {
 
   void insert(int index, E item, {Duration duration = _durationDefault}) {
     _items.insert(index, item);
-    _animatedList!.insertItem(index, duration: duration);
+    _animatedList?.insertItem(index, duration: duration);
   }
 
   E removeAt(int index) {
     final E removedItem = _items.removeAt(index);
     if (removedItem != null) {
-      _animatedList!.removeItem(
+      _animatedList?.removeItem(
         index,
             (BuildContext context, Animation<double> animation) {
           return removedItemBuilder(removedItem, context, animation);
