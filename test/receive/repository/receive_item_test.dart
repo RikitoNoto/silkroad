@@ -9,11 +9,11 @@ import 'package:mockito/mockito.dart';
 
 import 'package:silkroad/receive/repository/receive_item.dart';
 
-@GenerateMocks([Uint8List])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   accessorTest();
   sizeTest();
+  iconTest();
 }
 
 void accessorTest(){
@@ -58,6 +58,13 @@ ReceiveItem createItem({iconData=Icons.image, name='test.dart', data: '', sender
     sender: sender);
 }
 
+ReceiveItem createItemWithoutIcon({name='test.dart', data: '', sender: 'no name'}){
+  return ReceiveItem(
+      name: name,
+      data: Uint8List.fromList(utf8.encode(data)),
+      sender: sender);
+}
+
 void sizeTest(){
   group('calculate size test', () {
     test('should be return size 0 when empty data', () {
@@ -91,8 +98,31 @@ void sizeTest(){
     });
 
     test('should be get size string 3KB when 4095 chars', () {
-      ReceiveItem item = createItem(data: 'A'*4095);
-      expect(item.sizeStr, '3KB');
+      ReceiveItem item = createItem(data: 'A'*1024*1024);
+      expect(item.sizeStr, '1MB');
+    });
+
+    test('should be get size string 3KB when 4095 chars', () {
+      ReceiveItem item = createItem(data: 'AAB'*1024*1024);
+      expect(item.sizeStr, '3MB');
     });
   });
+}
+
+
+void iconTest(){
+  group('set icon test', () {
+    test('should be auto set icon description default', () {
+      ReceiveItem item = createItemWithoutIcon(name: 'A');
+      expect(item.iconData, Icons.description);
+    });
+  });
+}
+
+void tempFileTest(){
+  group('create temp file test', () {
+    test('should be create temp file.', () {
+    });
+  });
+
 }
