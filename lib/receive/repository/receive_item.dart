@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 
 import 'package:flutter/material.dart';
+import 'package:silkroad/utils/suffix_to_Icon_converter.dart';
 
 
 class ReceiveItem{
@@ -9,10 +10,22 @@ class ReceiveItem{
     required this.name,
     required Uint8List data,
     required this.sender,
-    this.iconData = Icons.description,
+    IconData? iconData,
   }){
     size = data.length;
     sizeStr = _convertSizeStr(size);
+    // if there is the icon arg.
+    if(iconData != null){
+      this.iconData = iconData; // set the arg icon.
+    }
+    // if there is no icon arg and can convert an icon from the name.
+    else if(SuffixToIconConverter.convertIcon(name) != null){
+      this.iconData = SuffixToIconConverter.convertIcon(name)!; // set the convert result.
+    }
+    // can't know icon.
+    else{
+      this.iconData = Icons.description;  // set description icon.
+    }
   }
   static const int _sizeBase = 1024;
   static const List<String> _sizeUint = <String>['B', 'KB', 'MB', 'GB', 'TB'];
@@ -29,7 +42,7 @@ class ReceiveItem{
     return sizeStr;
   }
 
-  final IconData iconData;            /// アイコンデータ
+  late final IconData iconData;            /// アイコンデータ
   final String name;                  /// ファイル名
   late final int size;                /// ファイルサイズ
   late final String sizeStr;          /// ファイルサイズ文字列

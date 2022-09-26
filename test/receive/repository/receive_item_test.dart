@@ -116,6 +116,11 @@ void iconTest(){
       ReceiveItem item = createItemWithoutIcon(name: 'A');
       expect(item.iconData, Icons.description);
     });
+
+    test('should be auto set icon image when suffix is [jpg]', () {
+      ReceiveItem item = createItemWithoutIcon(name: 'A.jpg');
+      expect(item.iconData, Icons.image);
+    });
   });
 }
 
