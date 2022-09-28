@@ -40,6 +40,7 @@ void main() {
   });
 
   tearDown(() async{
+    await Future.delayed(const Duration(milliseconds: 5));  // wait to finish file thread.
     await deleteSpyDirTree();
   });
   tempFileTest();
@@ -158,8 +159,16 @@ void tempFileTest(){
   group('create temp file test', () {
     test('should be create temp file.', () async{
       ReceiveItem item = createItem(name: 'temp.dart');
-      await Future.delayed(Duration(milliseconds: 1));  // wait to create temp file.
+      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
       expect(await File(p.join(kTempDir.path, 'temp.dart')).exists(), isTrue);
+    });
+
+    test('should be write receive content.', () async{
+      ReceiveItem item = createItem(name: 'temp.dart', data: 'should be write receive content.');
+      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
+      File file = File(p.join(kTempDir.path, 'temp.dart'));
+      expect(await file.exists(), isTrue);
+      expect(await file.readAsString(), 'should be write receive content.');
     });
   });
 

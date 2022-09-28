@@ -43,6 +43,9 @@ class ReceiveItem{
   Future _createTempFile({required name, required Uint8List data}) async{
     File tempFile = File(p.join((await getTemporaryDirectory()).path, name));
     await tempFile.create();
+
+    await tempFile.writeAsBytes(data);
+
   }
 
   static String _convertSizeStr(int size){
