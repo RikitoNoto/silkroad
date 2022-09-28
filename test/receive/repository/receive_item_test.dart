@@ -1,4 +1,4 @@
-
+import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -6,14 +6,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import '../../spy/path_provider_spy.dart';
 
 import 'package:silkroad/receive/repository/receive_item.dart';
+
+Directory kSpyRootDir = Directory(p.join('test','temp'));
+Directory kTempDir = Directory(p.join(kSpyRootDir.path, 'temp'));
+
+Future constructSpyDirTree() async{
+  await kSpyRootDir.create(recursive: true);
+  await kTempDir.create(recursive: true);
+}
+
+Future deleteSpyDirTree() async{
+  await kSpyRootDir.delete(recursive: true);
+}
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   accessorTest();
   sizeTest();
   iconTest();
+
+  setUpAll((){
+    PathProviderPlatformSpy.temporaryPath = kTempDir.path;
+  });
+
+  setUp(() async{
+    await constructSpyDirTree();
+    PathProviderPlatformSpy();
+  });
+
+  tearDown(() async{
+    await deleteSpyDirTree();
+  });
+  tempFileTest();
 }
 
 void accessorTest(){
@@ -49,6 +78,7 @@ void accessorTest(){
     });
   });
 }
+
 
 ReceiveItem createItem({iconData=Icons.image, name='test.dart', data: '', sender: 'no name'}){
   return ReceiveItem(
@@ -126,8 +156,12 @@ void iconTest(){
 
 void tempFileTest(){
   group('create temp file test', () {
-    test('should be create temp file.', () {
+    test('should be create temp file.', () async{
+      ReceiveItem item = createItem(name: 'temp.dart');
+      await Future.delayed(Duration(milliseconds: 1));  // wait to create temp file.
+      expect(await File(p.join(kTempDir.path, 'temp.dart')).exists(), isTrue);
     });
   });
 
 }
+
