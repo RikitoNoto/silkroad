@@ -15,9 +15,9 @@ Map<Command, _MessageFactoryMethod> _commandToClassTable = {
 };
 
 abstract class Message{
-  const Message({required this.command});
+  const Message(command);
 
-  final Command command;
+  Command get command;
 
   static Map<String, Command> commandConvertTable = {
     'SEND_FILE' : Command.sendFile,
@@ -41,10 +41,10 @@ abstract class Message{
 }
 
 class None implements Message{
-  const None({required this.receiveData}) : this.command = Command.none;
+  const None({required this.receiveData});
 
   @override
-  final Command command;
+  Command get command => Command.none;
 
   final Uint8List receiveData;
 
@@ -67,14 +67,13 @@ class SendFile implements Message{
   static const int dataIndexName = 0;
   static const int dataIndexFile = 1;
 
-  SendFile({required this.receiveData}) : this.command = Command.sendFile
-  {
+  SendFile({required this.receiveData}){
     name = _fetchName(receiveData);
     fileData = _fetchFileData(receiveData);
   }
 
   @override
-  final Command command;
+  Command get command => Command.sendFile;
 
   late final String name;
   late final Uint8List fileData;
