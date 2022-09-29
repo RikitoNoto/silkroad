@@ -34,7 +34,7 @@ class ReceiveItem{
     else if(SuffixToIconConverter.convertIcon(name) != null){
       this.iconData = SuffixToIconConverter.convertIcon(name)!; // set the convert result.
     }
-    // can't know icon.
+    // don't know icon.
     else{
       this.iconData = Icons.description;  // set description icon.
     }
