@@ -56,7 +56,7 @@ class ReceiveProvider with ChangeNotifier {
   }
 
   void _onReceive(Socket socket, Uint8List data) {
-    Message message = Message.convert(data);
+    Message message = Message(data);
 
     if(message is SendFile){
       ReceiveItem item = ReceiveItem(

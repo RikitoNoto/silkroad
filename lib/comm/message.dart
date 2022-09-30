@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:silkroad/comm/comm.dart';
-
 enum Command{
   none,
   sendFile,
@@ -15,18 +13,7 @@ Map<Command, _MessageFactoryMethod> _commandToClassTable = {
 };
 
 abstract class Message{
-  const Message(command);
-
-  Command get command;
-
-  static Map<String, Command> commandConvertTable = {
-    'SEND_FILE' : Command.sendFile,
-  };
-
-  String getDataStr(int index);
-  Uint8List getDataBin(int index);
-
-  static Message convert(Uint8List data){
+  factory Message(Uint8List data){
     String? commandStr = RegExp('^(.*)\n').firstMatch(String.fromCharCodes(data))?.group(1);
 
     Command command = commandConvertTable[commandStr] != null ?  commandConvertTable[commandStr]! : Command.none;
@@ -37,6 +24,15 @@ abstract class Message{
 
     return _commandToClassTable[command]!(data);
   }
+
+  Command get command;
+
+  static Map<String, Command> commandConvertTable = {
+    'SEND_FILE' : Command.sendFile,
+  };
+
+  String getDataStr(int index);
+  Uint8List getDataBin(int index);
 
 }
 
@@ -66,16 +62,21 @@ class None implements Message{
 class SendFile implements Message{
   static const int dataIndexName = 0;
   static const int dataIndexFile = 1;
+  static const int dataIndexSender = 1;
 
   SendFile({required this.receiveData}){
-    name = _fetchName(receiveData);
-    fileData = _fetchFileData(receiveData);
+    RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(receiveData));
+    String header = dataSplitter?.group(1) ?? '';
+    fileData = Uint8List.fromList(utf8.encode(dataSplitter?.group(2) ?? ''));
+    name = _fetchName(header);
+    sender = _fetchSender(header);
   }
 
   @override
   Command get command => Command.sendFile;
 
   late final String name;
+  late final String sender;
   late final Uint8List fileData;
   final Uint8List receiveData;
 
@@ -85,7 +86,16 @@ class SendFile implements Message{
 
   @override
   String getDataStr(int index) {
-    return name;
+    String data = '';
+    switch(index){
+      case dataIndexName:
+        data = name;
+        break;
+      case dataIndexSender:
+        data = sender;
+        break;
+    }
+    return data;
   }
 
   @override
@@ -93,26 +103,16 @@ class SendFile implements Message{
     return fileData;
   }
 
-  static String _fetchName(Uint8List data){
-    String name;
-    String? match = RegExp('^name:(.*)', multiLine: true).firstMatch(String.fromCharCodes(data))?.group(1);
-    if(match != null){
-      name = match;
-    }else{
-      name = '';
-    }
-    return name;
+  static String _fetchName(String data){
+    return _fetchSectionValue(data, 'name');
   }
 
-  static Uint8List _fetchFileData(Uint8List data){
-    Uint8List fileData;
-    String? match = RegExp('^file:(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(data))?.group(1);
+  static String _fetchSender(String data){
+    return _fetchSectionValue(data, 'sender');
+  }
 
-    if(match != null){
-      fileData = Uint8List.fromList(utf8.encode(match));
-    }else{
-      fileData = Uint8List.fromList(utf8.encode(''));
-    }
-    return fileData;
+  static String _fetchSectionValue(String data, String sectionName){
+    String? match = RegExp('^${sectionName}:(.*)', multiLine: true).firstMatch(data)?.group(1);
+    return match ?? '';
   }
 }
