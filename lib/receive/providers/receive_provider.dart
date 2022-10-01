@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:silkroad/comm/host_if.dart';
 import 'package:silkroad/comm/tcp_host.dart';
@@ -13,7 +12,7 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
   required String ipAddress,
   required int port,
   ConnectionCallback? connectionCallback,
-  ReceiveCallback? receiveCallback
+  ReceiveCallback? receiveCallback,
 });
 
 class ReceiveProvider with ChangeNotifier {
@@ -60,10 +59,9 @@ class ReceiveProvider with ChangeNotifier {
 
     if(message is SendFile){
       ReceiveItem item = ReceiveItem(
-        iconData: Icons.text_snippet_outlined,
-        name: message.getDataStr(SendFile.dataIndexName),
-        data: Uint8List(0),
-        sender: socket.toString(),
+        name: message.name,
+        data: message.fileData,
+        sender: message.sender,
       );
       _receiveList.insert(_receiveList.length, item);
     }

@@ -12,20 +12,13 @@ import '../../spy/path_provider_spy.dart';
 
 import 'package:silkroad/receive/repository/receive_item.dart';
 
-Directory kSpyRootDir = Directory(p.join('test','temp'));
-Directory kTempDir = Directory(p.join(kSpyRootDir.path, 'temp'));
-
-Future constructSpyDirTree() async{
-  await kSpyRootDir.create(recursive: true);
-  await kTempDir.create(recursive: true);
-}
-
-Future deleteSpyDirTree() async{
-  await kSpyRootDir.delete(recursive: true);
-}
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  kSpyRootDir = Directory(p.join('test','temp'));
+  kTempDir = Directory(p.join(kSpyRootDir.path, 'temp'));
+
   accessorTest();
   sizeTest();
   iconTest();
@@ -35,13 +28,11 @@ void main() {
   });
 
   setUp(() async{
-    await constructSpyDirTree();
-    PathProviderPlatformSpy();
+    await pathProviderSetUp();
   });
 
   tearDown(() async{
-    await Future.delayed(const Duration(milliseconds: 5));  // wait to finish file thread.
-    await deleteSpyDirTree();
+    await pathProviderTearDown();
   });
   tempFileTest();
 }

@@ -1,6 +1,31 @@
+import 'dart:io';
+
+import 'package:mockito/mockito.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:mockito/mockito.dart';
+
+Directory kSpyRootDir = Directory(p.join('test','temp'));
+Directory kTempDir = Directory(p.join(kSpyRootDir.path, 'temp'));
+
+Future constructSpyDirTree() async{
+  await kSpyRootDir.create(recursive: true);
+  await kTempDir.create(recursive: true);
+}
+
+Future deleteSpyDirTree() async{
+  await kSpyRootDir.delete(recursive: true);
+}
+
+Future pathProviderSetUp() async{
+  await constructSpyDirTree();
+  PathProviderPlatformSpy();
+}
+
+Future pathProviderTearDown() async{
+  await Future.delayed(const Duration(milliseconds: 5));  // wait to finish file thread.
+  await deleteSpyDirTree();
+}
 
 class PathProviderPlatformSpy extends Fake
     with MockPlatformInterfaceMixin
