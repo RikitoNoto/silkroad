@@ -7,16 +7,16 @@ import 'package:path/path.dart' as p;
 
 import 'package:silkroad/utils/suffix_to_Icon_converter.dart';
 
-
+/// receive item class.
 class ReceiveItem{
   static const int _sizeBase = 1024;
-  static const List<String> _sizeUint = <String>['B', 'KB', 'MB', 'GB', 'TB'];
+  static const List<String> _sizeUnit = <String>['B', 'KB', 'MB', 'GB', 'TB'];
 
-  late final IconData iconData;            /// アイコンデータ
-  final String name;                  /// ファイル名
-  late final int size;                /// ファイルサイズ
-  late final String sizeStr;          /// ファイルサイズ文字列
-  final String sender;                /// 送信者名
+  late final IconData iconData;
+  final String name;                  /// file name
+  late final int size;                /// file size
+  late final String sizeStr;          /// file size string
+  final String sender;
 
   ReceiveItem({required this.name, required Uint8List data, required this.sender, IconData? iconData,}){
     size = data.length;
@@ -56,7 +56,7 @@ class ReceiveItem{
       size = size ~/ _sizeBase;
       expCount++;
     }
-    sizeStr = '${size}${_sizeUint[expCount]}';
+    sizeStr = '$size${_sizeUnit[expCount]}';
     return sizeStr;
   }
 
