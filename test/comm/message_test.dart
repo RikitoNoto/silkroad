@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:silkroad/comm/message.dart';
 
@@ -15,7 +14,7 @@ Uint8List convertCommand({command=''}){
 }
 
 Uint8List convertSendFileCommand({name='', file='', sender=''}){
-  return Uint8List.fromList(utf8.encode('SEND_FILE\nname:${name}\nsender:${sender}\n\n${file}'));
+  return Uint8List.fromList(utf8.encode('SEND_FILE\nname:$name\nsender:$sender\n\n$file'));
 }
 
 void commandNoneTest() {
@@ -29,7 +28,7 @@ void commandNoneTest() {
 
 void commandSendFileTest() {
   group('command send file test', () {
-    test('should be return sendfile command when receive send file string', () async {
+    test('should be return send file command when receive send file string', () async {
       Message message = Message(convertSendFileCommand());
       expect(message.command, Command.sendFile);
     });
@@ -72,6 +71,12 @@ void dataSendFileTest(){
       Message message = Message(convertSendFileCommand(file: '\n\n'));
       expect(message is SendFile, isTrue);
       expect(String.fromCharCodes(message.getDataBin(SendFile.dataIndexFile)), '\n\n');
+    });
+
+    test('should be able to get data as string', () async {
+      Message message = Message(convertSendFileCommand(file: 'AAA'));
+      expect(message is SendFile, isTrue);
+      expect(message.getDataStr(SendFile.dataIndexFile), 'AAA');
     });
   });
 }

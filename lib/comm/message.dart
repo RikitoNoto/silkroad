@@ -62,7 +62,7 @@ class None implements Message{
 class SendFile implements Message{
   static const int dataIndexName = 0;
   static const int dataIndexFile = 1;
-  static const int dataIndexSender = 1;
+  static const int dataIndexSender = 2;
 
   SendFile({required this.receiveData}){
     RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(receiveData));
@@ -91,6 +91,9 @@ class SendFile implements Message{
       case dataIndexName:
         data = name;
         break;
+      case dataIndexFile:
+        data = String.fromCharCodes(fileData);
+        break;
       case dataIndexSender:
         data = sender;
         break;
@@ -112,7 +115,7 @@ class SendFile implements Message{
   }
 
   static String _fetchSectionValue(String data, String sectionName){
-    String? match = RegExp('^${sectionName}:(.*)', multiLine: true).firstMatch(data)?.group(1);
+    String? match = RegExp('^$sectionName:(.*)', multiLine: true).firstMatch(data)?.group(1);
     return match ?? '';
   }
 }
