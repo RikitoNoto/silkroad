@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:silkroad/home/views/home_view.dart';
+import 'package:silkroad/send/views/send_view.dart';
+import 'package:silkroad/receive/views/receive_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,7 +44,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: materialWhite,
       ),
       darkTheme: ThemeData.dark(),
-      home: const HomePage(),
+      // home: const HomePage(),
+
+      initialRoute: '/',
+      routes: {
+        '/' : (context) => const HomePage(),
+        '/send' : (context) => const SendPage(),
+        '/receive' : (context) => const ReceivePage(),
+      },
     );
   }
 }
