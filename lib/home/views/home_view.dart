@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
                     labelText: 'your name',
                     contentPadding: EdgeInsets.symmetric(horizontal: 10),
                     border: OutlineInputBorder(),
+                    focusColor: Colors.lightBlue,
+
                   ),
                   maxLines: 1,
                 ),
@@ -53,13 +55,20 @@ class _HomePageState extends State<HomePage> {
         child: ElevatedButton(
           onPressed:() {},
           child: SizedBox(
-            width: double.infinity,
+            width: 200,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SvgPicture.asset(
                   svgPath,
+                  height: 90,
                 ),
-                Text(label),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 40,
+                  ),
+                ),
               ],
             ),
           ),
