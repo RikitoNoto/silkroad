@@ -23,6 +23,23 @@ class SilkRoadApp extends StatelessWidget {
       900 : Color(0x1FFFFFFF),
     },
   );
+
+  final MaterialColor materialBlack = const MaterialColor(
+    0xFF000000,
+    <int, Color>{
+      50  : Color(0xDD000000),
+      100 : Color(0x8A000000),
+      200 : Color(0x73000000),
+      300 : Color(0x61000000),
+      400 : Color(0x42000000),
+      500 : Color(0x1F000000),
+      600 : Color(0x4DFFFFFF),
+      700 : Color(0x3DFFFFFF),
+      800 : Color(0x1FFFFFFF),
+      900 : Color(0x1FFFFFFF),
+    },
+  );
+
   const SilkRoadApp({super.key});
 
   // This widget is the root of your application.
@@ -33,7 +50,16 @@ class SilkRoadApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: materialWhite,
       ),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData.dark().copyWith(
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.grey),
+          ),
+        ),
+      ),
+      // darkTheme: ThemeData(
+      //   primarySwatch: Colors.grey,
+      // ),
       // home: const HomePage(),
 
       initialRoute: '/',

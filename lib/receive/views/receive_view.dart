@@ -1,4 +1,3 @@
-// 受信画面
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
@@ -6,7 +5,6 @@ import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 
-// 受信画面描画クラス
 class ReceivePage extends StatefulWidget {
   const ReceivePage({super.key});
 
@@ -28,6 +26,7 @@ class _ReceivePageState extends State<ReceivePage>{
     const ReceiveItemInfo(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
     const ReceiveItemInfo(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
   ];
+
 
   @override
   void initState() {
@@ -112,10 +111,10 @@ class _ReceivePageState extends State<ReceivePage>{
   Widget _buildBody(BuildContext context)
   {
     return Container(
-      color: Colors.white,
+      color: _getBackgroundColor(context),
       child: Column(
         children: [
-          // 入力欄
+          // input field
           Row(
             children: [
               Expanded(
@@ -123,7 +122,8 @@ class _ReceivePageState extends State<ReceivePage>{
                   padding: const EdgeInsets.all(10.0),
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      fillColor: Colors.lightBlue[50],
+                      // fillColor: Colors.grey[100],
+                      // fillColor: _getBackgroundColor(context),
                       filled: true,
                       prefixIcon: const Icon(Icons.language),
                       labelText: "My Ipaddress",
@@ -135,7 +135,7 @@ class _ReceivePageState extends State<ReceivePage>{
                       child: const Text(
                         "0.0.0.0",
                         style: TextStyle(
-                          color: Colors.black,
+                          // color: Colors.black,
                           fontSize: 24,
                         ),
                       ),
@@ -144,22 +144,40 @@ class _ReceivePageState extends State<ReceivePage>{
                 ),
               ),
 
-              const AlternateActionButton(
+              AlternateActionButton(
                 startIcon: Icons.play_arrow,
                 endIcon: Icons.pause,
+                progressIndicatorColor: Colors.blue,
+                iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
               ),
             ],
           ),
-          // 受信リスト
+
+          // receive list
           Flexible(
-            child: AnimatedList(
-              key: _listKey,
-              itemBuilder: _buildItem,
+            child: Container(
+              // color: Colors.grey[100],
+              color: _getBackgroundColor(context),
+              child: AnimatedList(
+                key: _listKey,
+                itemBuilder: _buildItem,
+              ),
             ),
           ),
         ]
       )
     );
+  }
+
+  Color _getBackgroundColor(BuildContext context){
+    Color? backgroundColor;
+    if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+      backgroundColor = Colors.grey[100];
+    }
+    else{
+      backgroundColor = Colors.grey[600];
+    }
+    return backgroundColor ?? Colors.grey;
   }
 }
 

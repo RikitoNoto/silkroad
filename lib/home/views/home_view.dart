@@ -33,11 +33,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               _buildActionSelectButton(
+                context,
                 label: 'Send',
                 svgPath: 'assets/icons/transfer-in.svg',
                 onPressed: () => Navigator.pushNamed(context, '/send'),
               ),
               _buildActionSelectButton(
+                context,
                 label: 'Receive',
                 svgPath: 'assets/icons/transfer-out.svg',
                 onPressed: () => Navigator.pushNamed(context, '/receive'),
@@ -49,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActionSelectButton({required String label, required String svgPath, void Function()? onPressed}){
+  Widget _buildActionSelectButton(BuildContext context, {required String label, required String svgPath, void Function()? onPressed}){
     return SizedBox(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 50),
@@ -66,6 +68,7 @@ class _HomePageState extends State<HomePage> {
                 SvgPicture.asset(
                   svgPath,
                   height: 90,
+                  color: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
                 ),
                 Text(
                   label,
