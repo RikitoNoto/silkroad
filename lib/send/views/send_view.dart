@@ -1,10 +1,9 @@
-// 送信画面
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:silkroad/utils/views/theme_input_field.dart';
 
-// 送信画面描画クラス
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
 
@@ -24,18 +23,21 @@ class _SendPageState extends State<SendPage>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Send"),
-      ),
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Send"),
+        ),
 
-      body: _buildBody(context),
-      floatingActionButton: FloatingActionButton(
-        onPressed: ()=>{
+        body: _buildBody(context),
+        floatingActionButton: FloatingActionButton(
+          onPressed: ()=>{
 
-        },
-        tooltip: 'Send',
-        child: const Icon(Icons.send),
+          },
+          tooltip: 'Send',
+          child: const Icon(Icons.send),
+        ),
       ),
     );
   }
@@ -47,8 +49,8 @@ class _SendPageState extends State<SendPage>{
         color: Colors.white,
         child: Column(
             children: [
-              _buildIpField(context), // IPアドレスフィールド
-              _buildFileSelector(),   // ファイルセレクター
+              _buildIpField(context), // ip address input field
+              _buildFileSelector(),   // file selector
             ]
         )
     );
@@ -69,6 +71,7 @@ class _SendPageState extends State<SendPage>{
         child: IntrinsicHeight(
           child: Row(
             children: [
+              //TODO: input action next does not work, because input field is in other state.
               _buildOctetField(),
               _buildComma(),
               _buildOctetField(),
@@ -100,13 +103,10 @@ class _SendPageState extends State<SendPage>{
     return Expanded(
       child: SizedBox(
         height: 30,
-        child: TextField(
+
+        child: ThemeInputField(
           textInputAction: textInputAction,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.symmetric(horizontal: 10),
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 1,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         ),
       ),
     );

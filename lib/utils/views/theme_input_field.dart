@@ -5,10 +5,12 @@ class ThemeInputField extends StatefulWidget {
     super.key,
     this.labelText,
     this.contentPadding,
+    this.textInputAction,
   });
 
   final String? labelText;
   final EdgeInsetsGeometry? contentPadding;
+  final TextInputAction? textInputAction;
 
   @override
   State<ThemeInputField> createState() => _ThemeInputFieldState();
@@ -41,6 +43,7 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
             )
           ),
         ),
+        textInputAction: widget.textInputAction,
         maxLines: 1,
       ),
     );

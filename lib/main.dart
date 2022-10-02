@@ -4,10 +4,10 @@ import 'package:silkroad/send/views/send_view.dart';
 import 'package:silkroad/receive/views/receive_view.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SilkRoadApp());
 }
 
-class MyApp extends StatelessWidget {
+class SilkRoadApp extends StatelessWidget {
   final MaterialColor materialWhite = const MaterialColor(
     0xFFFFFFFF,
     <int, Color>{
@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
       900 : Color(0x1FFFFFFF),
     },
   );
-  const MyApp({super.key});
+  const SilkRoadApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Silk road',
       theme: ThemeData(
         primarySwatch: materialWhite,
       ),
