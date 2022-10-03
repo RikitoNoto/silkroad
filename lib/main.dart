@@ -57,11 +57,6 @@ class SilkRoadApp extends StatelessWidget {
           ),
         ),
       ),
-      // darkTheme: ThemeData(
-      //   primarySwatch: Colors.grey,
-      // ),
-      // home: const HomePage(),
-
       initialRoute: '/',
       onGenerateRoute: (settings) {
         switch(settings.name) {
