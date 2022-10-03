@@ -28,16 +28,22 @@ class _SendPageState extends State<SendPage>{
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Send"),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: () {},
+            )
+          ],
         ),
 
         body: _buildBody(context),
-        floatingActionButton: FloatingActionButton(
-          onPressed: ()=>{
-
-          },
-          tooltip: 'Send',
-          child: const Icon(Icons.send),
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: ()=>{
+        //
+        //   },
+        //   tooltip: 'Send',
+        //   child: const Icon(Icons.send),
+        // ),
       ),
     );
   }
@@ -45,14 +51,11 @@ class _SendPageState extends State<SendPage>{
 
   Widget _buildBody(BuildContext context)
   {
-    return Container(
-        color: Colors.white,
-        child: Column(
-            children: [
-              _buildIpField(context), // ip address input field
-              _buildFileSelector(),   // file selector
-            ]
-        )
+    return Column(
+      children: [
+        _buildIpField(context), // ip address input field
+        _buildFileSelector(),   // file selector
+      ]
     );
   }
 
@@ -60,7 +63,6 @@ class _SendPageState extends State<SendPage>{
   {
     return Container(
       padding: const EdgeInsets.all(_ipFieldOutPadding),
-      color: Colors.white,
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: _ipFieldLabelText,

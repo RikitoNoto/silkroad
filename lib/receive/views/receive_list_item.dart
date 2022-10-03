@@ -8,8 +8,10 @@ mixin _ListItemBuilder{
   static const double _iconSize = 40.0;                     /// icon size
   static const double _sizeAndSenderWidth = 64.0;           /// size and sender column width
 
-  static const Color _itemLightModeColor = Colors.white;    /// white mode item color
-  static const Color _itemDarkModeColor = Colors.black54;   /// dark mode item color
+  static const Color _itemLightModeColor = Colors.white;      /// white mode item color
+  static const Color _itemDarkModeColor = Colors.black54;     /// dark mode item color
+  // static const Color _itemDarkModeColorOdd  = Colors.black26;  /// odd numbered item color in dark
+  // static const Color _itemDarkModeColorEven = Colors.black54;  /// even numbered item color in dark
 
   static Color _itemBackgroundColor = Colors.white;   /// item back ground color
   static Color _itemForegroundColor = Colors.black;   /// item font color
@@ -35,9 +37,9 @@ mixin _ListItemBuilder{
     color: _itemBackgroundColor,
   );
 
-  static const EdgeInsetsGeometry _itemPadding = EdgeInsets.only(top: 4);
+  static const EdgeInsetsGeometry _itemPadding = EdgeInsets.only(top: 0);
 
-  static Widget build(BuildContext context, {required iconData, required name, required size, required sender,})
+  static Widget build(BuildContext context, {required index, required iconData, required name, required size, required sender,})
   {
     // is light mode.
     if(MediaQuery.platformBrightnessOf(context) == Brightness.light){
@@ -47,6 +49,12 @@ mixin _ListItemBuilder{
     // is dark mode.
     else{
       _itemForegroundColor = Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+      // if(index % 2 == 0){
+      //   _itemBackgroundColor = _itemDarkModeColorEven;
+      // }
+      // else{
+      //   _itemBackgroundColor = _itemDarkModeColorOdd;
+      // }
       _itemBackgroundColor = _itemDarkModeColor;
     }
 
@@ -190,7 +198,7 @@ mixin _ListItemBuilder{
 }
 
 ///
-/// 受信リストアイテムクラス
+/// Receive list item for add.
 ///
 class ReceiveListItem extends StatelessWidget{
   ReceiveListItem({
@@ -199,14 +207,16 @@ class ReceiveListItem extends StatelessWidget{
     required this.size,
     required this.sender,
     required this.animation,
+    required this.index,
     super.key,
   });
 
-  final IconData iconData;            /// アイコンデータ
-  final String name;                  /// ファイル名
-  final int size;                     /// ファイルサイズ
-  final String sender;                /// 送信者名
-  final Animation<double> animation;  /// サイズアニメーション
+  final int index;
+  final IconData iconData;            /// icon
+  final String name;                  /// file name
+  final int size;                     /// file size
+  final String sender;                /// sender name
+  final Animation<double> animation;  /// size animation
 
   final Animatable<Offset> _offsetAnimation = Tween<Offset>(
     end: Offset.zero,
@@ -220,14 +230,13 @@ class ReceiveListItem extends StatelessWidget{
   {
     return SlideTransition(
       position: animation.drive(_offsetAnimation),
-      child: _ListItemBuilder.build(context, iconData: iconData, name: name, size: size, sender: sender),
+      child: _ListItemBuilder.build(context,index: index, iconData: iconData, name: name, size: size, sender: sender),
     );
   }
 }
 
 ///
-/// 受信リストアイテムクラス
-/// 削除用
+/// Receive list item for remove.
 ///
 class ReceiveListItemRemoving extends StatelessWidget{
   const ReceiveListItemRemoving({
@@ -236,14 +245,16 @@ class ReceiveListItemRemoving extends StatelessWidget{
     required this.size,
     required this.sender,
     required this.animation,
+    required this.index,
     super.key,
   });
 
-  final IconData iconData;            /// アイコンデータ
-  final String name;                  /// ファイル名
-  final int size;                     /// ファイルサイズ
-  final String sender;                /// 送信者名
-  final Animation<double> animation;  /// サイズアニメーション
+  final int index;
+  final IconData iconData;            /// icon
+  final String name;                  /// file name
+  final int size;                     /// file size
+  final String sender;                /// sender name
+  final Animation<double> animation;  /// size animation
 
 
   @override
@@ -251,7 +262,7 @@ class ReceiveListItemRemoving extends StatelessWidget{
   {
     return SizeTransition(
       sizeFactor: animation,
-      child: _ListItemBuilder.build(context, iconData: iconData, name: name, size: size, sender: sender),
+      child: _ListItemBuilder.build(context, index: index, iconData: iconData, name: name, size: size, sender: sender),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
+import 'package:silkroad/utils/views/app_color.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 
@@ -89,6 +90,7 @@ class _ReceivePageState extends State<ReceivePage>{
   Widget _buildItem(BuildContext context, int index, Animation<double> animation)
   {
     return ReceiveListItem(
+      index: index,
       iconData: _receiveList[index].iconData,
       name: _receiveList[index].name,
       size: _receiveList[index].size,
@@ -97,21 +99,22 @@ class _ReceivePageState extends State<ReceivePage>{
     );
   }
 
-  Widget _removeItem(ReceiveItemInfo item, BuildContext context, Animation<double> animation)
+  Widget _removeItem(ReceiveItemInfo item, int index, BuildContext context, Animation<double> animation)
   {
     return ReceiveListItemRemoving(
-        iconData: item.iconData,
-        name: item.name,
-        size: item.size,
-        sender: item.sender,
-        animation: animation
+      index: index,
+      iconData: item.iconData,
+      name: item.name,
+      size: item.size,
+      sender: item.sender,
+      animation: animation
     );
   }
 
   Widget _buildBody(BuildContext context)
   {
     return Container(
-      color: _getBackgroundColor(context),
+      // color: _getBackgroundColor(context),
       child: Column(
         children: [
           // input field
@@ -156,8 +159,7 @@ class _ReceivePageState extends State<ReceivePage>{
           // receive list
           Flexible(
             child: Container(
-              // color: Colors.grey[100],
-              color: _getBackgroundColor(context),
+              color: AppColor.getSecondaryBackgroundColor(context),
               child: AnimatedList(
                 key: _listKey,
                 itemBuilder: _buildItem,
@@ -169,15 +171,15 @@ class _ReceivePageState extends State<ReceivePage>{
     );
   }
 
-  Color _getBackgroundColor(BuildContext context){
-    Color? backgroundColor;
-    if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-      backgroundColor = Colors.grey[100];
-    }
-    else{
-      backgroundColor = Colors.grey[600];
-    }
-    return backgroundColor ?? Colors.grey;
-  }
+  // Color _getBackgroundColor(BuildContext context){
+  //   Color? backgroundColor;
+  //   if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+  //     backgroundColor = Colors.grey[100];
+  //   }
+  //   else{
+  //     backgroundColor = Colors.grey[600];
+  //   }
+  //   return backgroundColor ?? Colors.grey;
+  // }
 }
 

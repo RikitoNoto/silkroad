@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 typedef RemovedItemBuilder<T> = Widget Function(
-    T item, BuildContext context, Animation<double> animation);
+    T item, int index, BuildContext context, Animation<double> animation);
 
 class AnimatedListItemModel<E> {
   AnimatedListItemModel({
@@ -27,7 +27,7 @@ class AnimatedListItemModel<E> {
       _animatedList!.removeItem(
         index,
             (BuildContext context, Animation<double> animation) {
-          return removedItemBuilder(removedItem, context, animation);
+          return removedItemBuilder(removedItem, index, context, animation);
         },
       );
     }
