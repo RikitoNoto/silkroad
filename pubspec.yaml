@@ -17,7 +17,7 @@ dependencies:
   animate_icons:
   file_picker:
   provider: ^6.0.2
-  network_info_plus: ^2.1.4+1
+  network_info_plus: ^2.3.0
   path_provider: ^2.0.11
   path: ^1.8.2
   flutter_svg: ^1.1.5

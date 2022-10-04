@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/app_theme.dart';
 import 'receive_list_item.dart';
-import '../repository/receive_item.dart';
+import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/providers/receive_provider.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({super.key});
@@ -16,6 +19,7 @@ class ReceivePage extends StatefulWidget {
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
+  late ReceiveProvider _provider;
 
   final List<ReceiveItem> _debugReceiveItems = [
     ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(0), sender: "update"),
@@ -36,17 +40,21 @@ class _ReceivePageState extends State<ReceivePage>{
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
+    _provider = ReceiveProvider(receiveList: _receiveList);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Receive"),
-        actions: _getDebugActions(),
-      ),
+    return ChangeNotifierProvider(
+      create: (context) => _provider,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Receive"),
+          actions: _getDebugActions(),
+        ),
 
-      body: _buildBody(context)
+        body: _buildBody(context)
+      ),
     );
   }
 
@@ -146,6 +154,14 @@ class _ReceivePageState extends State<ReceivePage>{
               endIcon: Icons.pause,
               progressIndicatorColor: Colors.blue,
               iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
+              onTap: (state){
+                if(state == AlternateActionStatus.active){
+                  _provider.open();
+                }
+                else{
+                  _provider.close();
+                }
+              },
             ),
           ],
         ),

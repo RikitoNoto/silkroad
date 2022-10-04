@@ -28,6 +28,7 @@ class TcpHost implements HostIF{
       throw Exception('open error!!');
     }
 
+    print("begin listen port");
     _server_socket?.listen(
       (connection) {
         _connections.add(connection);
