@@ -2,70 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 ///
-/// 受信リストアイテムビルダー
+/// receive item builder
 ///
 mixin _ListItemBuilder{
-  static const double _iconSize = 40.0;                     /// アイコンサイズ
-  static const double _sizeAndSenderWidth = 64.0;           /// サイズ&送信者列 横幅
-  static const Color _itemBackgroundColor = Colors.white;   /// アイテム背景色
-  static const Color _itemForegroundColor = Colors.black;   /// アイテム内文字色
+  static const double _iconSize = 40.0;                     /// icon size
+  static const double _sizeAndSenderWidth = 64.0;           /// size and sender column width
 
-  /// テキストスタイル： ファイル名
-  static const TextStyle _fileNameTextStyle = TextStyle(
+  static const Color _itemLightModeColor = Colors.white;      /// white mode item color
+  static const Color _itemDarkModeColor = Colors.black54;     /// dark mode item color
+  // static const Color _itemDarkModeColorOdd  = Colors.black26;  /// odd numbered item color in dark
+  // static const Color _itemDarkModeColorEven = Colors.black54;  /// even numbered item color in dark
+
+  static Color _itemBackgroundColor = Colors.white;   /// item back ground color
+  static Color _itemForegroundColor = Colors.black;   /// item font color
+
+  /// text style： file name
+  static TextStyle get _fileNameTextStyle => TextStyle(
     color: _itemForegroundColor,
     fontSize: 24,
     fontWeight: FontWeight.bold,
   );
 
-  /// テキストスタイル： 送信者
-  static const TextStyle _senderTextStyle = TextStyle(
+  /// text style： sender
+  static TextStyle get _senderTextStyle => TextStyle(
     color: _itemForegroundColor,
     fontSize: 12,
   );
 
-  /// テキストスタイル： サイズ
-  static const TextStyle _sizeTextStyle = _senderTextStyle;
+  /// text style： file size
+  static TextStyle get _sizeTextStyle => _senderTextStyle;
 
-  /// アイテムデコレーション
-  static const BoxDecoration _decorationItem = BoxDecoration(
+  /// item decoration
+  static BoxDecoration get _decorationItem => BoxDecoration(
     color: _itemBackgroundColor,
-    border: Border(
-        bottom: BorderSide(
-          color: Colors.black,
-          width: 1,
-        )
-    ),
   );
 
-  static Widget build({required iconData, required name, required size, required sender,})
+  static const EdgeInsetsGeometry _itemPadding = EdgeInsets.only(top: 0);
+
+  static Widget build(BuildContext context, {required index, required iconData, required name, required size, required sender,})
   {
-    return Slidable(
-      startActionPane: _buildStartAction(),
-      endActionPane: _buildEndAction(),
-      child: Container(
-        decoration: _decorationItem,
-        child: IntrinsicHeight(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    _buildIcon(iconData),     // アイコン
-                    _buildFileName(name), // ファイル名
-                  ],
+    // is light mode.
+    if(MediaQuery.platformBrightnessOf(context) == Brightness.light){
+      _itemForegroundColor = Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+      _itemBackgroundColor = _itemLightModeColor;
+    }
+    // is dark mode.
+    else{
+      _itemForegroundColor = Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+      // if(index % 2 == 0){
+      //   _itemBackgroundColor = _itemDarkModeColorEven;
+      // }
+      // else{
+      //   _itemBackgroundColor = _itemDarkModeColorOdd;
+      // }
+      _itemBackgroundColor = _itemDarkModeColor;
+    }
+
+    return Padding(
+      padding: _itemPadding,
+      child: Slidable(
+        startActionPane: _buildStartAction(),
+        endActionPane: _buildEndAction(),
+        child: Container(
+          decoration: _decorationItem,
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      _buildIcon(iconData),     // icon
+                      _buildFileName(name),     // file name
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: _sizeAndSenderWidth,
-                child: Column(
-                  children: <Widget>[
-                    _buildFileSize(size),  // ファイルサイズ
-                    _buildSender(sender),   // 送信者
-                  ],
+                SizedBox(
+                  width: _sizeAndSenderWidth,
+                  child: Column(
+                    children: <Widget>[
+                      _buildFileSize(size),   // file size
+                      _buildSender(sender),   // sender
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -176,7 +198,7 @@ mixin _ListItemBuilder{
 }
 
 ///
-/// 受信リストアイテムクラス
+/// Receive list item for add.
 ///
 class ReceiveListItem extends StatelessWidget{
   ReceiveListItem({
@@ -185,14 +207,16 @@ class ReceiveListItem extends StatelessWidget{
     required this.size,
     required this.sender,
     required this.animation,
+    required this.index,
     super.key,
   });
 
-  final IconData iconData;            /// アイコンデータ
-  final String name;                  /// ファイル名
-  final int size;                     /// ファイルサイズ
-  final String sender;                /// 送信者名
-  final Animation<double> animation;  /// サイズアニメーション
+  final int index;
+  final IconData iconData;            /// icon
+  final String name;                  /// file name
+  final int size;                     /// file size
+  final String sender;                /// sender name
+  final Animation<double> animation;  /// size animation
 
   final Animatable<Offset> _offsetAnimation = Tween<Offset>(
     end: Offset.zero,
@@ -206,14 +230,13 @@ class ReceiveListItem extends StatelessWidget{
   {
     return SlideTransition(
       position: animation.drive(_offsetAnimation),
-      child: _ListItemBuilder.build(iconData: iconData, name: name, size: size, sender: sender),
+      child: _ListItemBuilder.build(context,index: index, iconData: iconData, name: name, size: size, sender: sender),
     );
   }
 }
 
 ///
-/// 受信リストアイテムクラス
-/// 削除用
+/// Receive list item for remove.
 ///
 class ReceiveListItemRemoving extends StatelessWidget{
   const ReceiveListItemRemoving({
@@ -222,14 +245,16 @@ class ReceiveListItemRemoving extends StatelessWidget{
     required this.size,
     required this.sender,
     required this.animation,
+    required this.index,
     super.key,
   });
 
-  final IconData iconData;            /// アイコンデータ
-  final String name;                  /// ファイル名
-  final int size;                     /// ファイルサイズ
-  final String sender;                /// 送信者名
-  final Animation<double> animation;  /// サイズアニメーション
+  final int index;
+  final IconData iconData;            /// icon
+  final String name;                  /// file name
+  final int size;                     /// file size
+  final String sender;                /// sender name
+  final Animation<double> animation;  /// size animation
 
 
   @override
@@ -237,7 +262,7 @@ class ReceiveListItemRemoving extends StatelessWidget{
   {
     return SizeTransition(
       sizeFactor: animation,
-      child: _ListItemBuilder.build(iconData: iconData, name: name, size: size, sender: sender),
+      child: _ListItemBuilder.build(context, index: index, iconData: iconData, name: name, size: size, sender: sender),
     );
   }
 }

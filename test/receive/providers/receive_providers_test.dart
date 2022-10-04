@@ -39,7 +39,7 @@ void main() {
   MockSocket mockSocket = MockSocket();
   kReceiveList = AnimatedListItemModel<ReceiveItem>(
     listKey: GlobalKey<AnimatedListState>(),
-    removedItemBuilder: (ReceiveItem item, BuildContext context, Animation<double> animation) => const Text(''),
+    removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
   );
 
   setUpAll((){
