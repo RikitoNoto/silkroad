@@ -37,13 +37,6 @@ class _SendPageState extends State<SendPage>{
         ),
 
         body: _buildBody(context),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: ()=>{
-        //
-        //   },
-        //   tooltip: 'Send',
-        //   child: const Icon(Icons.send),
-        // ),
       ),
     );
   }

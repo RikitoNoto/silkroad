@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
-import 'package:silkroad/utils/views/app_color.dart';
+import 'package:silkroad/app_theme.dart';
 import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 
@@ -113,73 +113,55 @@ class _ReceivePageState extends State<ReceivePage>{
 
   Widget _buildBody(BuildContext context)
   {
-    return Container(
-      // color: _getBackgroundColor(context),
-      child: Column(
-        children: [
-          // input field
-          Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      // fillColor: Colors.grey[100],
-                      // fillColor: _getBackgroundColor(context),
-                      filled: true,
-                      prefixIcon: const Icon(Icons.language),
-                      labelText: "My Ipaddress",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+    return Column(
+      children: [
+        // input field
+        Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    filled: true,
+                    prefixIcon: const Icon(Icons.language),
+                    labelText: "My Ipaddress",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    // child: Expanded(
-                      child: const Text(
-                        "0.0.0.0",
-                        style: TextStyle(
-                          // color: Colors.black,
-                          fontSize: 24,
-                        ),
-                      ),
-                    // ),
+                  ),
+                  child: const Text(
+                    "0.0.0.0",
+                    style: TextStyle(
+                      // color: Colors.black,
+                      fontSize: 24,
+                    ),
                   ),
                 ),
               ),
+            ),
 
-              AlternateActionButton(
-                startIcon: Icons.play_arrow,
-                endIcon: Icons.pause,
-                progressIndicatorColor: Colors.blue,
-                iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
-              ),
-            ],
-          ),
+            AlternateActionButton(
+              startIcon: Icons.play_arrow,
+              endIcon: Icons.pause,
+              progressIndicatorColor: Colors.blue,
+              iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
+            ),
+          ],
+        ),
 
-          // receive list
-          Flexible(
-            child: Container(
-              color: AppColor.getSecondaryBackgroundColor(context),
-              child: AnimatedList(
-                key: _listKey,
-                itemBuilder: _buildItem,
-              ),
+        // receive list
+        Flexible(
+          child: Container(
+            color: AppTheme.getSecondaryBackgroundColor(context),
+            child: AnimatedList(
+              key: _listKey,
+              itemBuilder: _buildItem,
             ),
           ),
-        ]
-      )
+        ),
+      ]
     );
   }
-
-  // Color _getBackgroundColor(BuildContext context){
-  //   Color? backgroundColor;
-  //   if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-  //     backgroundColor = Colors.grey[100];
-  //   }
-  //   else{
-  //     backgroundColor = Colors.grey[600];
-  //   }
-  //   return backgroundColor ?? Colors.grey;
-  // }
 }
 
