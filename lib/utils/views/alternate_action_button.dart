@@ -14,6 +14,9 @@ class AlternateActionButton extends StatefulWidget{
     required this.endIcon,
     this.onTap,
     this.durationMillis = 300,
+    this.progressIndicatorColor,
+    this.progressIndicatorBackGroundColor,
+    this.iconColor,
     super.key
   });
 
@@ -21,6 +24,11 @@ class AlternateActionButton extends StatefulWidget{
   final IconData endIcon;
   final AlternateActionCallback? onTap;
   final int durationMillis;
+
+  final Color? progressIndicatorColor;
+  final Color? progressIndicatorBackGroundColor;
+
+  final Color? iconColor;
 
   @override
   AlternateActionButtonState createState() => AlternateActionButtonState();
@@ -41,6 +49,8 @@ class AlternateActionButtonState extends State<AlternateActionButton>{
         children: [
           CircularProgressIndicator(
             value: _progress,
+            color: widget.progressIndicatorColor,
+            backgroundColor: widget.progressIndicatorBackGroundColor,
           ),
           AnimateIcons(
             startIcon: widget.startIcon,
@@ -49,6 +59,8 @@ class AlternateActionButtonState extends State<AlternateActionButton>{
             onEndIconPress: _onEnd,
             controller: _controller,
             duration: Duration(milliseconds: widget.durationMillis),
+            startIconColor: widget.iconColor,
+            endIconColor: widget.iconColor,
           ),
         ],
       ),
