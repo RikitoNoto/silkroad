@@ -4,8 +4,11 @@ class AppTheme{
 
   static final Color? _secondaryBackgroundColorLight = Colors.grey[100];
   static final Color? _secondaryBackgroundColorDark = Colors.grey[600];
+  static final Color _foregroundColorLight = Colors.black;
+  static final Color _foregroundColorDark = Colors.white;
 
   static const double _appBarElevation = 0.4;
+
   static const Color _appBackgroundColorLight = Color(0xFFFFFFFF);
   static const Color _appBarColorLight = _appBackgroundColorLight;
   static const Color _elevatedButtonColorLight = Color(0xFFFAFAFA);
@@ -13,6 +16,7 @@ class AppTheme{
   static const Color _appBackgroundColorDark = Color(0xFF303030);
   static const Color _appBarColorDark = _appBackgroundColorDark;
   static const Color _elevatedButtonColorDark = Color(0xFF505050);
+  static const Color _iconColorDark = Color(0xFFFFFFFF);
 
   static const MaterialColor materialWhite = MaterialColor(
     0xFFFFFFFF,
@@ -84,5 +88,17 @@ class AppTheme{
       backgroundColor = _secondaryBackgroundColorDark;
     }
     return backgroundColor ?? Colors.red;
+  }
+
+  static Color getForegroundColor(BuildContext context){
+
+    Color foregroundColor;
+    if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+      foregroundColor = _foregroundColorLight;
+    }
+    else{
+      foregroundColor = _foregroundColorDark;
+    }
+    return foregroundColor;
   }
 }

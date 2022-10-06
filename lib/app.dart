@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:platform/platform.dart';
+
 import 'package:silkroad/home/views/home_view.dart';
 import 'package:silkroad/send/views/send_view.dart';
 import 'package:silkroad/receive/views/receive_view.dart';
@@ -6,8 +9,12 @@ import 'package:silkroad/app_theme.dart';
 
 class SilkRoadApp extends StatelessWidget {
 
-  const SilkRoadApp({super.key});
+  const SilkRoadApp({
+    super.key,
+    required this.platform,
+  });
 
+  final Platform platform;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +41,7 @@ class SilkRoadApp extends StatelessWidget {
 
             case '/receive': {
               return PageRouteBuilder(
-                  pageBuilder: (_, __, ___)=> const ReceivePage(),
+                  pageBuilder: (_, __, ___)=> ReceivePage(platform: platform),
                   transitionsBuilder: (context, animation, secondaryAnimation, child){
                     return _buildSlideTransition(tweenBegin: const Offset(1.0, 0.0), context: context, animation: animation, child: child);
                   }

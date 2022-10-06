@@ -7,6 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:platform/platform.dart';
+
 import 'package:silkroad/home/home.dart';
 
 import 'package:silkroad/app.dart';
@@ -15,14 +18,14 @@ import 'package:silkroad/receive/views/receive_view.dart';
 
 void main() {
   testWidgets('display the home page when start application', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp());
+    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform(),));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomePage), findsOneWidget);
   });
 
   testWidgets('transition to the send page when push send button', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp());
+    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform()));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('Send')));
@@ -32,7 +35,7 @@ void main() {
   });
 
   testWidgets('transition to the receive page when push receive button', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp());
+    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform()));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('Receive')));

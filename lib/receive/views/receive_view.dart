@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:platform/platform.dart';
+
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/views/animated_list_item_model.dart';
 import 'package:silkroad/app_theme.dart';
@@ -7,7 +10,12 @@ import 'receive_list_item.dart';
 import '../receive_item_info.dart';
 
 class ReceivePage extends StatefulWidget {
-  const ReceivePage({super.key});
+  const ReceivePage({
+    super.key,
+    required this.platform,
+  });
+
+  final Platform platform;
 
   @override
   State<ReceivePage> createState() => _ReceivePageState();
@@ -16,6 +24,7 @@ class ReceivePage extends StatefulWidget {
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItemInfo> _receiveList;
+  List<String> _addressList = <String>['192.168.12.1', '192.168.12.2'];
 
   final List<ReceiveItemInfo> _debugReceiveItems = [
     const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
@@ -121,23 +130,7 @@ class _ReceivePageState extends State<ReceivePage>{
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    filled: true,
-                    prefixIcon: const Icon(Icons.language),
-                    labelText: "My Ipaddress",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: const Text(
-                    "0.0.0.0",
-                    style: TextStyle(
-                      // color: Colors.black,
-                      fontSize: 24,
-                    ),
-                  ),
-                ),
+                child: _buildIpDisplay(context),
               ),
             ),
 
@@ -145,7 +138,7 @@ class _ReceivePageState extends State<ReceivePage>{
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,
               progressIndicatorColor: Colors.blue,
-              iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
+              iconColor: AppTheme.getForegroundColor(context),
             ),
           ],
         ),
@@ -163,5 +156,98 @@ class _ReceivePageState extends State<ReceivePage>{
       ]
     );
   }
+
+  Widget _buildIpDisplay(BuildContext context){
+    Widget ipDisplay;
+    switch(widget.platform.operatingSystem){
+      case Platform.iOS:
+        ipDisplay = _buildIpListForIos(context);
+        break;
+      default:
+        ipDisplay = _buildIpListForAndroidPc(context);
+        break;
+    }
+
+    return ipDisplay;
+  }
+
+  Widget _buildIpListForAndroidPc(BuildContext context){
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        borderRadius: BorderRadius.circular(5),
+
+      ),
+      child: DropdownButton(
+        value: _addressList.isNotEmpty ? _addressList[0] : '',
+        icon: const Icon(Icons.arrow_drop_down),
+        iconSize: 30,
+        isExpanded: true,
+        underline: DropdownButtonHideUnderline(child: Container()),
+        elevation: 0,
+        onChanged: (text) => {},
+        items: _addressList.map((address) => DropdownMenuItem(child: Text(address), value: address,)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildIpListForIos(BuildContext context){
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        borderRadius: BorderRadius.circular(5),
+
+      ),
+      child:CupertinoButton(
+        child: Stack(
+          children: [
+            Text('ip address'),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Icon(
+                Icons.arrow_drop_down,
+                color: AppTheme.getForegroundColor(context),
+                // color: Colors.black,
+              )
+            ),
+          ],
+        ),
+        onPressed: (){
+          _showModalPicker(context);
+        },
+      ),
+    );
+  }
+
+  void _showModalPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height / 3,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: CupertinoPicker(
+              itemExtent: 40,
+              children: <Widget>[
+                Text('A'),
+                Text('A'),
+                Text('A'),
+                Text('A'),
+                Text('A'),
+                Text('A'),
+              ],
+              onSelectedItemChanged: (value) {
+
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }
 
