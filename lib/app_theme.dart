@@ -6,6 +6,7 @@ class AppTheme{
   static final Color? _secondaryBackgroundColorDark = Colors.grey[600];
 
   static const double _appBarElevation = 0.4;
+
   static const Color _appBackgroundColorLight = Color(0xFFFFFFFF);
   static const Color _appBarColorLight = _appBackgroundColorLight;
   static const Color _elevatedButtonColorLight = Color(0xFFFAFAFA);
@@ -13,6 +14,7 @@ class AppTheme{
   static const Color _appBackgroundColorDark = Color(0xFF303030);
   static const Color _appBarColorDark = _appBackgroundColorDark;
   static const Color _elevatedButtonColorDark = Color(0xFF505050);
+  static const Color _iconColorDark = Color(0xFFFFFFFF);
 
   static const MaterialColor materialWhite = MaterialColor(
     0xFFFFFFFF,
