@@ -138,7 +138,7 @@ class _ReceivePageState extends State<ReceivePage>{
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,
               progressIndicatorColor: Colors.blue,
-              iconColor: MediaQuery.platformBrightnessOf(context) == Brightness.dark ? Colors.white : Colors.black,
+              iconColor: AppTheme.getForegroundColor(context),
             ),
           ],
         ),
@@ -206,7 +206,7 @@ class _ReceivePageState extends State<ReceivePage>{
               alignment: Alignment.centerRight,
               child: Icon(
                 Icons.arrow_drop_down,
-                color: MediaQuery.platformBrightnessOf(context) == Brightness.light ? Colors.black : Colors.white,
+                color: AppTheme.getForegroundColor(context),
                 // color: Colors.black,
               )
             ),
