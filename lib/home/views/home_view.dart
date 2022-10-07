@@ -35,13 +35,13 @@ class _HomePageState extends State<HomePage> {
               _buildActionSelectButton(
                 context,
                 label: 'Send',
-                svgPath: 'assets/icons/transfer-in.svg',
+                svgPath: 'assets/svg_icons/transfer-in.svg',
                 onPressed: () => Navigator.pushNamed(context, '/send'),
               ),
               _buildActionSelectButton(
                 context,
                 label: 'Receive',
-                svgPath: 'assets/icons/transfer-out.svg',
+                svgPath: 'assets/svg_icons/transfer-out.svg',
                 onPressed: () => Navigator.pushNamed(context, '/receive'),
               ),
             ]
