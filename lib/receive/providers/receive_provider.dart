@@ -16,13 +16,9 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 });
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList {
-    _fetchIpAddress();
-  }
+  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList;
   static const portNo = 32099;
-  static NetworkInfo networkInfo = NetworkInfo();
   final ReceiveHostFactoryFunc builder;
-  String? _ipAddress;
   HostIF? _hostComm;
   final AnimatedListItemModel _receiveList;
 
@@ -36,15 +32,8 @@ class ReceiveProvider with ChangeNotifier {
     return TcpHost(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
   }
 
-  Future<bool> open() async{
-
-    _ipAddress ??= await networkInfo.getWifiIP();
-
-    if(_ipAddress == null){
-      return false;
-    }
-
-    _hostComm = builder(ipAddress: _ipAddress!, port: portNo, receiveCallback: _onReceive);
+  Future<bool> open(String ipAddress) async{
+    _hostComm = builder(ipAddress: ipAddress, port: portNo, receiveCallback: _onReceive);
 
     _hostComm!.listen();
     return true;
@@ -67,15 +56,12 @@ class ReceiveProvider with ChangeNotifier {
     }
   }
 
-  void _fetchIpAddress() async {
-    _ipAddress = await networkInfo.getWifiIP();
-  }
-
-
-  String get ipAddress{
-    if(_ipAddress == null){
-      return "";
+  void fetchIpAddresses(List<String> addressList) async {
+    addressList.clear();
+    for(NetworkInterface interface in await NetworkInterface.list()){
+      for(InternetAddress address in interface.addresses){
+        addressList.add(address.address);
+      }
     }
-    return _ipAddress!;
   }
 }

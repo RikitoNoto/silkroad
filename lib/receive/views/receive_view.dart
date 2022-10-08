@@ -15,9 +15,11 @@ class ReceivePage extends StatefulWidget {
   const ReceivePage({
     super.key,
     required this.platform,
+    required this.provider,
   });
 
   final Platform platform;
+  final ReceiveProvider provider;
 
   @override
   State<ReceivePage> createState() => _ReceivePageState();
@@ -26,7 +28,7 @@ class ReceivePage extends StatefulWidget {
 class _ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
-  late ReceiveProvider _provider;
+  // late ReceiveProvider widget.provider;
   List<String> _addressList = <String>['192.168.12.1', '192.168.12.2'];
 
   final List<ReceiveItem> _debugReceiveItems = [
@@ -48,13 +50,13 @@ class _ReceivePageState extends State<ReceivePage>{
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
-    _provider = ReceiveProvider(receiveList: _receiveList);
+    widget.provider = ReceiveProvider(receiveList: _receiveList);
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => _provider,
+      create: (context) => widget.provider,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Receive"),
@@ -148,10 +150,10 @@ class _ReceivePageState extends State<ReceivePage>{
               iconColor: AppTheme.getForegroundColor(context),
               onTap: (state){
                 if(state == AlternateActionStatus.active){
-                  _provider.open();
+                  widget.provider.open();
                 }
                 else{
-                  _provider.close();
+                  widget.provider.close();
                 }
               },
             ),
