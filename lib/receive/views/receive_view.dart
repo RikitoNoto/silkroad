@@ -15,20 +15,18 @@ class ReceivePage extends StatefulWidget {
   const ReceivePage({
     super.key,
     required this.platform,
-    required this.provider,
   });
 
   final Platform platform;
-  final ReceiveProvider provider;
 
   @override
-  State<ReceivePage> createState() => _ReceivePageState();
+  State<ReceivePage> createState() => ReceivePageState();
 }
 
-class _ReceivePageState extends State<ReceivePage>{
+class ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
-  // late ReceiveProvider widget.provider;
+   late ReceiveProvider _provider;
   List<String> _addressList = <String>['192.168.12.1', '192.168.12.2'];
 
   final List<ReceiveItem> _debugReceiveItems = [
@@ -42,7 +40,6 @@ class _ReceivePageState extends State<ReceivePage>{
     ReceiveItem(iconData: Icons.timer_10, name: "timer", data: Uint8List(0), sender: "cool"),
   ];
 
-
   @override
   void initState() {
     super.initState();
@@ -50,13 +47,13 @@ class _ReceivePageState extends State<ReceivePage>{
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
-    widget.provider = ReceiveProvider(receiveList: _receiveList);
+    _provider = ReceiveProvider(receiveList: _receiveList);
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => widget.provider,
+      create: (context) => _provider,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Receive"),
@@ -150,10 +147,10 @@ class _ReceivePageState extends State<ReceivePage>{
               iconColor: AppTheme.getForegroundColor(context),
               onTap: (state){
                 if(state == AlternateActionStatus.active){
-                  widget.provider.open();
+                  _provider.open('');
                 }
                 else{
-                  widget.provider.close();
+                  _provider.close();
                 }
               },
             ),
