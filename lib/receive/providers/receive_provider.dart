@@ -16,12 +16,20 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 });
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList;
+  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList
+  {
+    _addressList.add(_currentAddress);
+    fetchIpAddresses();
+  }
   static const portNo = 32099;
   final ReceiveHostFactoryFunc builder;
   HostIF? _hostComm;
   final AnimatedListItemModel _receiveList;
+  String _currentAddress = '';
+  final List<String> _addressList = <String>[];
 
+  String get currentAddress => _currentAddress;
+  List<String> get addressList => _addressList;
 
   static HostIF _build({
     required String ipAddress,
@@ -32,8 +40,8 @@ class ReceiveProvider with ChangeNotifier {
     return TcpHost(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
   }
 
-  Future<bool> open(String ipAddress) async{
-    _hostComm = builder(ipAddress: ipAddress, port: portNo, receiveCallback: _onReceive);
+  Future<bool> open() async{
+    _hostComm = builder(ipAddress: currentAddress, port: portNo, receiveCallback: _onReceive);
 
     _hostComm!.listen();
     return true;
@@ -45,7 +53,6 @@ class ReceiveProvider with ChangeNotifier {
 
   void _onReceive(Socket socket, Uint8List data) {
     Message message = Message(data);
-
     if(message is SendFile){
       ReceiveItem item = ReceiveItem(
         name: message.name,
@@ -56,11 +63,29 @@ class ReceiveProvider with ChangeNotifier {
     }
   }
 
-  void fetchIpAddresses(List<String> addressList) async {
-    addressList.clear();
+  void selectAddress(String? address){
+    if(address == null) return ;
+
+    if(_addressList.contains(address)){
+      _currentAddress = address;
+      notifyListeners();
+    }
+  }
+
+  void fetchIpAddresses() async {
     for(NetworkInterface interface in await NetworkInterface.list()){
       for(InternetAddress address in interface.addresses){
-        addressList.add(address.address);
+        if(address.type == InternetAddressType.IPv4) _addressList.add(address.address);
+      }
+    }
+    notifyListeners();
+  }
+
+  void overwriteAddressList(List<String> addressList){
+    if(kDebugMode){
+      _addressList.clear();
+      for(var address in addressList){
+        _addressList.add(address);
       }
     }
   }

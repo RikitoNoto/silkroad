@@ -26,8 +26,7 @@ class ReceivePage extends StatefulWidget {
 class ReceivePageState extends State<ReceivePage>{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
-   late ReceiveProvider _provider;
-  List<String> _addressList = <String>['192.168.12.1', '192.168.12.2'];
+  late final ReceiveProvider provider;
 
   final List<ReceiveItem> _debugReceiveItems = [
     ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(0), sender: "update"),
@@ -47,13 +46,13 @@ class ReceivePageState extends State<ReceivePage>{
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
-    _provider = ReceiveProvider(receiveList: _receiveList);
+    provider = ReceiveProvider(receiveList: _receiveList);
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => _provider,
+      create: (context) => provider,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Receive"),
@@ -147,10 +146,10 @@ class ReceivePageState extends State<ReceivePage>{
               iconColor: AppTheme.getForegroundColor(context),
               onTap: (state){
                 if(state == AlternateActionStatus.active){
-                  _provider.open('');
+                  provider.open();
                 }
                 else{
-                  _provider.close();
+                  provider.close();
                 }
               },
             ),
@@ -192,15 +191,19 @@ class ReceivePageState extends State<ReceivePage>{
         borderRadius: BorderRadius.circular(5),
 
       ),
-      child: DropdownButton(
-        value: _addressList.isNotEmpty ? _addressList[0] : '',
-        icon: const Icon(Icons.arrow_drop_down),
-        iconSize: 30,
-        isExpanded: true,
-        underline: DropdownButtonHideUnderline(child: Container()),
-        elevation: 0,
-        onChanged: (text) => {},
-        items: _addressList.map((address) => DropdownMenuItem(child: Text(address), value: address,)).toList(),
+      child: Consumer<ReceiveProvider>(
+        builder: (context, provider, child) => DropdownButton(
+            value: provider.currentAddress,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 30,
+            isExpanded: true,
+            underline: DropdownButtonHideUnderline(child: Container()),
+            elevation: 0,
+            onChanged: (address) => provider.selectAddress(address),
+            items: provider.addressList.map((address) =>
+                DropdownMenuItem(value: address, child: Text(address)))
+                .toList(),
+          )
       ),
     );
   }
@@ -215,7 +218,7 @@ class ReceivePageState extends State<ReceivePage>{
       child:CupertinoButton(
         child: Stack(
           children: [
-            Text('ip address'),
+            Consumer<ReceiveProvider>(builder: (context, provider, child) => Text(provider.currentAddress)),
             Align(
               alignment: Alignment.centerRight,
               child: Icon(
@@ -237,7 +240,7 @@ class ReceivePageState extends State<ReceivePage>{
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 3,
           child: GestureDetector(
             onTap: () {
@@ -245,16 +248,9 @@ class ReceivePageState extends State<ReceivePage>{
             },
             child: CupertinoPicker(
               itemExtent: 40,
-              children: <Widget>[
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-              ],
-              onSelectedItemChanged: (value) {
-
+              children: provider.addressList.map((address) => Text(address)).toList(),
+              onSelectedItemChanged: (address) {
+                provider.selectAddress(provider.addressList[address]);
               },
             ),
           ),

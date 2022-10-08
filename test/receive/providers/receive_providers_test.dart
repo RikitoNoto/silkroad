@@ -104,7 +104,9 @@ void setupSpyComm(MockTcpHost mockHost){
 
 Future<bool> openPort(String ip, int port){
   // when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(ip));
-  return kProvider!.open(ip);
+  kProvider!.overwriteAddressList(<String>[ip]);
+  kProvider!.selectAddress(ip);
+  return kProvider!.open();
 }
 
 Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bool isCalled, MockTcpHost mockHost) async{
