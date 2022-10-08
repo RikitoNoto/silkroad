@@ -6,6 +6,7 @@ import 'package:silkroad/home/views/home_view.dart';
 import 'package:silkroad/send/views/send_view.dart';
 import 'package:silkroad/receive/views/receive_view.dart';
 import 'package:silkroad/app_theme.dart';
+import 'global.dart';
 
 class SilkRoadApp extends StatelessWidget {
 
@@ -22,6 +23,8 @@ class SilkRoadApp extends StatelessWidget {
         title: 'Silk road',
         theme: AppTheme.appThemeLight,
         darkTheme: AppTheme.appThemeDark,
+        navigatorObservers: [kRouteObserver],
+
         initialRoute: '/',
         onGenerateRoute: (settings) {
           switch(settings.name) {

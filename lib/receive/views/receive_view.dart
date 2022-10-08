@@ -7,6 +7,7 @@ import 'package:platform/platform.dart';
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/app_theme.dart';
+import 'package:silkroad/global.dart';
 import 'receive_list_item.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
@@ -23,7 +24,9 @@ class ReceivePage extends StatefulWidget {
   State<ReceivePage> createState() => ReceivePageState();
 }
 
-class ReceivePageState extends State<ReceivePage>{
+class ReceivePageState extends State<ReceivePage>
+    with RouteAware
+{
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
   late final ReceiveProvider provider;
@@ -47,6 +50,28 @@ class ReceivePageState extends State<ReceivePage>{
       removedItemBuilder: _removeItem,
     );
     provider = ReceiveProvider(receiveList: _receiveList);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    kRouteObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    kRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPop() {
+    provider.close();
+  }
+
+  @override
+  void didPushNext() {
+    provider.close();
   }
 
   @override
@@ -218,13 +243,20 @@ class ReceivePageState extends State<ReceivePage>{
       child:CupertinoButton(
         child: Stack(
           children: [
-            Consumer<ReceiveProvider>(builder: (context, provider, child) => Text(provider.currentAddress)),
+            Consumer<ReceiveProvider>(builder: (context, provider, child){
+              return Text(
+                provider.currentAddress,
+                style: TextStyle(
+                  color: AppTheme.getForegroundColor(context),
+                ),
+              );
+            }),
+
             Align(
               alignment: Alignment.centerRight,
               child: Icon(
                 Icons.arrow_drop_down,
                 color: AppTheme.getForegroundColor(context),
-                // color: Colors.black,
               )
             ),
           ],
