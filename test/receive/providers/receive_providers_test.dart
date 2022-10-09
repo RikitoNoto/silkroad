@@ -47,6 +47,7 @@ void main() {
   portTest(mockHost);
   callbackActionTest(mockHost, mockSocket);
   ipAddressTest();
+  itemActionTest();
 }
 
 void ipAddressTest(){
@@ -78,32 +79,6 @@ void ipAddressTest(){
     });
   });
 }
-// void checkIpAddress(MockNetworkInfo mock, String? returnValue, String expectAddress) async {
-//   when(mock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(returnValue));
-//   ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
-//   await mock.getWifiIP();      // for wait complete.
-//   expect(kProvider.ipAddress, expectAddress);
-// }
-//
-// void ipAddressTest(MockNetworkInfo networkInfoMock) {
-//
-//   ReceiveProvider.networkInfo = networkInfoMock;
-//
-//   group('receive kProvider ip fetch test', () {
-//
-//     test('should be get the ip address when initialize(0.0.0.0)', () {
-//       checkIpAddress(networkInfoMock, "0.0.0.0", "0.0.0.0");
-//     });
-//
-//     test('should be get the ip address when initialize(255.255.255.255)', () async {
-//       checkIpAddress(networkInfoMock, "255.255.255.255", "255.255.255.255");
-//     });
-//
-//     test('should be get empty string when did not get ip address', () async {
-//       checkIpAddress(networkInfoMock, null, "");
-//     });
-//   });
-// }
 
 ReceiveProvider? kProvider;
 String? kIpAddressSpy;
@@ -161,11 +136,6 @@ void portTest(MockTcpHost mockHost) {
       setupSpyComm(mockHost);
       await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
     });
-
-    // test('should be not open port when did not get ip address', () async{
-    //   setupSpyComm(mockHost);
-    //   await checkOpenPort(null, 0, false, false, networkInfoMock, mockHost);
-    // });
 
     test('should be close port when call the close method', () async{
       setupSpyComm(mockHost);
@@ -238,5 +208,18 @@ void callbackActionTest(MockTcpHost mockHost, MockSocket mockSocket) {
       expect(kReceiveList[1].name, 'B');
     });
   });
+
 }
 
+
+void itemActionTest() {
+  group('delete display by item action test', (){
+
+    test('should be able to delete item.', () async{
+      // kReceiveList.clear();
+      // kReceiveList.add();
+      kProvider = ReceiveProvider(receiveList: kReceiveList);
+    });
+
+  });
+}
