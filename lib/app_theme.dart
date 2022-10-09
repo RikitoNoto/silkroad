@@ -4,8 +4,10 @@ class AppTheme{
 
   static final Color? _secondaryBackgroundColorLight = Colors.grey[100];
   static final Color? _secondaryBackgroundColorDark = Colors.grey[600];
-  static final Color _foregroundColorLight = Colors.black;
-  static final Color _foregroundColorDark = Colors.white;
+  static const Color _foregroundColorLight = Colors.black;
+  static const Color _foregroundColorDark = Colors.white;
+  static final Color? _foregroundColorDisableLight = Colors.grey[600];
+  static final Color? _foregroundColorDisableDark = Colors.grey[600];
 
   static const double _appBarElevation = 0.4;
 
@@ -82,12 +84,12 @@ class AppTheme{
   static Color getSecondaryBackgroundColor(BuildContext context){
     Color? backgroundColor;
     if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-      backgroundColor = _secondaryBackgroundColorLight;
+      backgroundColor = _secondaryBackgroundColorLight!;
     }
     else{
-      backgroundColor = _secondaryBackgroundColorDark;
+      backgroundColor = _secondaryBackgroundColorDark!;
     }
-    return backgroundColor ?? Colors.red;
+    return backgroundColor;
   }
 
   static Color getForegroundColor(BuildContext context){
@@ -100,5 +102,21 @@ class AppTheme{
       foregroundColor = _foregroundColorDark;
     }
     return foregroundColor;
+  }
+
+  static Color getForegroundDisableColor(BuildContext context){
+
+    Color foregroundColor;
+    if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+      foregroundColor = _foregroundColorDisableLight!;
+    }
+    else{
+      foregroundColor = _foregroundColorDisableDark!;
+    }
+    return foregroundColor;
+  }
+
+  static Color getButtonForegroundColor(BuildContext context, bool enable){
+    return enable ? getForegroundColor(context) : getForegroundDisableColor(context);
   }
 }

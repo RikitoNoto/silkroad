@@ -18,18 +18,20 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 class ReceiveProvider with ChangeNotifier {
   ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList
   {
-    _addressList.add(_currentAddress);
+    _ipList.add(_currentIp);
     fetchIpAddresses();
   }
   static const portNo = 32099;
   final ReceiveHostFactoryFunc builder;
   HostIF? _hostComm;
   final AnimatedListItemModel _receiveList;
-  String _currentAddress = '';
-  final List<String> _addressList = <String>[];
 
-  String get currentAddress => _currentAddress;
-  List<String> get addressList => _addressList;
+
+  String _currentIp = '';                   /// selected ip address
+  String get currentIp => _currentIp;
+
+  final List<String> _ipList = <String>[];  /// ip address list
+  List<String> get ipList => _ipList;
 
   static HostIF _build({
     required String ipAddress,
@@ -41,7 +43,7 @@ class ReceiveProvider with ChangeNotifier {
   }
 
   Future<bool> open() async{
-    _hostComm = builder(ipAddress: currentAddress, port: portNo, receiveCallback: _onReceive);
+    _hostComm = builder(ipAddress: currentIp, port: portNo, receiveCallback: _onReceive);
 
     _hostComm!.listen();
     return true;
@@ -63,11 +65,16 @@ class ReceiveProvider with ChangeNotifier {
     }
   }
 
-  void selectAddress(String? address){
+  /// change [_currentIp].
+  /// if [address] is not contain in [_ipList],
+  /// this method not set [_currentIp].
+  /// only when contain [_ipList],
+  /// notify to lister the change.
+  void selectIp(String? address){
     if(address == null) return ;
 
-    if(_addressList.contains(address)){
-      _currentAddress = address;
+    if(isEnableIp(address)){
+      _currentIp = address;
       notifyListeners();
     }
   }
@@ -75,17 +82,23 @@ class ReceiveProvider with ChangeNotifier {
   void fetchIpAddresses() async {
     for(NetworkInterface interface in await NetworkInterface.list()){
       for(InternetAddress address in interface.addresses){
-        if(address.type == InternetAddressType.IPv4) _addressList.add(address.address);
+        if(address.type == InternetAddressType.IPv4) _ipList.add(address.address);
       }
     }
     notifyListeners();
   }
 
+  /// check to enable the ip address.
+  bool isEnableIp(String address){
+    return address != '' && _ipList.contains(address);
+  }
+
+  /// for debug
   void overwriteAddressList(List<String> addressList){
     if(kDebugMode){
-      _addressList.clear();
+      _ipList.clear();
       for(var address in addressList){
-        _addressList.add(address);
+        _ipList.add(address);
       }
     }
   }

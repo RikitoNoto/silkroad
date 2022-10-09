@@ -44,12 +44,40 @@ void main() {
     await pathProviderTearDown();
   });
 
-  // ipAddressTest(networkInfoMock);
   portTest(mockHost);
   callbackActionTest(mockHost, mockSocket);
+  ipAddressTest();
 }
-//
-//
+
+void ipAddressTest(){
+  group('ip address test', () {
+    test('should be not set ip address when the ip list is empty', () {
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider.overwriteAddressList(<String>[]);
+      kProvider.selectIp('192.168.1.100');
+      expect(kProvider.currentIp, '');
+    });
+
+    test('should be set ip address when the ip is include in the ip list', () {
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider.overwriteAddressList(<String>['192.168.1.100']);
+      kProvider.selectIp('192.168.1.100');
+      expect(kProvider.currentIp, '192.168.1.100');
+    });
+
+    test('should be return false when the ip is not include in the ip list(empty)', () {
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider.overwriteAddressList(<String>[]);
+      expect(kProvider.isEnableIp('192.168.1.100'), isFalse);
+    });
+
+    test('should be return true when the ip is include in the ip list', () {
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider.overwriteAddressList(<String>['192.168.1.100']);
+      expect(kProvider.isEnableIp('192.168.1.100'), isTrue);
+    });
+  });
+}
 // void checkIpAddress(MockNetworkInfo mock, String? returnValue, String expectAddress) async {
 //   when(mock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(returnValue));
 //   ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
@@ -105,7 +133,7 @@ void setupSpyComm(MockTcpHost mockHost){
 Future<bool> openPort(String ip, int port){
   // when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(ip));
   kProvider!.overwriteAddressList(<String>[ip]);
-  kProvider!.selectAddress(ip);
+  kProvider!.selectIp(ip);
   return kProvider!.open();
 }
 

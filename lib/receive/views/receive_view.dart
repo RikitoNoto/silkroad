@@ -164,19 +164,22 @@ class ReceivePageState extends State<ReceivePage>
               ),
             ),
 
-            AlternateActionButton(
-              startIcon: Icons.play_arrow,
-              endIcon: Icons.pause,
-              progressIndicatorColor: Colors.blue,
-              iconColor: AppTheme.getForegroundColor(context),
-              onTap: (state){
-                if(state == AlternateActionStatus.active){
-                  provider.open();
-                }
-                else{
-                  provider.close();
-                }
-              },
+            Consumer<ReceiveProvider>(
+              builder: (context, provider, child) => AlternateActionButton(
+                enabled: provider.isEnableIp(provider.currentIp),
+                startIcon: Icons.play_arrow,
+                endIcon: Icons.pause,
+                progressIndicatorColor: Colors.blue,
+                iconColor: AppTheme.getForegroundColor(context),
+                onTap: (state){
+                  if(state == AlternateActionStatus.active){
+                    provider.open();
+                  }
+                  else{
+                    provider.close();
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -218,14 +221,14 @@ class ReceivePageState extends State<ReceivePage>
       ),
       child: Consumer<ReceiveProvider>(
         builder: (context, provider, child) => DropdownButton(
-            value: provider.currentAddress,
+            value: provider.currentIp,
             icon: const Icon(Icons.arrow_drop_down),
             iconSize: 30,
             isExpanded: true,
             underline: DropdownButtonHideUnderline(child: Container()),
             elevation: 0,
-            onChanged: (address) => provider.selectAddress(address),
-            items: provider.addressList.map((address) =>
+            onChanged: (address) => provider.selectIp(address),
+            items: provider.ipList.map((address) =>
                 DropdownMenuItem(value: address, child: Text(address)))
                 .toList(),
           )
@@ -245,7 +248,7 @@ class ReceivePageState extends State<ReceivePage>
           children: [
             Consumer<ReceiveProvider>(builder: (context, provider, child){
               return Text(
-                provider.currentAddress,
+                provider.currentIp,
                 style: TextStyle(
                   color: AppTheme.getForegroundColor(context),
                 ),
@@ -280,9 +283,9 @@ class ReceivePageState extends State<ReceivePage>
             },
             child: CupertinoPicker(
               itemExtent: 40,
-              children: provider.addressList.map((address) => Text(address)).toList(),
+              children: provider.ipList.map((address) => Text(address)).toList(),
               onSelectedItemChanged: (address) {
-                provider.selectAddress(provider.addressList[address]);
+                provider.selectIp(provider.ipList[address]);
               },
             ),
           ),
