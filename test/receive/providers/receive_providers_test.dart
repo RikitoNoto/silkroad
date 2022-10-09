@@ -38,6 +38,7 @@ void main() {
 
   setUp(() async{
     await pathProviderSetUp();
+    kReceiveList.clear();
   });
 
   tearDown(() async{
@@ -106,7 +107,6 @@ void setupSpyComm(MockTcpHost mockHost){
 }
 
 Future<bool> openPort(String ip, int port){
-  // when(networkInfoMock.getWifiIP()).thenAnswer((_)=>Future<String?>.value(ip));
   kProvider!.overwriteAddressList(<String>[ip]);
   kProvider!.selectIp(ip);
   return kProvider!.open();
@@ -216,9 +216,10 @@ void itemActionTest() {
   group('delete display by item action test', (){
 
     test('should be able to delete item.', () async{
-      // kReceiveList.clear();
-      // kReceiveList.add();
+      kReceiveList.append(ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'));
       kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider!.removeAt(0);
+      expect(kReceiveList.length, 0);
     });
 
   });

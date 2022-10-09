@@ -53,18 +53,6 @@ class ReceiveProvider with ChangeNotifier {
     _hostComm?.close();
   }
 
-  void _onReceive(Socket socket, Uint8List data) {
-    Message message = Message(data);
-    if(message is SendFile){
-      ReceiveItem item = ReceiveItem(
-        name: message.name,
-        data: message.fileData,
-        sender: message.sender,
-      );
-      _receiveList.insert(_receiveList.length, item);
-    }
-  }
-
   /// change [_currentIp].
   /// if [address] is not contain in [_ipList],
   /// this method not set [_currentIp].
@@ -91,6 +79,22 @@ class ReceiveProvider with ChangeNotifier {
   /// check to enable the ip address.
   bool isEnableIp(String address){
     return address != '' && _ipList.contains(address);
+  }
+
+  void removeAt(int index){
+    _receiveList.removeAt(index);
+  }
+
+  void _onReceive(Socket socket, Uint8List data) {
+    Message message = Message(data);
+    if(message is SendFile){
+      ReceiveItem item = ReceiveItem(
+        name: message.name,
+        data: message.fileData,
+        sender: message.sender,
+      );
+      _receiveList.append(item);
+    }
   }
 
   /// for debug
