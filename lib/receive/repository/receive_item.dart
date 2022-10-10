@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:silkroad/utils/suffix_analyzer.dart';
+import 'package:silkroad/utils/file_analyzer.dart';
 
 /// receive item class.
 class ReceiveItem{
@@ -31,8 +31,8 @@ class ReceiveItem{
       this.iconData = iconData; // set the arg icon.
     }
     // if there is no icon arg and can convert an icon from the name.
-    else if(SuffixAnalyzer.convertIcon(name) != null){
-      this.iconData = SuffixAnalyzer.convertIcon(name)!; // set the convert result.
+    else if(FileAnalyzer.convertIcon(name) != null){
+      this.iconData = FileAnalyzer.convertIcon(name)!; // set the convert result.
     }
     // don't know icon.
     else{
