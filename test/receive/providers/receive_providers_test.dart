@@ -130,7 +130,6 @@ Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bo
 
 void portTest(MockTcpHost mockHost) {
   group('port open and close test', () {
-    // ReceiveProvider.networkInfo = networkInfoMock;
 
     test('should be open port when call the open method', () async{
       setupSpyComm(mockHost);
@@ -230,6 +229,14 @@ void itemActionTest() {
       expect(kReceiveList.length, 2);
       expect(kReceiveList[0].name, 'no target');
       expect(kReceiveList[1].name, 'no target');
+    });
+
+  });
+
+  group('save item action test', (){
+
+    test('should be call save item in pc.', () async{
+
     });
 
   });

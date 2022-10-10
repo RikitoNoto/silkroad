@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
-class SuffixToIconConverter{
+enum MimeType{
+  text,
+  image,
+  music,
+  movie,
+  gif,
+  pdf,
+}
+
+class SuffixAnalyzer{
 
   static const Map<String, IconData> _convertTable = {
     /// text

@@ -135,6 +135,7 @@ class ReceivePageState extends State<ReceivePage>
       size: _receiveList[index].size,
       sender: _receiveList[index].sender,
       animation: animation,
+      // onSave: (context) =>
       onDelete: (context) => provider.removeAt(index),
     );
   }

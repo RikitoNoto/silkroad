@@ -46,6 +46,7 @@ mixin _ListItemBuilder{
       required size,
       required sender,
       void Function(BuildContext context)? onDelete,
+      void Function(BuildContext context)? onSave,
     })
   {
     // is light mode.
@@ -63,7 +64,7 @@ mixin _ListItemBuilder{
       padding: _itemPadding,
       child: Slidable(
         startActionPane: _buildStartAction(onDelete),
-        endActionPane: _buildEndAction(),
+        endActionPane: _buildEndAction(onSave),
         child: Container(
           decoration: _decorationItem,
           child: IntrinsicHeight(
@@ -113,7 +114,7 @@ mixin _ListItemBuilder{
     );
   }
 
-  static ActionPane _buildEndAction()
+  static ActionPane _buildEndAction(void Function(BuildContext context)? saveAction)
   {
     return ActionPane(
       motion: const ScrollMotion(),
@@ -121,7 +122,7 @@ mixin _ListItemBuilder{
         SlidableAction(
           // An action can be bigger than the others.
           flex: 2,
-          onPressed: (BuildContext context) => {},
+          onPressed: saveAction,
           backgroundColor: Colors.green,
           foregroundColor: Colors.white,
           icon: Icons.save,
