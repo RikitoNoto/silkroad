@@ -87,7 +87,8 @@ class ReceiveProvider with ChangeNotifier {
 
   void save(int index) async {
     ReceiveItem item = _receiveList[index];
-    PlatformSaverIF(platform: platform).save(item.tempPath);
+    await PlatformSaverIF(platform: platform).save(item.tempPath);
+    removeAt(index);
   }
 
   void removeAt(int index){

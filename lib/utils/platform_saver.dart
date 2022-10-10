@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:platform/platform.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:silkroad/utils/file_analyzer.dart';
 
@@ -43,9 +46,14 @@ class MobileSaver implements PlatformSaverIF{
       case DiscreteType.video:
         GallerySaver.saveVideo(path);
         break;
-
-
       default:
+        String? _localPath = (await getExternalStorageDirectories(type: StorageDirectory.downloads))?.first.path;
+        if(_localPath != null) {
+          File file = File(p.join(_localPath, p.basename(path)));
+          await file.writeAsBytes((await File(path).readAsBytes()));
+          print(file.path);
+        }
+
         break;
     }
     return await true;
