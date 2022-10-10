@@ -211,7 +211,6 @@ void callbackActionTest(MockTcpHost mockHost, MockSocket mockSocket) {
 
 }
 
-
 void itemActionTest() {
   group('delete display by item action test', (){
 
@@ -220,6 +219,17 @@ void itemActionTest() {
       kProvider = ReceiveProvider(receiveList: kReceiveList);
       kProvider!.removeAt(0);
       expect(kReceiveList.length, 0);
+    });
+
+    test('should be able to delete selected item.', () async{
+      kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
+      kReceiveList.append(ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'));
+      kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
+      kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider!.removeAt(1);
+      expect(kReceiveList.length, 2);
+      expect(kReceiveList[0].name, 'no target');
+      expect(kReceiveList[1].name, 'no target');
     });
 
   });
