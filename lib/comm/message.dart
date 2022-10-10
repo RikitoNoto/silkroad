@@ -25,6 +25,7 @@ abstract class Message{
     return _commandToClassTable[command]!(data);
   }
 
+  Uint8List get data;
   Command get command;
 
   static Map<String, Command> commandConvertTable = {
@@ -41,6 +42,9 @@ class None implements Message{
 
   @override
   Command get command => Command.none;
+
+  @override
+  Uint8List get data => Uint8List(0);
 
   final Uint8List receiveData;
 
@@ -64,7 +68,7 @@ class SendFile implements Message{
   static const int dataIndexFile = 1;
   static const int dataIndexSender = 2;
 
-  SendFile({required this.receiveData}){
+  SendFile.receive({required receiveData}){
     RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(receiveData));
     String header = dataSplitter?.group(1) ?? '';
     fileData = Uint8List.fromList(utf8.encode(dataSplitter?.group(2) ?? ''));
@@ -72,16 +76,22 @@ class SendFile implements Message{
     sender = _fetchSender(header);
   }
 
+  SendFile.send({required this.name, required this.sender, required this.fileData,});
+
   @override
   Command get command => Command.sendFile;
+
+  @override
+  Uint8List get data {
+    return Uint8List.fromList(utf8.encode('SEND_FILE\nname:$name\nsender:$sender\n\n${String.fromCharCodes(fileData)}'));
+  }
 
   late final String name;
   late final String sender;
   late final Uint8List fileData;
-  final Uint8List receiveData;
 
   static Message construct(Uint8List data){
-    return SendFile(receiveData: data);
+    return SendFile.receive(receiveData: data);
   }
 
   @override
