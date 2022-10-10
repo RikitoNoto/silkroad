@@ -16,7 +16,7 @@ abstract class Message{
   factory Message(Uint8List data){
     String? commandStr = RegExp('^(.*)\n').firstMatch(String.fromCharCodes(data))?.group(1);
 
-    Command command = commandConvertTable[commandStr] != null ?  commandConvertTable[commandStr]! : Command.none;
+    Command command = _commandConvertTable[commandStr] != null ?  _commandConvertTable[commandStr]! : Command.none;
 
     if(_commandToClassTable[command] == null){
       return _commandToClassTable[Command.none]!(data);
@@ -28,9 +28,17 @@ abstract class Message{
   Uint8List get data;
   Command get command;
 
-  static Map<String, Command> commandConvertTable = {
+  static final Map<String, Command> _commandConvertTable = {
     'SEND_FILE' : Command.sendFile,
   };
+
+  static String? convertMessageString(Command from){
+    String? messageStr;
+    _commandConvertTable.forEach((key, value) {
+      if(value == from) messageStr ??= key;
+    });
+    return messageStr;
+  }
 
   String getDataStr(int index);
   Uint8List getDataBin(int index);
@@ -83,7 +91,13 @@ class SendFile implements Message{
 
   @override
   Uint8List get data {
-    return Uint8List.fromList(utf8.encode('SEND_FILE\nname:$name\nsender:$sender\n\n${String.fromCharCodes(fileData)}'));
+    return Uint8List.fromList(utf8.encode(
+        '${Message.convertMessageString(command)}\n'  // command
+        'name:$name\n'                                // file name
+        'sender:$sender\n'                            // sender
+        '\n'                                          // separator
+        '${String.fromCharCodes(fileData)}'           // file data
+    ));
   }
 
   late final String name;
