@@ -9,6 +9,8 @@ import 'package:mockito/mockito.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:platform/platform.dart';
+
 import 'receive_providers_test.mocks.dart';
 
 import 'package:silkroad/comm/host_if.dart';
@@ -54,27 +56,27 @@ void main() {
 void ipAddressTest(){
   group('ip address test', () {
     test('should be not set ip address when the ip list is empty', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>[]);
       kProvider.selectIp('192.168.1.100');
       expect(kProvider.currentIp, '');
     });
 
     test('should be set ip address when the ip is include in the ip list', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>['192.168.1.100']);
       kProvider.selectIp('192.168.1.100');
       expect(kProvider.currentIp, '192.168.1.100');
     });
 
     test('should be return false when the ip is not include in the ip list(empty)', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>[]);
       expect(kProvider.isEnableIp('192.168.1.100'), isFalse);
     });
 
     test('should be return true when the ip is include in the ip list', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList);
+      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>['192.168.1.100']);
       expect(kProvider.isEnableIp('192.168.1.100'), isTrue);
     });
@@ -93,7 +95,7 @@ void setupSpyComm(MockTcpHost mockHost){
     kReceiveList.removeAt(0);
   }
 
-  kProvider = ReceiveProvider(receiveList: kReceiveList, builder: ({
+  kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform(), builder: ({
     required String ipAddress,
     required int port,
     ConnectionCallback? connectionCallback,
@@ -215,7 +217,7 @@ void itemActionTest() {
 
     test('should be able to delete item.', () async{
       kReceiveList.append(ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'));
-      kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider!.removeAt(0);
       expect(kReceiveList.length, 0);
     });
@@ -224,7 +226,7 @@ void itemActionTest() {
       kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
       kReceiveList.append(ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'));
       kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
-      kProvider = ReceiveProvider(receiveList: kReceiveList);
+      kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider!.removeAt(1);
       expect(kReceiveList.length, 2);
       expect(kReceiveList[0].name, 'no target');

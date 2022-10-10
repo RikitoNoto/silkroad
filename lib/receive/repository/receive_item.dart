@@ -17,6 +17,9 @@ class ReceiveItem{
   late final int size;                /// file size
   late final String sizeStr;          /// file size string
   final String sender;
+  String _tempPath = '';
+
+  String get tempPath => _tempPath;
 
   ReceiveItem({required this.name, required Uint8List data, required this.sender, IconData? iconData,}){
     size = data.length;
@@ -45,7 +48,7 @@ class ReceiveItem{
     await tempFile.create();
 
     await tempFile.writeAsBytes(data);
-
+    _tempPath = tempFile.path;
   }
 
   static String _convertSizeStr(int size){

@@ -210,6 +210,7 @@ class ReceiveListItem extends StatelessWidget{
     required this.sender,
     required this.animation,
     required this.index,
+    this.onSave,
     this.onDelete,
     super.key,
   });
@@ -220,6 +221,7 @@ class ReceiveListItem extends StatelessWidget{
   final int size;                     /// file size
   final String sender;                /// sender name
   final Animation<double> animation;  /// size animation
+  void Function(BuildContext context)? onSave;
   void Function(BuildContext context)? onDelete;
 
   final Animatable<Offset> _offsetAnimation = Tween<Offset>(
@@ -234,7 +236,7 @@ class ReceiveListItem extends StatelessWidget{
   {
     return SlideTransition(
       position: animation.drive(_offsetAnimation),
-      child: _ListItemBuilder.build(context,index: index, iconData: iconData, name: name, size: size, sender: sender, onDelete: onDelete,),
+      child: _ListItemBuilder.build(context,index: index, iconData: iconData, name: name, size: size, sender: sender, onSave: onSave, onDelete: onDelete,),
     );
   }
 }

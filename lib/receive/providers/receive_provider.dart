@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:platform/platform.dart';
+
 import 'package:silkroad/comm/host_if.dart';
 import 'package:silkroad/comm/tcp_host.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/utils/platform_saver.dart';
 
 typedef ReceiveHostFactoryFunc = HostIF Function({
   required String ipAddress,
@@ -16,7 +19,7 @@ typedef ReceiveHostFactoryFunc = HostIF Function({
 });
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required receiveList, this.builder = _build}) : _receiveList = receiveList
+  ReceiveProvider({required this.platform, required receiveList, this.builder = _build}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();
@@ -25,6 +28,7 @@ class ReceiveProvider with ChangeNotifier {
   final ReceiveHostFactoryFunc builder;
   HostIF? _hostComm;
   final AnimatedListItemModel _receiveList;
+  final Platform platform;
 
 
   String _currentIp = '';                   /// selected ip address
@@ -79,6 +83,11 @@ class ReceiveProvider with ChangeNotifier {
   /// check to enable the ip address.
   bool isEnableIp(String address){
     return address != '' && _ipList.contains(address);
+  }
+
+  void save(int index) async {
+    ReceiveItem item = _receiveList[index];
+    PlatformSaverIF(platform: platform).save(item.tempPath);
   }
 
   void removeAt(int index){

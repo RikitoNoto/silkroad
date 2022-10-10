@@ -161,7 +161,13 @@ void tempFileTest(){
       expect(await file.exists(), isTrue);
       expect(await file.readAsString(), 'should be write receive content.');
     });
-  });
 
+    test('should be get temp file path.', () async{
+      ReceiveItem item = createItem(name: 'temp.dart');
+      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
+      File file = File(p.join(kTempDir.path, 'temp.dart'));
+      expect(item.tempPath, file.path);
+    });
+  });
 }
 

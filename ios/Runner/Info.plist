@@ -47,5 +47,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+    <string>to save images received</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>to save images received</string>
 </dict>
 </plist>

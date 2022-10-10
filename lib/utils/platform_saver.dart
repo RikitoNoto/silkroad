@@ -1,6 +1,9 @@
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:platform/platform.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
+
+import 'package:silkroad/utils/file_analyzer.dart';
 
 abstract class PlatformSaverIF{
   factory PlatformSaverIF({required Platform platform}){
@@ -30,6 +33,21 @@ abstract class PlatformSaverIF{
 class MobileSaver implements PlatformSaverIF{
   @override
   Future<bool> save(String path) async {
+    switch(FileAnalyzer.getFileType(p.basename(path))){
+      /// if the file is image
+      case DiscreteType.image:
+        GallerySaver.saveImage(path);
+        break;
+
+      /// if the file is video
+      case DiscreteType.video:
+        GallerySaver.saveVideo(path);
+        break;
+
+
+      default:
+        break;
+    }
     return await true;
   }
 }

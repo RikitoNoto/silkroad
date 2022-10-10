@@ -49,7 +49,7 @@ class ReceivePageState extends State<ReceivePage>
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
-    provider = ReceiveProvider(receiveList: _receiveList);
+    provider = ReceiveProvider(platform: widget.platform, receiveList: _receiveList);
   }
 
   @override
@@ -135,7 +135,7 @@ class ReceivePageState extends State<ReceivePage>
       size: _receiveList[index].size,
       sender: _receiveList[index].sender,
       animation: animation,
-      // onSave: (context) =>
+      onSave: (context) => provider.save(index),
       onDelete: (context) => provider.removeAt(index),
     );
   }
