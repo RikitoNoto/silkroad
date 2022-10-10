@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:platform/platform.dart';
 
 import 'package:silkroad/utils/views/alternate_action_button.dart';
-import 'package:silkroad/utils/views/animated_list_item_model.dart';
+import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/app_theme.dart';
+import 'package:silkroad/global.dart';
 import 'receive_list_item.dart';
-import '../receive_item_info.dart';
+import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/providers/receive_provider.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({
@@ -18,44 +21,71 @@ class ReceivePage extends StatefulWidget {
   final Platform platform;
 
   @override
-  State<ReceivePage> createState() => _ReceivePageState();
+  State<ReceivePage> createState() => ReceivePageState();
 }
 
-class _ReceivePageState extends State<ReceivePage>{
+class ReceivePageState extends State<ReceivePage>
+    with RouteAware
+{
   final _listKey = GlobalKey<AnimatedListState>();
-  late AnimatedListItemModel<ReceiveItemInfo> _receiveList;
-  List<String> _addressList = <String>['192.168.12.1', '192.168.12.2'];
+  late AnimatedListItemModel<ReceiveItem> _receiveList;
+  late final ReceiveProvider provider;
 
-  final List<ReceiveItemInfo> _debugReceiveItems = [
-    const ReceiveItemInfo(iconData: Icons.system_update, name: "system", size: 310, sender: "update"),
-    const ReceiveItemInfo(iconData: Icons.add_moderator, name: "moderator", size: 000, sender: "adder"),
-    const ReceiveItemInfo(iconData: Icons.add_task, name: "task", size: 679, sender: "adder"),
-    const ReceiveItemInfo(iconData: Icons.wifi_tethering_error_outlined, name: "error", size: 7, sender: "buglover"),
-    const ReceiveItemInfo(iconData: Icons.volume_mute_sharp, name: "volume", size: 1000, sender: "pin"),
-    const ReceiveItemInfo(iconData: Icons.video_stable, name: "video", size: 6797, sender: "ummm"),
-    const ReceiveItemInfo(iconData: Icons.turn_sharp_right, name: "turn", size: 657109, sender: "right"),
-    const ReceiveItemInfo(iconData: Icons.timer_10, name: "timer", size: 159465, sender: "cool"),
+  final List<ReceiveItem> _debugReceiveItems = [
+    ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(0), sender: "update"),
+    ReceiveItem(iconData: Icons.add_moderator, name: "moderator", data: Uint8List(0), sender: "adder"),
+    ReceiveItem(iconData: Icons.add_task, name: "task", data: Uint8List(0), sender: "adder"),
+    ReceiveItem(iconData: Icons.wifi_tethering_error_outlined, name: "error", data: Uint8List(0), sender: "buglover"),
+    ReceiveItem(iconData: Icons.volume_mute_sharp, name: "volume", data: Uint8List(0), sender: "pin"),
+    ReceiveItem(iconData: Icons.video_stable, name: "video", data: Uint8List(0), sender: "ummm"),
+    ReceiveItem(iconData: Icons.turn_sharp_right, name: "turn", data: Uint8List(0), sender: "right"),
+    ReceiveItem(iconData: Icons.timer_10, name: "timer", data: Uint8List(0), sender: "cool"),
   ];
-
 
   @override
   void initState() {
     super.initState();
-    _receiveList = AnimatedListItemModel<ReceiveItemInfo>(
+    _receiveList = AnimatedListItemModel<ReceiveItem>(
       listKey: _listKey,
       removedItemBuilder: _removeItem,
     );
+    provider = ReceiveProvider(platform: widget.platform, receiveList: _receiveList);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    kRouteObserver.subscribe(this, ModalRoute.of(context) as PageRoute);
+  }
+
+  @override
+  void dispose() {
+    kRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPop() {
+    provider.close();
+  }
+
+  @override
+  void didPushNext() {
+    provider.close();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Receive"),
-        actions: _getDebugActions(),
-      ),
+    return ChangeNotifierProvider(
+      create: (context) => provider,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Receive"),
+          actions: _getDebugActions(),
+        ),
 
-      body: _buildBody(context)
+        body: _buildBody(context)
+      ),
     );
   }
 
@@ -105,10 +135,12 @@ class _ReceivePageState extends State<ReceivePage>{
       size: _receiveList[index].size,
       sender: _receiveList[index].sender,
       animation: animation,
+      onSave: (context) => provider.save(index),
+      onDelete: (context) => provider.removeAt(index),
     );
   }
 
-  Widget _removeItem(ReceiveItemInfo item, int index, BuildContext context, Animation<double> animation)
+  Widget _removeItem(ReceiveItem item, int index, BuildContext context, Animation<double> animation)
   {
     return ReceiveListItemRemoving(
       index: index,
@@ -134,11 +166,22 @@ class _ReceivePageState extends State<ReceivePage>{
               ),
             ),
 
-            AlternateActionButton(
-              startIcon: Icons.play_arrow,
-              endIcon: Icons.pause,
-              progressIndicatorColor: Colors.blue,
-              iconColor: AppTheme.getForegroundColor(context),
+            Consumer<ReceiveProvider>(
+              builder: (context, provider, child) => AlternateActionButton(
+                enabled: provider.isEnableIp(provider.currentIp),
+                startIcon: Icons.play_arrow,
+                endIcon: Icons.pause,
+                progressIndicatorColor: Colors.blue,
+                iconColor: AppTheme.getForegroundColor(context),
+                onTap: (state){
+                  if(state == AlternateActionStatus.active){
+                    provider.open();
+                  }
+                  else{
+                    provider.close();
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -178,15 +221,19 @@ class _ReceivePageState extends State<ReceivePage>{
         borderRadius: BorderRadius.circular(5),
 
       ),
-      child: DropdownButton(
-        value: _addressList.isNotEmpty ? _addressList[0] : '',
-        icon: const Icon(Icons.arrow_drop_down),
-        iconSize: 30,
-        isExpanded: true,
-        underline: DropdownButtonHideUnderline(child: Container()),
-        elevation: 0,
-        onChanged: (text) => {},
-        items: _addressList.map((address) => DropdownMenuItem(child: Text(address), value: address,)).toList(),
+      child: Consumer<ReceiveProvider>(
+        builder: (context, provider, child) => DropdownButton(
+            value: provider.currentIp,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 30,
+            isExpanded: true,
+            underline: DropdownButtonHideUnderline(child: Container()),
+            elevation: 0,
+            onChanged: (address) => provider.selectIp(address),
+            items: provider.ipList.map((address) =>
+                DropdownMenuItem(value: address, child: Text(address)))
+                .toList(),
+          )
       ),
     );
   }
@@ -201,13 +248,20 @@ class _ReceivePageState extends State<ReceivePage>{
       child:CupertinoButton(
         child: Stack(
           children: [
-            Text('ip address'),
+            Consumer<ReceiveProvider>(builder: (context, provider, child){
+              return Text(
+                provider.currentIp,
+                style: TextStyle(
+                  color: AppTheme.getForegroundColor(context),
+                ),
+              );
+            }),
+
             Align(
               alignment: Alignment.centerRight,
               child: Icon(
                 Icons.arrow_drop_down,
                 color: AppTheme.getForegroundColor(context),
-                // color: Colors.black,
               )
             ),
           ],
@@ -223,7 +277,7 @@ class _ReceivePageState extends State<ReceivePage>{
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height / 3,
           child: GestureDetector(
             onTap: () {
@@ -231,16 +285,9 @@ class _ReceivePageState extends State<ReceivePage>{
             },
             child: CupertinoPicker(
               itemExtent: 40,
-              children: <Widget>[
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-                Text('A'),
-              ],
-              onSelectedItemChanged: (value) {
-
+              children: provider.ipList.map((address) => Text(address)).toList(),
+              onSelectedItemChanged: (address) {
+                provider.selectIp(provider.ipList[address]);
               },
             ),
           ),

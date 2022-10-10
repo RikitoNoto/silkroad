@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_icons/animate_icons.dart';
+import 'package:silkroad/app_theme.dart';
 
 enum AlternateActionStatus{
   active,
@@ -9,7 +10,7 @@ enum AlternateActionStatus{
 typedef AlternateActionCallback = Function(AlternateActionStatus);
 
 class AlternateActionButton extends StatefulWidget{
-  const AlternateActionButton({
+  AlternateActionButton({
     required this.startIcon,
     required this.endIcon,
     this.onTap,
@@ -17,6 +18,7 @@ class AlternateActionButton extends StatefulWidget{
     this.progressIndicatorColor,
     this.progressIndicatorBackGroundColor,
     this.iconColor,
+    this.enabled = true,
     super.key
   });
 
@@ -29,6 +31,8 @@ class AlternateActionButton extends StatefulWidget{
   final Color? progressIndicatorBackGroundColor;
 
   final Color? iconColor;
+  
+  bool enabled;
 
   @override
   AlternateActionButtonState createState() => AlternateActionButtonState();
@@ -55,11 +59,11 @@ class AlternateActionButtonState extends State<AlternateActionButton>{
           AnimateIcons(
             startIcon: widget.startIcon,
             endIcon: widget.endIcon,
-            onStartIconPress: _onStart,
+            onStartIconPress: widget.enabled ? _onStart : ()=>false,
             onEndIconPress: _onEnd,
             controller: _controller,
             duration: Duration(milliseconds: widget.durationMillis),
-            startIconColor: widget.iconColor,
+            startIconColor: widget.enabled ? widget.iconColor : AppTheme.getForegroundDisableColor(context),
             endIconColor: widget.iconColor,
           ),
         ],

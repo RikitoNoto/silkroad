@@ -18,20 +18,32 @@ class AnimatedListItemModel<E> {
 
   void insert(int index, E item, {Duration duration = _durationDefault}) {
     _items.insert(index, item);
-    _animatedList!.insertItem(index, duration: duration);
+    _animatedList?.insertItem(index, duration: duration);
   }
 
-  E removeAt(int index) {
+  E? removeAt(int index) {
+    if(length == 0) return null;
+
     final E removedItem = _items.removeAt(index);
     if (removedItem != null) {
-      _animatedList!.removeItem(
+      _animatedList?.removeItem(
         index,
-            (BuildContext context, Animation<double> animation) {
+        (BuildContext context, Animation<double> animation) {
           return removedItemBuilder(removedItem, index, context, animation);
         },
       );
     }
     return removedItem;
+  }
+
+  void append(E item){
+    insert(length, item);
+  }
+
+  void clear(){
+    while(length != 0) {
+      removeAt(0);
+    }
   }
 
   int get length => _items.length;
