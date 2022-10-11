@@ -13,8 +13,8 @@ import 'package:platform/platform.dart';
 
 import 'receive_providers_test.mocks.dart';
 
-import 'package:silkroad/comm/host_if.dart';
-import 'package:silkroad/comm/tcp_host.dart';
+import 'package:silkroad/comm/communication_if.dart';
+import 'package:silkroad/comm/tcp.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -23,7 +23,7 @@ import '../../spy/path_provider_spy.dart';
 
 late AnimatedListItemModel<ReceiveItem> kReceiveList;
 
-@GenerateMocks([TcpHost])
+@GenerateMocks([Tcp])
 @GenerateMocks([Socket])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,7 +85,7 @@ void ipAddressTest(){
 
 ReceiveProvider? kProvider;
 String? kIpAddressSpy;
-ReceiveCallback? kReceiveCallbackSpy;
+ReceiveCallback<Socket>? kReceiveCallbackSpy;
 int kPortSpy = 0;
 void setupSpyComm(MockTcpHost mockHost){
   kIpAddressSpy = null;
@@ -98,8 +98,8 @@ void setupSpyComm(MockTcpHost mockHost){
   kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform(), builder: ({
     required String ipAddress,
     required int port,
-    ConnectionCallback? connectionCallback,
-    ReceiveCallback? receiveCallback
+    ConnectionCallback<Socket>? connectionCallback,
+    ReceiveCallback<Socket>? receiveCallback
   }){
     kIpAddressSpy = ipAddress;
     kPortSpy = port;
@@ -140,7 +140,7 @@ void portTest(MockTcpHost mockHost) {
 
     test('should be close port when call the close method', () async{
       setupSpyComm(mockHost);
-      when(mockHost.close()).thenAnswer((_)=> {null});
+      when(mockHost.close()).thenAnswer((_)=> Future.value(null));
       await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
       verifyNever(mockHost.close());
       kProvider!.close();
