@@ -93,13 +93,14 @@ class _SendPageState extends State<SendPage>{
     );
   }
 
-  Widget _buildOctetField({textInputAction=TextInputAction.next})
+  Widget _buildOctetField({textInputAction=TextInputAction.next, Key? key})
   {
     return Expanded(
       child: SizedBox(
         height: 30,
 
         child: ThemeInputField(
+          key: key,
           textInputAction: textInputAction,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         ),
