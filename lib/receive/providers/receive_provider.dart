@@ -3,19 +3,20 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:platform/platform.dart';
+import 'package:silkroad/comm/communication_if.dart';
 
-import 'package:silkroad/comm/host_if.dart';
-import 'package:silkroad/comm/tcp_host.dart';
+import 'package:silkroad/comm/communication_if.dart';
+import 'package:silkroad/comm/tcp.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
 
-typedef ReceiveHostFactoryFunc = HostIF Function({
+typedef ReceiveHostFactoryFunc = CommunicationIF Function({
   required String ipAddress,
   required int port,
-  ConnectionCallback? connectionCallback,
-  ReceiveCallback? receiveCallback,
+  ConnectionCallback<Socket>? connectionCallback,
+  ReceiveCallback<Socket>? receiveCallback,
 });
 
 class ReceiveProvider with ChangeNotifier {
@@ -26,7 +27,7 @@ class ReceiveProvider with ChangeNotifier {
   }
   static const portNo = 32099;
   final ReceiveHostFactoryFunc builder;
-  HostIF? _hostComm;
+  CommunicationIF? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
 
@@ -37,13 +38,13 @@ class ReceiveProvider with ChangeNotifier {
   final List<String> _ipList = <String>[];  /// ip address list
   List<String> get ipList => _ipList;
 
-  static HostIF _build({
+  static CommunicationIF _build({
     required String ipAddress,
     required int port,
-    ConnectionCallback? connectionCallback,
-    ReceiveCallback? receiveCallback
+    ConnectionCallback<Socket>? connectionCallback,
+    ReceiveCallback<Socket>? receiveCallback
   }){
-    return TcpHost(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
+    return Tcp(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
   }
 
   Future<bool> open() async{

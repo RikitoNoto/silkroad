@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'host_if.dart';
+import 'package:flutter/foundation.dart';
+
+import 'communication_if.dart';
 
 
-class TcpHost implements HostIF{
-  TcpHost({
+class Tcp implements CommunicationIF<Socket>{
+  Tcp({
     required this.ipAddress,
     required this.port,
     this.connectionCallback,
@@ -13,8 +14,8 @@ class TcpHost implements HostIF{
 
   final String ipAddress;
   final int port; 
-  final ConnectionCallback? connectionCallback; // callback when connection socket.
-  final ReceiveCallback? receiveCallback;       // callback when receive message.
+  final ConnectionCallback<Socket>? connectionCallback; // callback when connection socket.
+  final ReceiveCallback<Socket>? receiveCallback;       // callback when receive message.
   ServerSocket? _server_socket;
   List<Socket> _connections = <Socket>[];           // connecting socket list
 
@@ -24,11 +25,15 @@ class TcpHost implements HostIF{
     try{
       _server_socket = await ServerSocket.bind(ipAddress, port);
     }catch(e){
-      print(e);
-      throw Exception('open error!!');
+      if(kDebugMode) {
+        print("fail binding");
+      }
+      return ;
     }
 
-    print("begin listen port");
+    if(kDebugMode) {
+      print("begin listen port");
+    }
     _server_socket?.listen(
       (connection) {
         _connections.add(connection);
@@ -40,11 +45,11 @@ class TcpHost implements HostIF{
       }
     );
 
-    return Future(()=>{});
+    return ;
   }
 
   @override
-  void close(){
+  Future close() async{
     _connections.forEach((connection) {
       connection.close();
     });
@@ -55,17 +60,22 @@ class TcpHost implements HostIF{
   }
 
   @override
-  void send(Socket connection, Uint8List data){
+  Future<Result> send(Socket connection, Uint8List data) async {
     connection.write(data);
+    return Future.value(Result.success);
   }
 
   Future<void> _listenConnection(Socket connection){
     connection.listen(
-            (Uint8List data) {
-          if(receiveCallback != null){
-            receiveCallback!(connection, data);
-          }
+      (Uint8List data) {
+        if(kDebugMode) {
+          print(String.fromCharCodes(data));
         }
+
+        if(receiveCallback != null){
+          receiveCallback!(connection, data);
+        }
+      }
     );
     return Future(()=>{});
   }
