@@ -6,10 +6,11 @@
 import 'dart:async' as _i4;
 import 'dart:convert' as _i3;
 import 'dart:io' as _i2;
-import 'dart:typed_data' as _i6;
+import 'dart:typed_data' as _i7;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:silkroad/comm/tcp_host.dart' as _i5;
+import 'package:silkroad/comm/communication_if.dart' as _i6;
+import 'package:silkroad/comm/tcp.dart' as _i5;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -57,7 +58,7 @@ class _FakeStreamSubscription_2<T> extends _i1.SmartFake
 /// A class which mocks [TcpHost].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTcpHost extends _i1.Mock implements _i5.TcpHost {
+class MockTcpHost extends _i1.Mock implements _i5.Tcp {
   MockTcpHost() {
     _i1.throwOnMissingStub(this);
   }
@@ -82,19 +83,19 @@ class MockTcpHost extends _i1.Mock implements _i5.TcpHost {
         returnValueForMissingStub: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
   @override
-  void close() => super.noSuchMethod(
+  _i4.Future<dynamic> close() => (super.noSuchMethod(
         Invocation.method(
           #close,
           [],
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<dynamic>.value(),
+      ) as _i4.Future<dynamic>);
   @override
-  void send(
+  _i4.Future<_i6.Result> send(
     _i2.Socket? connection,
-    _i6.Uint8List? data,
+    _i7.Uint8List? data,
   ) =>
-      super.noSuchMethod(
+      (super.noSuchMethod(
         Invocation.method(
           #send,
           [
@@ -102,8 +103,8 @@ class MockTcpHost extends _i1.Mock implements _i5.TcpHost {
             data,
           ],
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<_i6.Result>.value(_i6.Result.success),
+      ) as _i4.Future<_i6.Result>);
 }
 
 /// A class which mocks [Socket].
@@ -161,20 +162,20 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
   @override
-  _i4.Future<_i6.Uint8List> get first => (super.noSuchMethod(
+  _i4.Future<_i7.Uint8List> get first => (super.noSuchMethod(
         Invocation.getter(#first),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> get last => (super.noSuchMethod(
+  _i4.Future<_i7.Uint8List> get last => (super.noSuchMethod(
         Invocation.getter(#last),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> get single => (super.noSuchMethod(
+  _i4.Future<_i7.Uint8List> get single => (super.noSuchMethod(
         Invocation.getter(#single),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
   _i3.Encoding get encoding => (super.noSuchMethod(
         Invocation.getter(#encoding),
@@ -215,14 +216,14 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: false,
       ) as bool);
   @override
-  _i6.Uint8List getRawOption(_i2.RawSocketOption? option) =>
+  _i7.Uint8List getRawOption(_i2.RawSocketOption? option) =>
       (super.noSuchMethod(
         Invocation.method(
           #getRawOption,
           [option],
         ),
-        returnValue: _i6.Uint8List(0),
-      ) as _i6.Uint8List);
+        returnValue: _i7.Uint8List(0),
+      ) as _i7.Uint8List);
   @override
   void setRawOption(_i2.RawSocketOption? option) => super.noSuchMethod(
         Invocation.method(
@@ -240,9 +241,9 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<dynamic>.value(),
       ) as _i4.Future<dynamic>);
   @override
-  _i4.Stream<_i6.Uint8List> asBroadcastStream({
-    void Function(_i4.StreamSubscription<_i6.Uint8List>)? onListen,
-    void Function(_i4.StreamSubscription<_i6.Uint8List>)? onCancel,
+  _i4.Stream<_i7.Uint8List> asBroadcastStream({
+    void Function(_i4.StreamSubscription<_i7.Uint8List>)? onListen,
+    void Function(_i4.StreamSubscription<_i7.Uint8List>)? onCancel,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -253,11 +254,11 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
             #onCancel: onCancel,
           },
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.StreamSubscription<_i6.Uint8List> listen(
-    void Function(_i6.Uint8List)? onData, {
+  _i4.StreamSubscription<_i7.Uint8List> listen(
+    void Function(_i7.Uint8List)? onData, {
     Function? onError,
     void Function()? onDone,
     bool? cancelOnError,
@@ -272,7 +273,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
             #cancelOnError: cancelOnError,
           },
         ),
-        returnValue: _FakeStreamSubscription_2<_i6.Uint8List>(
+        returnValue: _FakeStreamSubscription_2<_i7.Uint8List>(
           this,
           Invocation.method(
             #listen,
@@ -284,18 +285,18 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
             },
           ),
         ),
-      ) as _i4.StreamSubscription<_i6.Uint8List>);
+      ) as _i4.StreamSubscription<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> where(bool Function(_i6.Uint8List)? test) =>
+  _i4.Stream<_i7.Uint8List> where(bool Function(_i7.Uint8List)? test) =>
       (super.noSuchMethod(
         Invocation.method(
           #where,
           [test],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<S> map<S>(S Function(_i6.Uint8List)? convert) =>
+  _i4.Stream<S> map<S>(S Function(_i7.Uint8List)? convert) =>
       (super.noSuchMethod(
         Invocation.method(
           #map,
@@ -304,7 +305,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Stream<S>.empty(),
       ) as _i4.Stream<S>);
   @override
-  _i4.Stream<E> asyncMap<E>(_i4.FutureOr<E> Function(_i6.Uint8List)? convert) =>
+  _i4.Stream<E> asyncMap<E>(_i4.FutureOr<E> Function(_i7.Uint8List)? convert) =>
       (super.noSuchMethod(
         Invocation.method(
           #asyncMap,
@@ -314,7 +315,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
       ) as _i4.Stream<E>);
   @override
   _i4.Stream<E> asyncExpand<E>(
-          _i4.Stream<E>? Function(_i6.Uint8List)? convert) =>
+          _i4.Stream<E>? Function(_i7.Uint8List)? convert) =>
       (super.noSuchMethod(
         Invocation.method(
           #asyncExpand,
@@ -323,7 +324,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Stream<E>.empty(),
       ) as _i4.Stream<E>);
   @override
-  _i4.Stream<_i6.Uint8List> handleError(
+  _i4.Stream<_i7.Uint8List> handleError(
     Function? onError, {
     bool Function(dynamic)? test,
   }) =>
@@ -333,10 +334,10 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           [onError],
           {#test: test},
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<S> expand<S>(Iterable<S> Function(_i6.Uint8List)? convert) =>
+  _i4.Stream<S> expand<S>(Iterable<S> Function(_i7.Uint8List)? convert) =>
       (super.noSuchMethod(
         Invocation.method(
           #expand,
@@ -345,7 +346,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Stream<S>.empty(),
       ) as _i4.Stream<S>);
   @override
-  _i4.Future<dynamic> pipe(_i4.StreamConsumer<_i6.Uint8List>? streamConsumer) =>
+  _i4.Future<dynamic> pipe(_i4.StreamConsumer<_i7.Uint8List>? streamConsumer) =>
       (super.noSuchMethod(
         Invocation.method(
           #pipe,
@@ -355,7 +356,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
       ) as _i4.Future<dynamic>);
   @override
   _i4.Stream<S> transform<S>(
-          _i4.StreamTransformer<_i6.Uint8List, S>? streamTransformer) =>
+          _i4.StreamTransformer<_i7.Uint8List, S>? streamTransformer) =>
       (super.noSuchMethod(
         Invocation.method(
           #transform,
@@ -364,10 +365,10 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Stream<S>.empty(),
       ) as _i4.Stream<S>);
   @override
-  _i4.Future<_i6.Uint8List> reduce(
-          _i6.Uint8List Function(
-    _i6.Uint8List,
-    _i6.Uint8List,
+  _i4.Future<_i7.Uint8List> reduce(
+          _i7.Uint8List Function(
+    _i7.Uint8List,
+    _i7.Uint8List,
   )?
               combine) =>
       (super.noSuchMethod(
@@ -375,14 +376,14 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           #reduce,
           [combine],
         ),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
   _i4.Future<S> fold<S>(
     S? initialValue,
     S Function(
       S,
-      _i6.Uint8List,
+      _i7.Uint8List,
     )?
         combine,
   ) =>
@@ -413,7 +414,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
   @override
-  _i4.Future<dynamic> forEach(void Function(_i6.Uint8List)? action) =>
+  _i4.Future<dynamic> forEach(void Function(_i7.Uint8List)? action) =>
       (super.noSuchMethod(
         Invocation.method(
           #forEach,
@@ -422,7 +423,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<dynamic>.value(),
       ) as _i4.Future<dynamic>);
   @override
-  _i4.Future<bool> every(bool Function(_i6.Uint8List)? test) =>
+  _i4.Future<bool> every(bool Function(_i7.Uint8List)? test) =>
       (super.noSuchMethod(
         Invocation.method(
           #every,
@@ -431,7 +432,7 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
   @override
-  _i4.Future<bool> any(bool Function(_i6.Uint8List)? test) =>
+  _i4.Future<bool> any(bool Function(_i7.Uint8List)? test) =>
       (super.noSuchMethod(
         Invocation.method(
           #any,
@@ -448,21 +449,21 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Stream<R>.empty(),
       ) as _i4.Stream<R>);
   @override
-  _i4.Future<List<_i6.Uint8List>> toList() => (super.noSuchMethod(
+  _i4.Future<List<_i7.Uint8List>> toList() => (super.noSuchMethod(
         Invocation.method(
           #toList,
           [],
         ),
-        returnValue: _i4.Future<List<_i6.Uint8List>>.value(<_i6.Uint8List>[]),
-      ) as _i4.Future<List<_i6.Uint8List>>);
+        returnValue: _i4.Future<List<_i7.Uint8List>>.value(<_i7.Uint8List>[]),
+      ) as _i4.Future<List<_i7.Uint8List>>);
   @override
-  _i4.Future<Set<_i6.Uint8List>> toSet() => (super.noSuchMethod(
+  _i4.Future<Set<_i7.Uint8List>> toSet() => (super.noSuchMethod(
         Invocation.method(
           #toSet,
           [],
         ),
-        returnValue: _i4.Future<Set<_i6.Uint8List>>.value(<_i6.Uint8List>{}),
-      ) as _i4.Future<Set<_i6.Uint8List>>);
+        returnValue: _i4.Future<Set<_i7.Uint8List>>.value(<_i7.Uint8List>{}),
+      ) as _i4.Future<Set<_i7.Uint8List>>);
   @override
   _i4.Future<E> drain<E>([E? futureValue]) => (super.noSuchMethod(
         Invocation.method(
@@ -472,44 +473,44 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         returnValue: _i4.Future<E>.value(null),
       ) as _i4.Future<E>);
   @override
-  _i4.Stream<_i6.Uint8List> take(int? count) => (super.noSuchMethod(
+  _i4.Stream<_i7.Uint8List> take(int? count) => (super.noSuchMethod(
         Invocation.method(
           #take,
           [count],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> takeWhile(bool Function(_i6.Uint8List)? test) =>
+  _i4.Stream<_i7.Uint8List> takeWhile(bool Function(_i7.Uint8List)? test) =>
       (super.noSuchMethod(
         Invocation.method(
           #takeWhile,
           [test],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> skip(int? count) => (super.noSuchMethod(
+  _i4.Stream<_i7.Uint8List> skip(int? count) => (super.noSuchMethod(
         Invocation.method(
           #skip,
           [count],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> skipWhile(bool Function(_i6.Uint8List)? test) =>
+  _i4.Stream<_i7.Uint8List> skipWhile(bool Function(_i7.Uint8List)? test) =>
       (super.noSuchMethod(
         Invocation.method(
           #skipWhile,
           [test],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> distinct(
+  _i4.Stream<_i7.Uint8List> distinct(
           [bool Function(
-            _i6.Uint8List,
-            _i6.Uint8List,
+            _i7.Uint8List,
+            _i7.Uint8List,
           )?
               equals]) =>
       (super.noSuchMethod(
@@ -517,12 +518,12 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           #distinct,
           [equals],
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> firstWhere(
-    bool Function(_i6.Uint8List)? test, {
-    _i6.Uint8List Function()? orElse,
+  _i4.Future<_i7.Uint8List> firstWhere(
+    bool Function(_i7.Uint8List)? test, {
+    _i7.Uint8List Function()? orElse,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -530,12 +531,12 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           [test],
           {#orElse: orElse},
         ),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> lastWhere(
-    bool Function(_i6.Uint8List)? test, {
-    _i6.Uint8List Function()? orElse,
+  _i4.Future<_i7.Uint8List> lastWhere(
+    bool Function(_i7.Uint8List)? test, {
+    _i7.Uint8List Function()? orElse,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -543,12 +544,12 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           [test],
           {#orElse: orElse},
         ),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> singleWhere(
-    bool Function(_i6.Uint8List)? test, {
-    _i6.Uint8List Function()? orElse,
+  _i4.Future<_i7.Uint8List> singleWhere(
+    bool Function(_i7.Uint8List)? test, {
+    _i7.Uint8List Function()? orElse,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -556,20 +557,20 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           [test],
           {#orElse: orElse},
         ),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Future<_i6.Uint8List> elementAt(int? index) => (super.noSuchMethod(
+  _i4.Future<_i7.Uint8List> elementAt(int? index) => (super.noSuchMethod(
         Invocation.method(
           #elementAt,
           [index],
         ),
-        returnValue: _i4.Future<_i6.Uint8List>.value(_i6.Uint8List(0)),
-      ) as _i4.Future<_i6.Uint8List>);
+        returnValue: _i4.Future<_i7.Uint8List>.value(_i7.Uint8List(0)),
+      ) as _i4.Future<_i7.Uint8List>);
   @override
-  _i4.Stream<_i6.Uint8List> timeout(
+  _i4.Stream<_i7.Uint8List> timeout(
     Duration? timeLimit, {
-    void Function(_i4.EventSink<_i6.Uint8List>)? onTimeout,
+    void Function(_i4.EventSink<_i7.Uint8List>)? onTimeout,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -577,8 +578,8 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
           [timeLimit],
           {#onTimeout: onTimeout},
         ),
-        returnValue: _i4.Stream<_i6.Uint8List>.empty(),
-      ) as _i4.Stream<_i6.Uint8List>);
+        returnValue: _i4.Stream<_i7.Uint8List>.empty(),
+      ) as _i4.Stream<_i7.Uint8List>);
   @override
   void add(List<int>? data) => super.noSuchMethod(
         Invocation.method(
