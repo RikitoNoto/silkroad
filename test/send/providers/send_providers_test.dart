@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:platform/platform.dart';
 
@@ -10,6 +12,26 @@ void main() {
     kProvider = SendProvider(platform: const LocalPlatform());
   });
   ipTest();
+  fileSetTest();
+}
+
+void fileSetTest(){
+  group('file set test', () {
+    test('should be able to set file and get file path', () {
+      kProvider.file = File('');
+      expect(kProvider.filePath, '');
+    });
+
+    test('should be change file path [A]', () {
+      kProvider.file = File('A');
+      expect(kProvider.filePath, 'A');
+    });
+
+    test('should be change file path [file]', () {
+      kProvider.file = File('file');
+      expect(kProvider.filePath, 'file');
+    });
+  });
 }
 
 void ipTest(){
