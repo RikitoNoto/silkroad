@@ -55,11 +55,11 @@ class _FakeStreamSubscription_2<T> extends _i1.SmartFake
         );
 }
 
-/// A class which mocks [TcpHost].
+/// A class which mocks [Tcp].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTcpHost extends _i1.Mock implements _i5.Tcp {
-  MockTcpHost() {
+class MockTcp extends _i1.Mock implements _i5.Tcp {
+  MockTcp() {
     _i1.throwOnMissingStub(this);
   }
 

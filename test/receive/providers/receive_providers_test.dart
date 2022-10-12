@@ -27,7 +27,7 @@ late AnimatedListItemModel<ReceiveItem> kReceiveList;
 @GenerateMocks([Socket])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MockTcpHost mockHost = MockTcpHost();
+  MockTcp mockHost = MockTcp();
   MockSocket mockSocket = MockSocket();
   kReceiveList = AnimatedListItemModel<ReceiveItem>(
     listKey: GlobalKey<AnimatedListState>(),
@@ -87,7 +87,7 @@ ReceiveProvider? kProvider;
 String? kIpAddressSpy;
 ReceiveCallback<Socket>? kReceiveCallbackSpy;
 int kPortSpy = 0;
-void setupSpyComm(MockTcpHost mockHost){
+void setupSpyComm(MockTcp mockHost){
   kIpAddressSpy = null;
   kPortSpy = 0;
   kReceiveCallbackSpy = null;
@@ -114,7 +114,7 @@ Future<bool> openPort(String ip, int port){
   return kProvider!.open();
 }
 
-Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bool isCalled, MockTcpHost mockHost) async{
+Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bool isCalled, MockTcp mockHost) async{
 
   when(mockHost.listen()).thenAnswer((_)=>Future<void>.value());
   verifyNever(mockHost.listen());
@@ -130,7 +130,7 @@ Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bo
   expect(result, providerOpenReturnValue);
 }
 
-void portTest(MockTcpHost mockHost) {
+void portTest(MockTcp mockHost) {
   group('port open and close test', () {
 
     test('should be open port when call the open method', () async{
@@ -149,7 +149,7 @@ void portTest(MockTcpHost mockHost) {
   });
 }
 
-Future<void> setupCallbackAction(MockTcpHost mockHost, {
+Future<void> setupCallbackAction(MockTcp mockHost, {
   String ip = '192.168.1.1',
   int port = ReceiveProvider.portNo,
 }) async{
@@ -167,7 +167,7 @@ String convertMessageString({required name, sender='', data=''}){
   return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
 }
 
-void callbackActionTest(MockTcpHost mockHost, MockSocket mockSocket) {
+void callbackActionTest(MockTcp mockHost, MockSocket mockSocket) {
   group('callback action test', () {
     // ReceiveProvider.networkInfo = networkInfoMock;
 

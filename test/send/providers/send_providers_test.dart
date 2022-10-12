@@ -2,17 +2,49 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:platform/platform.dart';
+import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 
+import 'package:silkroad/comm/tcp.dart';
+import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 
-late SendProvider kProvider;
+import 'send_providers_test.mocks.dart';
 
+late SendProvider kProvider;
+late MockFile kFileMock;
+late MockTcp kTcpMock;
+
+CommunicationIF _buildSpy({
+  required String ipAddress,
+  required int port,
+  ConnectionCallback<Socket>? connectionCallback,
+  ReceiveCallback<Socket>? receiveCallback
+}){
+  return kTcpMock;
+}
+
+@GenerateMocks([Tcp])
+@GenerateMocks([File])
 void main() {
   setUp((){
-    kProvider = SendProvider(platform: const LocalPlatform());
+    kFileMock = MockFile();
+    kTcpMock = MockTcp();
+    kProvider = SendProvider(platform: const LocalPlatform(), builder: _buildSpy);
   });
   ipTest();
   fileSetTest();
+  sendMessageTest();
+}
+
+void sendMessageTest(){
+  group('send message test', () {
+    test('should be send message', () {
+      //TODO: create connection method in tcp
+      //      that can not send message because it unknown send to.
+      kProvider.send();
+    });
+  });
 }
 
 void fileSetTest(){
