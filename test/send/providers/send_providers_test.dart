@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:platform/platform.dart';
@@ -14,6 +15,7 @@ import 'send_providers_test.mocks.dart';
 late SendProvider kProvider;
 late MockFile kFileMock;
 late MockTcp kTcpMock;
+late MockSocket kSocketMock;
 
 CommunicationIF _buildSpy({
   required String ipAddress,
@@ -24,12 +26,14 @@ CommunicationIF _buildSpy({
   return kTcpMock;
 }
 
+@GenerateMocks([Socket])
 @GenerateMocks([Tcp])
 @GenerateMocks([File])
 void main() {
   setUp((){
     kFileMock = MockFile();
     kTcpMock = MockTcp();
+    kSocketMock = MockSocket();
     kProvider = SendProvider(platform: const LocalPlatform(), builder: _buildSpy);
   });
   ipTest();
@@ -39,10 +43,13 @@ void main() {
 
 void sendMessageTest(){
   group('send message test', () {
-    test('should be send message', () {
-      //TODO: create connection method in tcp
-      //      that can not send message because it unknown send to.
-      // kProvider.send();
+    test('should be connect and send to socket', () {
+      when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(Uint8List(0)));
+      when(kTcpMock.connect(any)).thenAnswer((_)=>Future.value(kSocketMock));
+      when(kTcpMock.send(any, any)).thenAnswer((_)=>Future.value(null));
+      kProvider.send();
+      verify(kTcpMock.connect('0.0.0.0:32099'));
+      verify(kTcpMock.send(kSocketMock, any));
     });
   });
 }

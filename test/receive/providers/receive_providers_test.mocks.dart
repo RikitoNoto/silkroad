@@ -64,20 +64,27 @@ class MockTcp extends _i1.Mock implements _i5.Tcp {
   }
 
   @override
-  String get ipAddress => (super.noSuchMethod(
-        Invocation.getter(#ipAddress),
-        returnValue: '',
-      ) as String);
+  _i4.Future<_i2.Socket?> connect(String? to) => (super.noSuchMethod(
+        Invocation.method(
+          #connect,
+          [to],
+        ),
+        returnValue: _i4.Future<_i2.Socket?>.value(),
+      ) as _i4.Future<_i2.Socket?>);
   @override
-  int get port => (super.noSuchMethod(
-        Invocation.getter(#port),
-        returnValue: 0,
-      ) as int);
-  @override
-  _i4.Future<void> listen() => (super.noSuchMethod(
+  _i4.Future<void> listen(
+    String? bind, {
+    _i6.ConnectionCallback<_i2.Socket>? connectionCallback,
+    _i6.ReceiveCallback<_i2.Socket>? receiveCallback,
+  }) =>
+      (super.noSuchMethod(
         Invocation.method(
           #listen,
-          [],
+          [bind],
+          {
+            #connectionCallback: connectionCallback,
+            #receiveCallback: receiveCallback,
+          },
         ),
         returnValue: _i4.Future<void>.value(),
         returnValueForMissingStub: _i4.Future<void>.value(),

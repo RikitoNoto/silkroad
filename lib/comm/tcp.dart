@@ -5,19 +5,25 @@ import 'communication_if.dart';
 
 
 class Tcp implements CommunicationIF<Socket>{
-  Tcp({
-    required this.ipAddress,
-    required this.port,
-    this.connectionCallback,
-    this.receiveCallback,
-  });
+  Tcp();
 
-  final String ipAddress;
-  final int port; 
-  final ConnectionCallback<Socket>? connectionCallback; // callback when connection socket.
-  final ReceiveCallback<Socket>? receiveCallback;       // callback when receive message.
-  ServerSocket? _server_socket;
-  List<Socket> _connections = <Socket>[];           // connecting socket list
+  // final String ipAddress;
+  // final int port;
+  // final ConnectionCallback<Socket>? connectionCallback; // callback when connection socket.
+  // final ReceiveCallback<Socket>? receiveCallback;       // callback when receive message.
+  final List<ServerSocket> _serverSocket = <ServerSocket>[];
+  final List<Socket> _connections = <Socket>[];           // connecting socket list
+
+  String? _convertAddress(String addressStr){
+    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(addressStr);
+    return match?.group(1);
+  }
+
+  int? _convertPort(String portStr){
+    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(portStr);
+    String? port = match?.group(2);
+    return port == null ? int.parse(port!) : null;
+  }
 
   @override
   Future<Socket?> connect(String to) async{
@@ -33,10 +39,13 @@ class Tcp implements CommunicationIF<Socket>{
   }
   
   @override
-  Future<void> listen() async{
+  Future<void> listen(String bind, {ConnectionCallback<Socket>? connectionCallback, ReceiveCallback<Socket>? receiveCallback}) async{
+    if( (_convertAddress(bind) == null) || (_convertPort(bind) == null )) throw ArgumentError('invalid arg. the arg format is <address>:<port>');
 
+    ServerSocket socket;
     try{
-      _server_socket = await ServerSocket.bind(ipAddress, port);
+      socket = await ServerSocket.bind(_convertAddress(bind), _convertPort(bind)!);
+      _serverSocket.add(socket);
     }catch(e){
       if(kDebugMode) {
         print("fail binding");
@@ -47,11 +56,11 @@ class Tcp implements CommunicationIF<Socket>{
     if(kDebugMode) {
       print("begin listen port");
     }
-    _server_socket?.listen(
+    socket.listen(
       (connection) {
         _connections.add(connection);
         if(connectionCallback != null){
-          connectionCallback!(connection);
+          connectionCallback(connection);
         }
 
         _listenConnection(connection);
@@ -66,10 +75,12 @@ class Tcp implements CommunicationIF<Socket>{
     _connections.forEach((connection) {
       connection.close();
     });
-    _server_socket?.close();
 
+    _serverSocket.forEach((connection) {
+      connection.close();
+    });
     _connections.clear();
-    _server_socket = null;
+    _serverSocket.clear();
   }
 
   @override
@@ -78,7 +89,7 @@ class Tcp implements CommunicationIF<Socket>{
     return Future.value(Result.success);
   }
 
-  Future<void> _listenConnection(Socket connection){
+  Future<void> _listenConnection(Socket connection, {ReceiveCallback<Socket>? receiveCallback}){
     connection.listen(
       (Uint8List data) {
         if(kDebugMode) {
@@ -86,7 +97,7 @@ class Tcp implements CommunicationIF<Socket>{
         }
 
         if(receiveCallback != null){
-          receiveCallback!(connection, data);
+          receiveCallback(connection, data);
         }
       }
     );

@@ -21,6 +21,7 @@ class SendProvider with ChangeNotifier {
   final List<int> _ip = <int>[0, 0, 0, 0];
   File? _file;
   final SendClientFactoryFunc builder;
+  CommunicationIF? communicator;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -32,6 +33,10 @@ class SendProvider with ChangeNotifier {
     ReceiveCallback<Socket>? receiveCallback
   }){
     return Tcp(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
+  }
+
+  Future send() async{
+    // communicator = builder(ipAddress: ip, port:)
   }
 
   void setOctet(int octet, int value){
