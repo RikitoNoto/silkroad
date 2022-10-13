@@ -9,6 +9,7 @@ enum Result{
 }
 
 abstract class CommunicationIF<T>{
+  Future<T?> connect(String to);
   Future<void> listen();
   Future close();
   Future<Result> send(T connection, Uint8List data);

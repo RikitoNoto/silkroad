@@ -20,6 +20,19 @@ class Tcp implements CommunicationIF<Socket>{
   List<Socket> _connections = <Socket>[];           // connecting socket list
 
   @override
+  Future<Socket?> connect(String to) async{
+    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(to);
+    String? address = match?.group(1);
+    String? port = match?.group(2);
+    if( (address != null) && (port != null) ){
+      return await Socket.connect(address, int.parse(port));
+    }
+    else{
+      throw ArgumentError('invalid arg. the arg format is <address>:<port>');
+    }
+  }
+  
+  @override
   Future<void> listen() async{
 
     try{
