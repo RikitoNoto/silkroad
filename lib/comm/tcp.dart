@@ -98,7 +98,7 @@ class Tcp implements CommunicationIF<Socket>{
         }
 
         if(receiveCallback != null){
-          receiveCallback(connection, data);
+          receiveCallback(connection, Message(data));
         }
       }
     );

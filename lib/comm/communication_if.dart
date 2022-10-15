@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'message.dart';
 
 typedef ConnectionCallback<T> = Function(T socket);
-typedef ReceiveCallback<T> = Function(T socket, Uint8List data);//TODO: change the type of data to Message
+typedef ReceiveCallback<T> = Function(T socket, Message data);
 
 enum Result{
   success,

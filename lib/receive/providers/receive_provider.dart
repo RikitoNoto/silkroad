@@ -86,13 +86,12 @@ class ReceiveProvider with ChangeNotifier {
     _receiveList.removeAt(index);
   }
 
-  void _onReceive(Socket socket, Uint8List data) {
-    Message message = Message(data);
-    if(message is SendFile){
+  void _onReceive(Socket socket, Message data) {
+    if(data is SendFile){
       ReceiveItem item = ReceiveItem(
-        name: message.name,
-        data: message.fileData,
-        sender: message.sender,
+        name: data.name,
+        data: data.fileData,
+        sender: data.sender,
       );
       _receiveList.append(item);
     }

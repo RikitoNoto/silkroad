@@ -15,6 +15,7 @@ import 'receive_providers_test.mocks.dart';
 
 import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/tcp.dart';
+import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -136,7 +137,7 @@ Future<void> setupCallbackAction({
 }
 
 Future checkReceiveListLen(int expectLen, String sendData) async{//, MockSocket mockSocket, MockTcp mockHost) async{
-  await kReceiveCallbackSpy!(kMockSocket, Uint8List.fromList(utf8.encode(sendData)));
+  await kReceiveCallbackSpy!(kMockSocket, Message(Uint8List.fromList(utf8.encode(sendData))));
   expect(kReceiveList.length, expectLen);
 }
 
