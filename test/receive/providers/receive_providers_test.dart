@@ -111,11 +111,15 @@ void ipAddressTest(){
 Future<ReceiveCallback<Socket>?> openPort(String ip, int port) async{
   kProvider.overwriteAddressList(<String>[ip]);
   kProvider.selectIp(ip);
-  when(kMockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).thenAnswer((_) => Future.value(kMockSocket));
+  when(kMockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).thenAnswer((Invocation invocation){
+    kReceiveCallbackSpy = invocation.namedArguments[Symbol('receiveCallback')];
+    return Future.value(kMockSocket);
+  });
 //  when(mockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).thenAnswer((_) => Future.value(mockSocket));
 //  kReceiveCallbackSpy = verify(mockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).captured.first;
   if(!await kProvider.open()) fail('fail open');
-  return verify(kMockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).captured.first;
+  return kReceiveCallbackSpy;
+//  return verify(kMockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).captured.first;
 //  return result;
 }
 

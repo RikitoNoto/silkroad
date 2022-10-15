@@ -12,7 +12,7 @@ import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
 
-typedef ReceiveHostFactoryFunc = CommunicationIF Function();
+typedef ReceiveHostFactoryFunc<T> = CommunicationIF<T> Function();
 
 class ReceiveProvider with ChangeNotifier {
   ReceiveProvider({required this.platform, required receiveList, this.builder = _build}) : _receiveList = receiveList
@@ -21,8 +21,8 @@ class ReceiveProvider with ChangeNotifier {
     fetchIpAddresses();
   }
   static const portNo = 32099;
-  final ReceiveHostFactoryFunc builder;
-  CommunicationIF? _hostComm;
+  final ReceiveHostFactoryFunc<Socket> builder;
+  CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
 
@@ -33,14 +33,14 @@ class ReceiveProvider with ChangeNotifier {
   final List<String> _ipList = <String>[];  /// ip address list
   List<String> get ipList => _ipList;
 
-  static CommunicationIF _build(){
+  static CommunicationIF<Socket> _build(){
     return Tcp();
   }
 
   Future<bool> open() async{
     _hostComm = builder();
 
-    _hostComm!.listen('');
+    _hostComm!.listen(currentIp, receiveCallback: _onReceive);
     return true;
   }
 
