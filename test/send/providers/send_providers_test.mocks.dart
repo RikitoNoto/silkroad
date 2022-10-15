@@ -10,6 +10,7 @@ import 'dart:typed_data' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:silkroad/comm/communication_if.dart' as _i7;
+import 'package:silkroad/comm/message.dart' as _i8;
 import 'package:silkroad/comm/tcp.dart' as _i6;
 
 // ignore_for_file: type=lint
@@ -736,7 +737,7 @@ class MockTcp extends _i1.Mock implements _i6.Tcp {
   @override
   _i4.Future<_i7.Result> send(
     _i2.Socket? connection,
-    _i5.Uint8List? data,
+    _i8.Message? data,
   ) =>
       (super.noSuchMethod(
         Invocation.method(

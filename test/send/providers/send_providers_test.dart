@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -5,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:platform/platform.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
+import 'package:path/path.dart' as p;
+import 'package:silkroad/comm/comm.dart';
 
 import 'package:silkroad/comm/tcp.dart';
 import 'package:silkroad/comm/communication_if.dart';
@@ -16,13 +19,9 @@ late SendProvider kProvider;
 late MockFile kFileMock;
 late MockTcp kTcpMock;
 late MockSocket kSocketMock;
+late Message? kSendData;
 
-CommunicationIF _buildSpy({
-  required String ipAddress,
-  required int port,
-  ConnectionCallback<Socket>? connectionCallback,
-  ReceiveCallback<Socket>? receiveCallback
-}){
+CommunicationIF<Socket> _buildSpy(){
   return kTcpMock;
 }
 
@@ -31,27 +30,16 @@ CommunicationIF _buildSpy({
 @GenerateMocks([File])
 void main() {
   setUp((){
+    kSendData = null;
     kFileMock = MockFile();
     kTcpMock = MockTcp();
     kSocketMock = MockSocket();
     kProvider = SendProvider(platform: const LocalPlatform(), builder: _buildSpy);
+    kProvider.file = kFileMock;
   });
   ipTest();
   fileSetTest();
   sendMessageTest();
-}
-
-void sendMessageTest(){
-  group('send message test', () {
-    test('should be connect and send to socket', () {
-      when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(Uint8List(0)));
-      when(kTcpMock.connect(any)).thenAnswer((_)=>Future.value(kSocketMock));
-      when(kTcpMock.send(any, any)).thenAnswer((_)=>Future.value(null));
-      kProvider.send();
-      verify(kTcpMock.connect('0.0.0.0:32099'));
-      verify(kTcpMock.send(kSocketMock, any));
-    });
-  });
 }
 
 void fileSetTest(){
@@ -70,6 +58,13 @@ void fileSetTest(){
       kProvider.file = File('file');
       expect(kProvider.filePath, 'file');
     });
+  });
+}
+
+
+void setIpAddressToProvider(String ip){
+  ip.split('.').asMap().forEach((int i, String octet) {
+    kProvider.setOctet(i, int.parse(octet));
   });
 }
 
@@ -101,11 +96,89 @@ void ipTest(){
     });
 
     test('should be able to set all octets to 255', () {
-      kProvider.setOctet(0, 255);
-      kProvider.setOctet(1, 255);
-      kProvider.setOctet(2, 255);
-      kProvider.setOctet(3, 255);
+      setIpAddressToProvider('255.255.255.255');
       expect(kProvider.ip, '255.255.255.255');
+    });
+  });
+}
+
+void setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? data, Result sendResult=Result.success, bool connectionResult=true}){
+  when(kFileMock.exists()).thenAnswer((_) => Future.value(isFileExist));
+  when(kFileMock.path).thenAnswer((_) => p.join(fileName));
+  when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(data ?? Uint8List(0)));
+  when(kTcpMock.connect(any)).thenAnswer((_)=>Future.value(connectionResult ? kSocketMock : null));
+  when(kTcpMock.send(any, any)).thenAnswer((Invocation invocation) {
+    kSendData = invocation.positionalArguments[1];
+    return Future.value(sendResult);
+  });
+  when(kTcpMock.close()).thenAnswer((_)=>Future.value(null));
+}
+
+void checkCalledSend({
+  String expectIp='0.0.0.0',
+  int expectPort=32099,
+  Message? data,
+  bool checkNever=false,
+  bool checkNeverConnect=false,
+  bool checkNeverSend=false,
+  bool checkNeverClose=false,
+}){
+  if(checkNever) checkNeverConnect = checkNeverSend = checkNeverClose = checkNever;
+
+  if(!checkNeverConnect) {
+    verify(kTcpMock.connect('$expectIp:$expectPort'));
+  }
+  else{
+    verifyNever(kTcpMock.connect(any));
+  }
+
+  if(!checkNeverSend){
+    verify(kTcpMock.send(kSocketMock, any));
+    if(data != null){
+      expect(kSendData?.data, data.data);
+    }
+  }else{
+    verifyNever(kTcpMock.send(any, any));
+  }
+
+  if(!checkNeverClose){
+    verify(kTcpMock.close());
+  }else{
+    verifyNever(kTcpMock.close());
+  }
+}
+
+void sendMessageTest(){
+  group('send message test', () {
+    test('should be connect and send to socket default', () async{
+      setupSendMocks();
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(expectIp: '0.0.0.0', expectPort: 32099);
+    });
+
+    test('should be connect and send to socket [192.168.12.1]', () async{
+      setupSendMocks();
+      setIpAddressToProvider('192.168.12.1');
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(expectIp: '192.168.12.1', expectPort: 32099);
+    });
+
+    test('should be fail and not send message if file is none', () async{
+      setupSendMocks(fileName: 'name', isFileExist: false);
+      expect(await kProvider.send(), isFalse);
+      checkCalledSend(checkNeverSend: true);
+    });
+
+    test('should be fail and not send message if connection is fail', () async{
+      setupSendMocks(fileName: 'name', isFileExist: false, connectionResult: false);
+      expect(await kProvider.send(), isFalse);
+      checkCalledSend(checkNeverSend: true);
+    });
+
+    test('should be send message empty data when file data is empty', () async{
+      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });
   });
 }

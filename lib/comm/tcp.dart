@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'communication_if.dart';
+import 'message.dart';
 
 
 class Tcp implements CommunicationIF<Socket>{
@@ -84,8 +85,8 @@ class Tcp implements CommunicationIF<Socket>{
   }
 
   @override
-  Future<Result> send(Socket connection, Uint8List data) async {
-    connection.write(data);
+  Future<Result> send(Socket connection, Message data) async {
+    connection.write(data.data);
     return Future.value(Result.success);
   }
 
