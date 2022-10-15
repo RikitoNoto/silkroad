@@ -1,29 +1,29 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:path/path.dart' as p;
-import 'package:platform/platform.dart';
 
 import 'package:silkroad/comm/comm.dart';
-import 'package:silkroad/comm/communication_if.dart';
-import 'package:silkroad/comm/tcp.dart';
 
 typedef SendClientFactoryFunc<T> = CommunicationIF<T> Function();
 
 class SendProvider with ChangeNotifier {
-  SendProvider({required this.platform, this.builder = _build});
+  SendProvider({this.builder = _build});
 
-  final LocalPlatform platform;
+  static const String fileNameNoSelect = 'No select';
+
   final List<int> _ip = <int>[0, 0, 0, 0];
   File? _file;
   final SendClientFactoryFunc<Socket> builder;
-  // CommunicationIF<Socket>? communicator;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
+  String get fileName {
+    File? file = _file;
+    return file != null ? p.basename(_file!.path) : fileNameNoSelect;
+  }
 
+  //TODO: move global.
   static CommunicationIF<Socket> _build(){
     return Tcp();
   }
@@ -55,5 +55,6 @@ class SendProvider with ChangeNotifier {
 
   set file(File? file) {
     _file = file;
+    notifyListeners();
   }
 }

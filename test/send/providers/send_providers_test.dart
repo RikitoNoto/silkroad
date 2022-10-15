@@ -3,14 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:platform/platform.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:path/path.dart' as p;
-import 'package:silkroad/comm/comm.dart';
 
-import 'package:silkroad/comm/tcp.dart';
-import 'package:silkroad/comm/communication_if.dart';
+import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 
 import 'send_providers_test.mocks.dart';
@@ -34,12 +31,13 @@ void main() {
     kFileMock = MockFile();
     kTcpMock = MockTcp();
     kSocketMock = MockSocket();
-    kProvider = SendProvider(platform: const LocalPlatform(), builder: _buildSpy);
+    kProvider = SendProvider(builder: _buildSpy);
     kProvider.file = kFileMock;
   });
   ipTest();
   fileSetTest();
   sendMessageTest();
+  fileNameTest();
 }
 
 void fileSetTest(){
@@ -61,6 +59,19 @@ void fileSetTest(){
   });
 }
 
+void fileNameTest(){
+  group('file name test', () {
+    test('should be get file name [No select] when no file set', () {
+      kProvider.file = null;
+      expect(kProvider.fileName, 'No select');
+    });
+
+    test('should be get file name [temp.c] when set file temp/temp.c', () {
+      when(kFileMock.path).thenAnswer((_) => p.join('temp', 'temp.c'));
+      expect(kProvider.fileName, 'temp.c');
+    });
+  });
+}
 
 void setIpAddressToProvider(String ip){
   ip.split('.').asMap().forEach((int i, String octet) {

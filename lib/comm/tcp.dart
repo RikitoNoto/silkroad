@@ -16,26 +16,26 @@ class Tcp implements CommunicationIF<Socket>{
   final List<Socket> _connections = <Socket>[];           // connecting socket list
 
   String? _convertAddress(String addressStr){
-    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(addressStr);
+    RegExpMatch? match = RegExp("(([0-9]+\.)+[0-9]+):([0-9]+)").firstMatch(addressStr);
     return match?.group(1);
   }
 
   int? _convertPort(String portStr){
-    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(portStr);
-    String? port = match?.group(2);
-    return port == null ? int.parse(port!) : null;
+    RegExpMatch? match = RegExp("(([0-9]+\.)+[0-9]+):([0-9]+)").firstMatch(portStr);
+    String? port = match?.group(3);
+    return port != null ? int.parse(port) : null;
   }
 
   @override
   Future<Socket?> connect(String to) async{
-    RegExpMatch? match = RegExp("(\d+\.)+:(\d+)").firstMatch(to);
-    String? address = match?.group(1);
-    String? port = match?.group(2);
+    // RegExpMatch? match = RegExp("((\d+\.)+\d+):(\d+)").firstMatch(to);
+    String? address = _convertAddress(to); // match?.group(1);
+    int? port = _convertPort(to); //match?.group(3);
     if( (address != null) && (port != null) ){
-      return await Socket.connect(address, int.parse(port));
+      return await Socket.connect(address, port);
     }
     else{
-      throw ArgumentError('invalid arg. the arg format is <address>:<port>');
+      throw ArgumentError('invalid arg [$to].\nthe arg format is <address>:<port>');
     }
   }
   
