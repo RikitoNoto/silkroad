@@ -7,6 +7,7 @@ import 'package:silkroad/comm/message.dart';
 void main() {
   commandNoneTest();
   commandSendFileTest();
+  convertMessageTest();
 }
 
 Uint8List convertCommand({command=''}){
@@ -112,6 +113,25 @@ void nameSendFileTest(){
       Message message = Message(convertSendFileCommand(name: 'A',file: 'name: \'B\''));
       expect(message is SendFile, isTrue);
       expect(message.getDataStr(SendFile.dataIndexName), 'A');
+    });
+  });
+}
+
+void convertMessageTest(){
+  group('command convert to byte message test', () {
+    test('should be get send data1', (){
+      Message message = SendFile.send(name: 'file name', sender: 'sender', fileData: Uint8List(0),);
+      expect(message.data, Uint8List.fromList(utf8.encode('SEND_FILE\nname:file name\nsender:sender\n\n')),reason: String.fromCharCodes(message.data));
+    });
+
+    test('should be get send data2', (){
+      Message message = SendFile.send(name: '_file_name_', sender: '_sender_', fileData: Uint8List.fromList(utf8.encode('aaabbb')),);
+      expect(message.data, Uint8List.fromList(utf8.encode('SEND_FILE\nname:_file_name_\nsender:_sender_\n\n${'aaabbb'}')),reason: String.fromCharCodes(message.data));
+    });
+
+    test('should be get send data with binary', (){
+      Message message = SendFile.send(name: 'file_name', sender: '_sender', fileData: Uint8List.fromList([0x00, 0x10, 0x54, 0x00]),);
+      expect(message.data, Uint8List.fromList(utf8.encode('SEND_FILE\nname:file_name\nsender:_sender\n\n${String.fromCharCodes([0x00, 0x10, 0x54, 0x00])}')),reason: String.fromCharCodes(message.data));
     });
   });
 }
