@@ -25,7 +25,7 @@ abstract class Message{
     return _commandToClassTable[command]!(data);
   }
 
-  Uint8List get data;
+  String get data;
   Command get command;
 
   static final Map<String, Command> _commandConvertTable = {
@@ -52,7 +52,7 @@ class None implements Message{
   Command get command => Command.none;
 
   @override
-  Uint8List get data => Uint8List(0);
+  String get data => '';
 
   final Uint8List receiveData;
 
@@ -90,14 +90,14 @@ class SendFile implements Message{
   Command get command => Command.sendFile;
 
   @override
-  Uint8List get data {
-    return Uint8List.fromList(utf8.encode(
-        '${Message.convertMessageString(command)}\n'  // command
-        'name:$name\n'                                // file name
-        'sender:$sender\n'                            // sender
-        '\n'                                          // separator
-        '${String.fromCharCodes(fileData)}'           // file data
-    ));
+  String get data {
+    return
+      '${Message.convertMessageString(command)}\n'  // command
+      'name:$name\n'                                // file name
+      'sender:$sender\n'                            // sender
+      '\n'                                          // separator
+      '${String.fromCharCodes(fileData)}'           // file data
+      ;
   }
 
   late final String name;

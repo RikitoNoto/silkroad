@@ -64,7 +64,7 @@ class Tcp implements CommunicationIF<Socket>{
           connectionCallback(connection);
         }
 
-        _listenConnection(connection);
+        _listenConnection(connection, receiveCallback: receiveCallback);
       }
     );
 
