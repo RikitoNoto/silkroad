@@ -40,7 +40,7 @@ class ReceiveProvider with ChangeNotifier {
   Future<bool> open() async{
     _hostComm = builder();
 
-    _hostComm!.listen(currentIp, receiveCallback: _onReceive);
+    _hostComm!.listen('$currentIp:$portNo', receiveCallback: _onReceive);
     return true;
   }
 

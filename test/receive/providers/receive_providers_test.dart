@@ -57,6 +57,7 @@ void main() {
   callbackActionTest();
   ipAddressTest();
   itemActionTest();
+  portTest();
 }
 
 void ipAddressTest(){
@@ -103,7 +104,7 @@ Future<ReceiveCallback<Socket>?> checkOpenPort(String ip, int port, bool provide
   verifyNever(mockHost.listen(any));
   ReceiveCallback<Socket>? callback = await openPort(ip, port);
   if(isCalled) {
-    verify(mockHost.listen('$ip:${port.toString()}'));
+    verify(mockHost.listen('$ip:$port', connectionCallback: anyNamed('connectionCallback'), receiveCallback: anyNamed('receiveCallback')));
   }else{
     verifyNever(mockHost.listen(any));
   }
@@ -111,19 +112,19 @@ Future<ReceiveCallback<Socket>?> checkOpenPort(String ip, int port, bool provide
   return callback;
 }
 
-void portTest(MockTcp mockHost) {
+void portTest() {
   group('port open and close test', () {
 
     test('should be open port when call the open method', () async{
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
     });
 
     test('should be close port when call the close method', () async{
-      when(mockHost.close()).thenAnswer((_)=> Future.value(null));
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
-      verifyNever(mockHost.close());
+      when(kMockHost.close()).thenAnswer((_)=> Future.value(null));
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
+      verifyNever(kMockHost.close());
       kProvider.close();
-      verify(mockHost.close());
+      verify(kMockHost.close());
     });
   });
 }

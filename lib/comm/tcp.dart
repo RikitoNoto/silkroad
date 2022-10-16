@@ -73,12 +73,12 @@ class Tcp implements CommunicationIF<Socket>{
 
   @override
   Future close() async{
-    _connections.forEach((connection) {
-      connection.close();
+    _connections.forEach((connection) async {
+      await connection.close();
     });
 
-    _serverSocket.forEach((connection) {
-      connection.close();
+    _serverSocket.forEach((connection) async {
+      await connection.close();
     });
     _connections.clear();
     _serverSocket.clear();
