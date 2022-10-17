@@ -15,7 +15,7 @@ import 'package:silkroad/utils/platform_saver.dart';
 typedef ReceiveHostFactoryFunc<T> = CommunicationIF<T> Function();
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required this.platform, required receiveList, this.builder = _build}) : _receiveList = receiveList
+  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = _build}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();
