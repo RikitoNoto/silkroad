@@ -94,6 +94,7 @@ class Tcp implements CommunicationIF<Socket>{
     connection.listen(
       (Uint8List data) {
         if(kDebugMode) {
+          print('receive:');
           print(String.fromCharCodes(data));
         }
 

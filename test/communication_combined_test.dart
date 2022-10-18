@@ -54,6 +54,7 @@ void main() {
   });
 
   tearDown(() async{
+    kReceiveProvider.close();
     await pathProviderTearDown();
   });
 
@@ -63,10 +64,11 @@ void main() {
 void checkSendAndReceive(){
   group('send and receive test', () {
     test('should be send and receive message', () async{
-      kReceiveProvider.overwriteAddressList(['127', '0', '0', '1']);
+      kReceiveProvider.overwriteAddressList(['127.0.0.1']);
+      kReceiveProvider.selectIp('127.0.0.1');
       kReceiveProvider.open();
 
-      Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(Duration(milliseconds: 1));
 
       kSendProvider.setOctet(0, 127);
       kSendProvider.setOctet(1, 0);
@@ -74,18 +76,21 @@ void checkSendAndReceive(){
       kSendProvider.setOctet(3, 1);
 
       List<int> expectData = [0x00, 0x01];
-      File file = File(p.join((await getTemporaryDirectory()).path, 'temp'));
-      await file.writeAsBytes(expectData);
+      Directory dir = Directory(p.join((await getTemporaryDirectory()).path, 'send'));
+      await dir.create(recursive: true);
+      File file = File(p.join((await getTemporaryDirectory()).path, 'send_file'));
+      await file.writeAsBytes(expectData, mode: FileMode.writeOnlyAppend);
       kSendProvider.file = file;
-      kSendProvider.send();
+      await kSendProvider.send();
 
-      Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(Duration(milliseconds: 10));
+
 
       expect(kReceiveList.length, 1);
       File receiveFile = File(kReceiveList[0].tempPath);
-      expect(receiveFile.exists(), isTrue);
+      expect(await receiveFile.exists(), isTrue);
       Uint8List fileData = await receiveFile.readAsBytes();
-      for(int i=0; i < await receiveFile.length(); i++){
+      for(int i=0; i < expectData.length; i++){
         expect(fileData[i], expectData[i]);
       }
     });
