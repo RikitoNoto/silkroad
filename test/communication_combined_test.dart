@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -11,6 +12,7 @@ import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
+import 'package:silkroad/comm/message.dart';
 
 import 'spy/path_provider_spy.dart';
 
@@ -83,7 +85,7 @@ Future checkSendAndReceive(List<int> expectData) async{
 
   await sendData(expectData);
 
-  await Future.delayed(Duration(milliseconds: 100));
+  await Future.delayed(Duration(milliseconds: 200));
 
 
   expect(kReceiveList.length, 1);
@@ -91,7 +93,7 @@ Future checkSendAndReceive(List<int> expectData) async{
   expect(await receiveFile.exists(), isTrue);
   Uint8List fileData = await receiveFile.readAsBytes();
   for(int i=0; i < expectData.length; i++){
-  expect(fileData[i], expectData[i]);
+    expect(fileData[i], expectData[i]);
   }
 }
 
@@ -106,6 +108,25 @@ void sendAndReceiveTest(){
       for(int i=0; i<1024; i++){
         expectData.add(0x00);
       }
+      await checkSendAndReceive(expectData);
+    });
+
+    test('should be send and receive message 1024kbyte', () async{
+      List<int> expectData = [];
+      for(int i=0; i<1024*1024; i++){
+        expectData.add(0x00);
+      }
+      await checkSendAndReceive(expectData);
+    });
+
+    test('should be send and receive message 65536', () async{
+      List<int> expectData = [];
+      int headerSize = Uint8List.fromList(utf8.encode(SendFile.send(name: 'name', sender: '', fileData: Uint8List(0)).data)).length;
+
+      for(int i=0; i<65536 - headerSize - 5; i++){
+        expectData.add(0x00);
+      }
+
       await checkSendAndReceive(expectData);
     });
   });

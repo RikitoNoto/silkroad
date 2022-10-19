@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
@@ -8,12 +9,9 @@ import 'message.dart';
 class Tcp implements CommunicationIF<Socket>{
   Tcp();
 
-  // final String ipAddress;
-  // final int port;
-  // final ConnectionCallback<Socket>? connectionCallback; // callback when connection socket.
-  // final ReceiveCallback<Socket>? receiveCallback;       // callback when receive message.
   final List<ServerSocket> _serverSocket = <ServerSocket>[];
   final List<Socket> _connections = <Socket>[];           // connecting socket list
+  final Map<Socket, Uint8List> _receiveDatas = <Socket, Uint8List>{};
 
   String? _convertAddress(String addressStr){
     RegExpMatch? match = RegExp("(([0-9]+\.)+[0-9]+):([0-9]+)").firstMatch(addressStr);
@@ -86,7 +84,8 @@ class Tcp implements CommunicationIF<Socket>{
 
   @override
   Future<Result> send(Socket connection, Message data) async {
-    connection.write(data.data);
+    // print('send size: ${utf8.encode(data.data).length}');
+    connection.write('${utf8.encode(data.data).length}\n${data.data}');
     return Future.value(Result.success);
   }
 
@@ -94,14 +93,27 @@ class Tcp implements CommunicationIF<Socket>{
     connection.listen(
       (Uint8List data) {
         if(kDebugMode) {
-          print('receive:');
+          print('receive: size[${data.length}]');
           print(String.fromCharCodes(data));
         }
 
-        if(receiveCallback != null){
-          receiveCallback(connection, Message(data));
+        if(!_receiveDatas.containsKey(connection)) {
+
+          _receiveDatas[connection] = data;
         }
-      }
+        else {
+          List<int> list = List.from(_receiveDatas[connection]!);
+          list.addAll(data);
+          _receiveDatas[connection] = Uint8List.fromList(list);
+        }
+
+        if(data.length < 65536){
+          if(receiveCallback != null){
+            receiveCallback(connection, Message(_receiveDatas[connection]!));
+          }
+          _receiveDatas.remove(connection);
+        }
+      },
     );
     return Future(()=>{});
   }
