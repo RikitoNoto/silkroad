@@ -11,6 +11,7 @@ import 'package:silkroad/comm/comm.dart';
 
 late MockSocket kSocketMock;
 late Tcp kTcp;
+late Message? kReceiveData;
 String? kSendData;
 
 @GenerateMocks([Socket])
@@ -18,12 +19,17 @@ void main() {
   setUp((){
     kTcp = Tcp();
     kSocketMock = MockSocket();
+    kReceiveData = null;
 
     when(kSocketMock.write(any)).thenAnswer((realInvocation) {
       kSendData = realInvocation.positionalArguments.first;
     });
   });
   sendTest();
+}
+
+void receiveSpy(Socket socket, Message data){
+  kReceiveData = data;
 }
 
 
@@ -59,6 +65,32 @@ void sendTest(){
       expect(sendBin.length, data.length);
       for(int i=0; i<4096; i++){
         expect(sendBin[i], data[i]);
+      }
+    });
+  });
+}
+
+
+
+void sendAndReceiveTest(){
+
+  group('send and receive test', (){
+    test('should be send and receive data one byte.', () async {
+      kTcp.listen('127.0.0.1:50000');
+      Future.delayed(Duration(milliseconds: 1));
+
+      Tcp sender = Tcp();
+      Socket? connection = await sender.connect('127.0.0.1:50000');
+      expect(connection == null, isFalse);
+
+      sender.send(connection!, SendFile.send(name: '', sender: '', fileData: Uint8List.fromList([0x00])));
+
+      Future.delayed(Duration(milliseconds: 200));
+      expect(kReceiveData is SendFile, isTrue);
+      expect(kReceiveData?.getDataStr(SendFile.dataIndexName), '');
+      expect(kReceiveData?.getDataStr(SendFile.dataIndexSender), '');
+      for(var value in kReceiveData!.getDataBin(SendFile.dataIndexFile)){
+        expect(value, 0x00);
       }
     });
   });

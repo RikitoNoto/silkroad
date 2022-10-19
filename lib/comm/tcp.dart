@@ -84,8 +84,8 @@ class Tcp implements CommunicationIF<Socket>{
 
   @override
   Future<Result> send(Socket connection, Message data) async {
-    // print('send size: ${utf8.encode(data.data).length}');
-    connection.write('${utf8.encode(data.data).length}\n${data.data}');
+//    connection.write('${utf8.encode(data.data).length}\n${data.data}');
+    connection.write(data.data);
     return Future.value(Result.success);
   }
 
