@@ -60,12 +60,24 @@ Future checkSendAndReceiveData({int port=50000, int waitReceiveTimeMs=10, String
   }
 }
 
-Uint8List createDataFromSize(int size){
+Uint8List createDataFromSize(int size, {int Function(int)? valueFactory}){
   List<int> data = <int>[];
   for(int i=0; i<size; i++){
-    data.add(0x00);
+    int value = 0x00;
+    if(valueFactory != null){
+      value = valueFactory(i);
+    }
+    data.add(value);
   }
   return Uint8List.fromList(data);
+}
+
+Uint8List createDataFromSizeSomeValues(int size){
+  return createDataFromSize(size,
+    valueFactory: (value){
+      return value % 0xFF;
+    }
+  );
 }
 
 void sendAndReceiveTest(){
@@ -90,6 +102,26 @@ void sendAndReceiveTest(){
     test('should be send and receive data 65536 byte include header.', () async {
       Message data = SendFile.send(name: '', sender: '', fileData: Uint8List(0));
       await checkSendAndReceiveData(data: createDataFromSize(65536 - utf8.encode(data.data).length));
+    });
+
+    test('should be send and receive data 10 byte with some values.', () async {
+      await checkSendAndReceiveData(data: createDataFromSizeSomeValues(10));
+    });
+
+    test('should be send and receive data 100 byte with some values.', () async {
+      await checkSendAndReceiveData(data: createDataFromSizeSomeValues(100));
+    });
+
+    test('should be send and receive data 127 byte with some values.', () async {
+      await checkSendAndReceiveData(data: createDataFromSizeSomeValues(127));
+    });
+
+    test('should be send and receive data 128 byte with some values.', () async {
+      await checkSendAndReceiveData(data: createDataFromSizeSomeValues(128));
+    });
+
+    test('should be send and receive data 129 byte with some values.', () async {
+      await checkSendAndReceiveData(data: createDataFromSizeSomeValues(129));
     });
   });
 }
