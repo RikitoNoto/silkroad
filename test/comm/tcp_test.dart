@@ -10,14 +10,16 @@ import 'tcp_test.mocks.dart';
 import 'package:silkroad/comm/comm.dart';
 
 late MockSocket kSocketMock;
-late Tcp kTcp;
+late Tcp kReceiver;
+late Tcp kSender;
 late Message? kReceiveData;
 String? kSendData;
 
 @GenerateMocks([Socket])
 void main() {
   setUp((){
-    kTcp = Tcp();
+    kSender = Tcp();
+    kReceiver = Tcp();
     kSocketMock = MockSocket();
     kReceiveData = null;
 
@@ -25,73 +27,69 @@ void main() {
       kSendData = realInvocation.positionalArguments.first;
     });
   });
-  sendTest();
+
+  tearDown((){
+    kSender.close();
+    kReceiver.close();
+  });
+
+  sendAndReceiveTest();
 }
 
 void receiveSpy(Socket socket, Message data){
   kReceiveData = data;
 }
 
+Future checkSendAndReceiveData({int port=50000, int waitReceiveTimeMs=10, String dataName='', String dataSender='', required Uint8List data,}) async{
+  await kReceiver.listen('127.0.0.1:$port', receiveCallback: receiveSpy);
 
-void sendTest(){
-  group('send test', () {
-    test('should be send data.', () async {
-      Message sendMessage = SendFile.send(name: '', sender: '', fileData: Uint8List.fromList([]));
-      await kTcp.send(kSocketMock, sendMessage);
-      expect(kSendData, sendMessage.data);
-    });
+  Socket? connection = await kSender.connect('127.0.0.1:$port');
+  expect(connection == null, isFalse);  // sender should be connect to receiver.
 
-    test('should be convert send data before send [0x00, 0x01].', () async {
-      Message sendMessage = SendFile.send(name: '', sender: '', fileData: Uint8List.fromList([0x00, 0x01]));
-      await kTcp.send(kSocketMock, sendMessage);
-      Message sendData = Message(Uint8List.fromList(utf8.encode(kSendData!)));
-      expect(sendData is SendFile, isTrue);
-      expect(sendData.getDataBin(SendFile.dataIndexFile), Uint8List.fromList([0x00, 0x01]));
-    });
+  await kSender.send(connection!, SendFile.send(name: dataName, sender: dataSender, fileData: data));
 
-    test('should be convert send data before send 4096byte [0x00].', () async {
-      List<int> data = [];
-      for(int i=0; i<4096; i++){
-        data.add(0x00);
-      }
-
-      Message sendMessage = SendFile.send(name: '', sender: '', fileData: Uint8List.fromList(data));
-      await kTcp.send(kSocketMock, sendMessage);
-      Message sendData = Message(Uint8List.fromList(utf8.encode(kSendData!)));
-      expect(sendData is SendFile, isTrue);
-
-      Uint8List sendBin = sendData.getDataBin(SendFile.dataIndexFile);
-
-      expect(sendBin.length, data.length);
-      for(int i=0; i<4096; i++){
-        expect(sendBin[i], data[i]);
-      }
-    });
-  });
+  await Future.delayed(Duration(milliseconds: waitReceiveTimeMs));
+  expect(kReceiveData is SendFile, isTrue);                               // should be receive SendFile Message.
+  expect(kReceiveData?.getDataStr(SendFile.dataIndexName), dataName);     // should be receive the data name.
+  expect(kReceiveData?.getDataStr(SendFile.dataIndexSender), dataSender); // should be receive the data sender.
+  expect(kReceiveData!.getDataBin(SendFile.dataIndexFile).length, data.length);  // should be same receive data length and send data length.
+  // should be receive data is same of expect data.
+  Uint8List receiveFileData = kReceiveData!.getDataBin(SendFile.dataIndexFile);
+  for(int i=0; i<data.length; i++){
+    expect(receiveFileData[i], data[i]);
+  }
 }
 
-
+Uint8List createDataFromSize(int size){
+  List<int> data = <int>[];
+  for(int i=0; i<size; i++){
+    data.add(0x00);
+  }
+  return Uint8List.fromList(data);
+}
 
 void sendAndReceiveTest(){
 
   group('send and receive test', (){
     test('should be send and receive data one byte.', () async {
-      kTcp.listen('127.0.0.1:50000');
-      Future.delayed(Duration(milliseconds: 1));
+      await checkSendAndReceiveData(data: createDataFromSize(1));
+    });
 
-      Tcp sender = Tcp();
-      Socket? connection = await sender.connect('127.0.0.1:50000');
-      expect(connection == null, isFalse);
+    test('should be send and receive data 65536 byte.', () async {
+      await checkSendAndReceiveData(data: createDataFromSize(65536));
+    });
 
-      sender.send(connection!, SendFile.send(name: '', sender: '', fileData: Uint8List.fromList([0x00])));
+    test('should be send and receive data 65537 byte.', () async {
+      await checkSendAndReceiveData(data: createDataFromSize(65537));
+    });
 
-      Future.delayed(Duration(milliseconds: 200));
-      expect(kReceiveData is SendFile, isTrue);
-      expect(kReceiveData?.getDataStr(SendFile.dataIndexName), '');
-      expect(kReceiveData?.getDataStr(SendFile.dataIndexSender), '');
-      for(var value in kReceiveData!.getDataBin(SendFile.dataIndexFile)){
-        expect(value, 0x00);
-      }
+    test('should be send and receive data 524288 byte.', () async {
+      await checkSendAndReceiveData(data: createDataFromSize(524288), waitReceiveTimeMs: 100);
+    });
+
+    test('should be send and receive data 65536 byte include header.', () async {
+      Message data = SendFile.send(name: '', sender: '', fileData: Uint8List(0));
+      await checkSendAndReceiveData(data: createDataFromSize(65536 - utf8.encode(data.data).length));
     });
   });
 }

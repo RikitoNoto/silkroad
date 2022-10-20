@@ -6,12 +6,37 @@ import 'communication_if.dart';
 import 'message.dart';
 
 
+class _ReceiveData{
+  _ReceiveData(Uint8List data){
+    for(int i=0; i<data.length; i++){
+      if(data[i] == utf8.encode('\n').first){
+        size = int.parse(String.fromCharCodes(data.sublist(0, i)));
+        _data = data.sublist(i+1, data.length).toList();
+        break;
+      }
+    }
+  }
+
+  late final int size;
+  late final List<int> _data;
+
+  Uint8List get data => Uint8List.fromList(_data);
+
+  void append(Uint8List data){
+    _data.addAll(data);
+  }
+
+  bool isReceiveFin(){
+    return _data.length == size;
+  }
+}
+
 class Tcp implements CommunicationIF<Socket>{
   Tcp();
 
   final List<ServerSocket> _serverSocket = <ServerSocket>[];
   final List<Socket> _connections = <Socket>[];           // connecting socket list
-  final Map<Socket, Uint8List> _receiveDatas = <Socket, Uint8List>{};
+  final Map<Socket, _ReceiveData> _receiveDataMap = <Socket, _ReceiveData>{};
 
   String? _convertAddress(String addressStr){
     RegExpMatch? match = RegExp("(([0-9]+\.)+[0-9]+):([0-9]+)").firstMatch(addressStr);
@@ -84,8 +109,8 @@ class Tcp implements CommunicationIF<Socket>{
 
   @override
   Future<Result> send(Socket connection, Message data) async {
-//    connection.write('${utf8.encode(data.data).length}\n${data.data}');
-    connection.write(data.data);
+    connection.write('${utf8.encode(data.data).length}\n${data.data}');
+    // connection.write(data.data);
     return Future.value(Result.success);
   }
 
@@ -97,21 +122,23 @@ class Tcp implements CommunicationIF<Socket>{
           print(String.fromCharCodes(data));
         }
 
-        if(!_receiveDatas.containsKey(connection)) {
+        if(!_receiveDataMap.containsKey(connection)) {
 
-          _receiveDatas[connection] = data;
+          _receiveDataMap[connection] = _ReceiveData(data);
         }
         else {
-          List<int> list = List.from(_receiveDatas[connection]!);
-          list.addAll(data);
-          _receiveDatas[connection] = Uint8List.fromList(list);
+          _ReceiveData receiveData = _receiveDataMap[connection]!;
+          receiveData.append(data);
         }
 
-        if(data.length < 65536){
+
+        // if receive all data.
+        if(_receiveDataMap[connection]!.isReceiveFin()){
           if(receiveCallback != null){
-            receiveCallback(connection, Message(_receiveDatas[connection]!));
+            receiveCallback(connection, Message(_receiveDataMap[connection]!.data));
           }
-          _receiveDatas.remove(connection);
+
+          _receiveDataMap.remove(connection);
         }
       },
     );
