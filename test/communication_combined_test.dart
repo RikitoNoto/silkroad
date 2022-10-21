@@ -121,9 +121,9 @@ void sendAndReceiveTest(){
       await checkSendAndReceive(expectData);
     });
 
-    test('should be send and receive message 1024kbyte', () async{
+    test('should be send and receive message 10kbyte', () async{
       List<int> expectData = [];
-      for(int i=0; i<1024*1024; i++){
+      for(int i=0; i<1024*10; i++){
         expectData.add(0x00);
       }
       await checkSendAndReceive(expectData, waitTimeMs: 5000);
