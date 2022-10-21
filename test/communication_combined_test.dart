@@ -26,6 +26,35 @@ Widget _removeItemBuilderSpy(ReceiveItem item, int index, BuildContext context, 
   return Text('');
 }
 
+Future _setUp() async{
+  await pathProviderSetUp();
+
+  kGlobalKey = GlobalKey<AnimatedListState>();
+  kReceiveList = AnimatedListItemModel<ReceiveItem>(
+    listKey: kGlobalKey,
+    removedItemBuilder: _removeItemBuilderSpy,
+  );
+  kSendProvider = SendProvider();
+  kReceiveProvider = ReceiveProvider(platform: LocalPlatform(), receiveList: kReceiveList);
+}
+
+Future _tearDown() async{
+  kReceiveProvider.close();
+  await pathProviderTearDown();
+}
+
+Future _dummyTest() async{
+  await _setUp();
+
+  await openPort();
+
+  await sendData([0x00]);
+
+  await Future.delayed(Duration(milliseconds: 200));
+
+  await _tearDown();
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -33,24 +62,15 @@ void main() {
   Directory tempDir = Directory(p.join(spyRootDir.path, 'temp'));
   setUpAll(() async{
     PathProviderPlatformSpy.temporaryPath = tempDir.path;
+    await _dummyTest(); //FIXME: why this dummy test? if this test is not run, fail a test of [sendAndReceiveTest] in code magic.
   });
 
   setUp(() async{
-    await pathProviderSetUp();
-
-    kGlobalKey = GlobalKey<AnimatedListState>();
-    kReceiveList = AnimatedListItemModel<ReceiveItem>(
-      listKey: kGlobalKey,
-      removedItemBuilder: _removeItemBuilderSpy,
-    );
-    kSendProvider = SendProvider();
-    kReceiveProvider = ReceiveProvider(platform: LocalPlatform(), receiveList: kReceiveList);
-
+    await _setUp();
   });
 
   tearDown(() async{
-    kReceiveProvider.close();
-    await pathProviderTearDown();
+    await _tearDown();
   });
 
   sendAndReceiveTest();
