@@ -116,7 +116,7 @@ void sendAndReceiveTest(){
       for(int i=0; i<1024*1024; i++){
         expectData.add(0x00);
       }
-      await checkSendAndReceive(expectData, waitTimeMs: 500);
+      await checkSendAndReceive(expectData, waitTimeMs: 1000);
     });
 
     test('should be send and receive message 65536', () async{
