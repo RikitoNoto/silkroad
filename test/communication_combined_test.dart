@@ -109,9 +109,9 @@ Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
 
 void sendAndReceiveTest(){
   group('send and receive test', () {
-    test('should be send and receive message', () async{
-      await checkSendAndReceive(<int>[0x00, 0x01]);
-    });
+    // test('should be send and receive message', () async{
+    //   await checkSendAndReceive(<int>[0x00, 0x01]);
+    // });
 
     test('should be send and receive message 1024byte', () async{
       List<int> expectData = [];
