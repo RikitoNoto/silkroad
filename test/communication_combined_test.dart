@@ -31,8 +31,12 @@ void main() {
 
   Directory spyRootDir = Directory(p.join('test','temp'));
   Directory tempDir = Directory(p.join(spyRootDir.path, 'temp'));
-  setUpAll((){
+  setUpAll(() async{
     PathProviderPlatformSpy.temporaryPath = tempDir.path;
+    Directory dir = Directory(p.join((await getTemporaryDirectory()).path, 'send'));
+    await dir.create(recursive: true);
+    File file = File(p.join((await getTemporaryDirectory()).path, 'send_file'));
+    await file.writeAsBytes(<int>[0x00], mode: FileMode.writeOnlyAppend);
   });
 
   setUp(() async{
@@ -109,8 +113,6 @@ Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
 
 void sendAndReceiveTest(){
   group('send and receive test', () {
-    test('dummy test', () async{
-    });
 
     test('should be send and receive message', () async{
       await checkSendAndReceive(<int>[0x00, 0x01]);
