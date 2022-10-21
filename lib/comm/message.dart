@@ -25,7 +25,7 @@ abstract class Message{
     return _commandToClassTable[command]!(data);
   }
 
-  Uint8List get data;
+  String get data;
   Command get command;
 
   static final Map<String, Command> _commandConvertTable = {
@@ -52,7 +52,7 @@ class None implements Message{
   Command get command => Command.none;
 
   @override
-  Uint8List get data => Uint8List(0);
+  String get data => '';
 
   final Uint8List receiveData;
 
@@ -79,7 +79,12 @@ class SendFile implements Message{
   SendFile.receive({required receiveData}){
     RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(receiveData));
     String header = dataSplitter?.group(1) ?? '';
-    fileData = Uint8List.fromList(utf8.encode(dataSplitter?.group(2) ?? ''));
+//    fileData = Uint8List.fromList(utf8.encode(dataSplitter?.group(2) ?? ''));
+    List<int>? dataList;
+    if(dataSplitter?.group(2) != ''){
+      dataList = dataSplitter?.group(2)?.split(',').map<int>((String item)=>int.parse(item)).toList();
+    }
+    fileData = dataList!=null ? Uint8List.fromList(dataList) : Uint8List(0);
     name = _fetchName(header);
     sender = _fetchSender(header);
   }
@@ -90,14 +95,15 @@ class SendFile implements Message{
   Command get command => Command.sendFile;
 
   @override
-  Uint8List get data {
-    return Uint8List.fromList(utf8.encode(
-        '${Message.convertMessageString(command)}\n'  // command
-        'name:$name\n'                                // file name
-        'sender:$sender\n'                            // sender
-        '\n'                                          // separator
-        '${String.fromCharCodes(fileData)}'           // file data
-    ));
+  String get data {
+    return
+      '${Message.convertMessageString(command)}\n'  // command
+      'name:$name\n'                                // file name
+      'sender:$sender\n'                            // sender
+      '\n'                                          // separator
+//      '${String.fromCharCodes(fileData)}'           // file data
+      '${fileData.map<String>((int value) => value.toString()).join(',')}'           // file data
+      ;
   }
 
   late final String name;

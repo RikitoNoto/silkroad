@@ -15,6 +15,7 @@ import 'receive_providers_test.mocks.dart';
 
 import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/tcp.dart';
+import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -22,179 +23,158 @@ import '../../spy/path_provider_spy.dart';
 
 
 late AnimatedListItemModel<ReceiveItem> kReceiveList;
+late ReceiveProvider kProvider;
+
+late MockTcp kMockHost;
+late MockSocket kMockSocket;
+ReceiveCallback<Socket>? kReceiveCallbackSpy;
 
 @GenerateMocks([Tcp])
 @GenerateMocks([Socket])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  MockTcpHost mockHost = MockTcpHost();
-  MockSocket mockSocket = MockSocket();
-  kReceiveList = AnimatedListItemModel<ReceiveItem>(
-    listKey: GlobalKey<AnimatedListState>(),
-    removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
-  );
-
   setUpAll((){
+    kReceiveList = AnimatedListItemModel<ReceiveItem>(
+      listKey: GlobalKey<AnimatedListState>(),
+      removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
+    );
     PathProviderPlatformSpy.temporaryPath = kTempDir.path;
   });
 
   setUp(() async{
     await pathProviderSetUp();
     kReceiveList.clear();
+    kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform(), builder: ()=>kMockHost);
+    kMockHost = MockTcp();
+    kMockSocket = MockSocket();
+    kReceiveCallbackSpy = null;
   });
 
   tearDown(() async{
     await pathProviderTearDown();
   });
 
-  portTest(mockHost);
-  callbackActionTest(mockHost, mockSocket);
+  callbackActionTest();
   ipAddressTest();
   itemActionTest();
+  portTest();
 }
 
 void ipAddressTest(){
   group('ip address test', () {
     test('should be not set ip address when the ip list is empty', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>[]);
       kProvider.selectIp('192.168.1.100');
       expect(kProvider.currentIp, '');
     });
 
     test('should be set ip address when the ip is include in the ip list', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>['192.168.1.100']);
       kProvider.selectIp('192.168.1.100');
       expect(kProvider.currentIp, '192.168.1.100');
     });
 
     test('should be return false when the ip is not include in the ip list(empty)', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>[]);
       expect(kProvider.isEnableIp('192.168.1.100'), isFalse);
     });
 
     test('should be return true when the ip is include in the ip list', () {
-      ReceiveProvider kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
       kProvider.overwriteAddressList(<String>['192.168.1.100']);
       expect(kProvider.isEnableIp('192.168.1.100'), isTrue);
     });
   });
 }
 
-ReceiveProvider? kProvider;
-String? kIpAddressSpy;
-ReceiveCallback<Socket>? kReceiveCallbackSpy;
-int kPortSpy = 0;
-void setupSpyComm(MockTcpHost mockHost){
-  kIpAddressSpy = null;
-  kPortSpy = 0;
-  kReceiveCallbackSpy = null;
-  while(kReceiveList.length != 0){
-    kReceiveList.removeAt(0);
-  }
-
-  kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform(), builder: ({
-    required String ipAddress,
-    required int port,
-    ConnectionCallback<Socket>? connectionCallback,
-    ReceiveCallback<Socket>? receiveCallback
-  }){
-    kIpAddressSpy = ipAddress;
-    kPortSpy = port;
-    kReceiveCallbackSpy = receiveCallback;
-    return mockHost;
+Future<ReceiveCallback<Socket>?> openPort(String ip, int port) async{
+  kProvider.overwriteAddressList(<String>[ip]);
+  kProvider.selectIp(ip);
+  when(kMockHost.listen(any, receiveCallback: captureAnyNamed('receiveCallback'), connectionCallback: anyNamed('connectionCallback'))).thenAnswer((Invocation invocation){
+    kReceiveCallbackSpy = invocation.namedArguments[Symbol('receiveCallback')];
+    return Future.value(kMockSocket);
   });
+
+  if(!await kProvider.open()) fail('fail open');
+  return kReceiveCallbackSpy;
 }
 
-Future<bool> openPort(String ip, int port){
-  kProvider!.overwriteAddressList(<String>[ip]);
-  kProvider!.selectIp(ip);
-  return kProvider!.open();
-}
+Future<ReceiveCallback<Socket>?> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bool isCalled, MockTcp mockHost) async{
 
-Future<void> checkOpenPort(String ip, int port, bool providerOpenReturnValue, bool isCalled, MockTcpHost mockHost) async{
-
-  when(mockHost.listen()).thenAnswer((_)=>Future<void>.value());
-  verifyNever(mockHost.listen());
-  bool result = await openPort(ip, port);
+  when(mockHost.listen(any)).thenAnswer((_)=>Future<void>.value());
+  verifyNever(mockHost.listen(any));
+  ReceiveCallback<Socket>? callback = await openPort(ip, port);
   if(isCalled) {
-    verify(mockHost.listen());
+    verify(mockHost.listen('$ip:$port', connectionCallback: anyNamed('connectionCallback'), receiveCallback: anyNamed('receiveCallback')));
   }else{
-    verifyNever(mockHost.listen());
+    verifyNever(mockHost.listen(any));
   }
 
-  expect(kIpAddressSpy, ip);
-  expect(kPortSpy, port);
-  expect(result, providerOpenReturnValue);
+  return callback;
 }
 
-void portTest(MockTcpHost mockHost) {
+void portTest() {
   group('port open and close test', () {
 
     test('should be open port when call the open method', () async{
-      setupSpyComm(mockHost);
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
     });
 
     test('should be close port when call the close method', () async{
-      setupSpyComm(mockHost);
-      when(mockHost.close()).thenAnswer((_)=> Future.value(null));
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, mockHost);
-      verifyNever(mockHost.close());
-      kProvider!.close();
-      verify(mockHost.close());
+      when(kMockHost.close()).thenAnswer((_)=> Future.value(null));
+      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
+      verifyNever(kMockHost.close());
+      kProvider.close();
+      verify(kMockHost.close());
     });
   });
 }
 
-Future<void> setupCallbackAction(MockTcpHost mockHost, {
+Future<void> setupCallbackAction({
   String ip = '192.168.1.1',
   int port = ReceiveProvider.portNo,
 }) async{
-  setupSpyComm(mockHost);
-  await openPort(ip, port);
-  if(kReceiveCallbackSpy == null) fail("did not set receive callback.");
+  kReceiveCallbackSpy = await openPort(ip, port);
+  if(kReceiveCallbackSpy == null) fail("could not get receive callback.");
 }
 
-Future checkReceiveListLen(int expectLen, String sendData, MockSocket mockSocket) async{
-  await kReceiveCallbackSpy!(mockSocket, Uint8List.fromList(utf8.encode(sendData)));
+Future checkReceiveListLen(int expectLen, String sendData) async{//, MockSocket mockSocket, MockTcp mockHost) async{
+  await kReceiveCallbackSpy!(kMockSocket, Message(Uint8List.fromList(utf8.encode(sendData))));
   expect(kReceiveList.length, expectLen);
 }
 
 String convertMessageString({required name, sender='', data=''}){
-  return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
+  // return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
+  return SendFile.send(name: name, sender: sender, fileData: Uint8List.fromList(utf8.encode(data))).data;
 }
 
-void callbackActionTest(MockTcpHost mockHost, MockSocket mockSocket) {
+void callbackActionTest(){
   group('callback action test', () {
-    // ReceiveProvider.networkInfo = networkInfoMock;
 
     test('should be not increment list len when receive no command.', () async{
-      checkReceiveListLen(0, '', mockSocket);
+      await setupCallbackAction();
+      checkReceiveListLen(0, '');
     });
 
     test('should be increment list len when receive send file command.', () async{
-      await setupCallbackAction(mockHost);
-      checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'), mockSocket);
+      await setupCallbackAction();
+      checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
     });
 
     test('should be set name to added item.', () async{
-      await setupCallbackAction(mockHost);
-      checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'), mockSocket);
+      await setupCallbackAction();
+      checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
       expect(kReceiveList[0].name, 'A');
     });
 
     test('should be set sender to added item.', () async{
-      await setupCallbackAction(mockHost);
-      await checkReceiveListLen(1, convertMessageString(name: 'senderTest', sender: 'sender'), mockSocket);
+      await setupCallbackAction();
+      await checkReceiveListLen(1, convertMessageString(name: 'senderTest', sender: 'sender'));
       expect(kReceiveList[0].sender, 'sender');
     });
 
     test('should be set data to added item.', () async{
-      await setupCallbackAction(mockHost);
-      await checkReceiveListLen(1, convertMessageString(name: 'dataTest', data: 'test data'), mockSocket);
+      await setupCallbackAction();
+      await checkReceiveListLen(1, convertMessageString(name: 'dataTest', data: 'test data'));
       File tempFile = File(p.join((await getTemporaryDirectory()).path, 'dataTest'));
       String data = await tempFile.readAsString();
 
@@ -202,9 +182,9 @@ void callbackActionTest(MockTcpHost mockHost, MockSocket mockSocket) {
     });
 
     test('should be add to end item.', () async{
-      await setupCallbackAction(mockHost);
-      await checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'), mockSocket);
-      await checkReceiveListLen(2, convertMessageString(name: 'B', data: '!'), mockSocket);
+      await setupCallbackAction();
+      await checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
+      await checkReceiveListLen(2, convertMessageString(name: 'B', data: '!'));
       expect(kReceiveList[0].name, 'A');
       expect(kReceiveList[1].name, 'B');
     });
@@ -218,7 +198,7 @@ void itemActionTest() {
     test('should be able to delete item.', () async{
       kReceiveList.append(ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'));
       kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
-      kProvider!.removeAt(0);
+      kProvider.removeAt(0);
       expect(kReceiveList.length, 0);
     });
 
@@ -227,18 +207,10 @@ void itemActionTest() {
       kReceiveList.append(ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'));
       kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
       kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
-      kProvider!.removeAt(1);
+      kProvider.removeAt(1);
       expect(kReceiveList.length, 2);
       expect(kReceiveList[0].name, 'no target');
       expect(kReceiveList[1].name, 'no target');
-    });
-
-  });
-
-  group('save item action test', (){
-
-    test('should be call save item in pc.', () async{
-
     });
 
   });

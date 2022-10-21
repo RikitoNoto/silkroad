@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ThemeInputField extends StatefulWidget {
   const ThemeInputField({
@@ -6,11 +7,17 @@ class ThemeInputField extends StatefulWidget {
     this.labelText,
     this.contentPadding,
     this.textInputAction,
+    this.onChanged,
+    this.inputFormatters,
+    this.keyboardType,
   });
 
   final String? labelText;
   final EdgeInsetsGeometry? contentPadding;
   final TextInputAction? textInputAction;
+  final Function(String)? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextInputType? keyboardType;
 
   @override
   State<ThemeInputField> createState() => _ThemeInputFieldState();
@@ -29,6 +36,9 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
         });
       },
       child: TextField(
+        onChanged: widget.onChanged,
+        inputFormatters: widget.inputFormatters,
+        keyboardType: widget.keyboardType,
         cursorColor: _getFocusColor(context),
         decoration: InputDecoration(
           labelText: widget.labelText,

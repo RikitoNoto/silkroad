@@ -51,7 +51,6 @@ class MobileSaver implements PlatformSaverIF{
         if(_localPath != null) {
           File file = File(p.join(_localPath, p.basename(path)));
           await file.writeAsBytes((await File(path).readAsBytes()));
-          print(file.path);
         }
 
         break;
@@ -67,6 +66,10 @@ class PcSaver implements PlatformSaverIF{
       dialogTitle: 'Please select an output file:',
       fileName: p.basename(path),
     );
+
+    if(outputFile != null){
+      await File(outputFile).writeAsBytes((await File(path).readAsBytes()));
+    }
     return outputFile != null;
   }
 }

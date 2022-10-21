@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:silkroad/send/providers/send_provider.dart';
+
 import 'package:silkroad/utils/views/theme_input_field.dart';
 
 class SendPage extends StatefulWidget {
@@ -12,7 +16,7 @@ class SendPage extends StatefulWidget {
 }
 
 class _SendPageState extends State<SendPage>{
-  String _selectFile = "No select";
+  late final SendProvider provider;
 
   static const String _ipFieldLabelText = 'Receiver Ipaddress';
   static const double _ipFieldOutPadding = 10.0;
@@ -22,21 +26,33 @@ class _SendPageState extends State<SendPage>{
   );
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Send"),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {},
-            )
-          ],
-        ),
+  void initState() {
+    super.initState();
 
-        body: _buildBody(context),
+    provider = SendProvider();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => provider,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Send"),
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: () {
+                  provider.send();
+                },
+              )
+            ],
+          ),
+
+          body: _buildBody(context),
+        ),
       ),
     );
   }
@@ -67,13 +83,13 @@ class _SendPageState extends State<SendPage>{
           child: Row(
             children: [
               //TODO: input action next does not work, because input field is in other state.
-              _buildOctetField(),
+              _buildOctetField(0,),
               _buildComma(),
-              _buildOctetField(),
+              _buildOctetField(1,),
               _buildComma(),
-              _buildOctetField(),
+              _buildOctetField(2,),
               _buildComma(),
-              _buildOctetField(textInputAction: TextInputAction.done),
+              _buildOctetField(3, textInputAction: TextInputAction.done,),
             ],
           ),
         ),
@@ -93,13 +109,20 @@ class _SendPageState extends State<SendPage>{
     );
   }
 
-  Widget _buildOctetField({textInputAction=TextInputAction.next})
+  Widget _buildOctetField(int octetNumber, {textInputAction=TextInputAction.next, Key? key})
   {
     return Expanded(
       child: SizedBox(
         height: 30,
 
         child: ThemeInputField(
+          key: key,
+          keyboardType: TextInputType.number,
+          onChanged: (String value)
+          {
+            provider.setOctet(octetNumber, int.parse(value));
+          },
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textInputAction: textInputAction,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
         ),
@@ -126,11 +149,13 @@ class _SendPageState extends State<SendPage>{
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    _selectFile,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.left,
+                  child: Consumer<SendProvider>(
+                    builder: (context, provider, child) => Text(
+                      provider.fileName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.left,
+                    ),
                   ),
                 ),
               ],
@@ -145,10 +170,7 @@ class _SendPageState extends State<SendPage>{
             onPressed: () async {
               FilePickerResult? result = await FilePicker.platform.pickFiles();
               if (result != null) {
-                File file = File(result.files.single.path!);
-                setState(() {
-                  _selectFile = basename(file.path);
-                });
+                provider.file = File(result.files.single.path!);
               }
             },
           ),

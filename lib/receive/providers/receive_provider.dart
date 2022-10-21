@@ -12,22 +12,17 @@ import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
 
-typedef ReceiveHostFactoryFunc = CommunicationIF Function({
-  required String ipAddress,
-  required int port,
-  ConnectionCallback<Socket>? connectionCallback,
-  ReceiveCallback<Socket>? receiveCallback,
-});
+typedef ReceiveHostFactoryFunc<T> = CommunicationIF<T> Function();
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required this.platform, required receiveList, this.builder = _build}) : _receiveList = receiveList
+  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = _build}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();
   }
   static const portNo = 32099;
-  final ReceiveHostFactoryFunc builder;
-  CommunicationIF? _hostComm;
+  final ReceiveHostFactoryFunc<Socket> builder;
+  CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
 
@@ -38,19 +33,14 @@ class ReceiveProvider with ChangeNotifier {
   final List<String> _ipList = <String>[];  /// ip address list
   List<String> get ipList => _ipList;
 
-  static CommunicationIF _build({
-    required String ipAddress,
-    required int port,
-    ConnectionCallback<Socket>? connectionCallback,
-    ReceiveCallback<Socket>? receiveCallback
-  }){
-    return Tcp(ipAddress: ipAddress, port: port, connectionCallback: connectionCallback, receiveCallback: receiveCallback);
+  static CommunicationIF<Socket> _build(){
+    return Tcp();
   }
 
   Future<bool> open() async{
-    _hostComm = builder(ipAddress: currentIp, port: portNo, receiveCallback: _onReceive);
+    _hostComm = builder();
 
-    _hostComm!.listen();
+    _hostComm!.listen('$currentIp:$portNo', receiveCallback: _onReceive);
     return true;
   }
 
@@ -96,13 +86,12 @@ class ReceiveProvider with ChangeNotifier {
     _receiveList.removeAt(index);
   }
 
-  void _onReceive(Socket socket, Uint8List data) {
-    Message message = Message(data);
-    if(message is SendFile){
+  void _onReceive(Socket socket, Message data) {
+    if(data is SendFile){
       ReceiveItem item = ReceiveItem(
-        name: message.name,
-        data: message.fileData,
-        sender: message.sender,
+        name: data.name,
+        data: data.fileData,
+        sender: data.sender,
       );
       _receiveList.append(item);
     }
