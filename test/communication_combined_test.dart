@@ -110,7 +110,7 @@ Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
 void sendAndReceiveTest(){
   group('send and receive test', () {
     test('should be send and receive message', () async{
-      await checkSendAndReceive([0x00, 0x01]);
+      await checkSendAndReceive([0x00]);
     });
 
     test('should be send and receive message 1024byte', () async{
@@ -121,12 +121,12 @@ void sendAndReceiveTest(){
       await checkSendAndReceive(expectData);
     });
 
-    test('should be send and receive message 10kbyte', () async{
+    test('should be send and receive message 1024kbyte', () async{
       List<int> expectData = [];
-      for(int i=0; i<1024*10; i++){
+      for(int i=0; i<1024*1024; i++){
         expectData.add(0x00);
       }
-      await checkSendAndReceive(expectData, waitTimeMs: 5000);
+      await checkSendAndReceive(expectData, waitTimeMs: 200);
     });
 
     test('should be send and receive message 65536', () async{
