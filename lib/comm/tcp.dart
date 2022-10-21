@@ -119,7 +119,7 @@ class Tcp implements CommunicationIF<Socket>{
       (Uint8List data) {
         if(kDebugMode) {
           print('receive: size[${data.length}]');
-          print(String.fromCharCodes(data));
+          // print(String.fromCharCodes(data));
         }
 
         if(!_receiveDataMap.containsKey(connection)) {

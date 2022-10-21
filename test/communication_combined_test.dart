@@ -33,11 +33,6 @@ void main() {
   Directory tempDir = Directory(p.join(spyRootDir.path, 'temp'));
   setUpAll(() async{
     PathProviderPlatformSpy.temporaryPath = tempDir.path;
-    await pathProviderSetUp();
-    Directory dir = Directory(p.join((await getTemporaryDirectory()).path, 'send'));
-    await dir.create(recursive: true);
-    File file = File(p.join((await getTemporaryDirectory()).path, 'send_file'));
-    await file.writeAsBytes(<int>[0x00], mode: FileMode.writeOnlyAppend);
   });
 
   setUp(() async{
