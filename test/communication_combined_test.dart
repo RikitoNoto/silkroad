@@ -79,13 +79,13 @@ Future sendData(List<int> expectData) async{
   await kSendProvider.send();
 }
 
-Future checkSendAndReceive(List<int> expectData) async{
+Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
 
   await openPort();
 
   await sendData(expectData);
 
-  await Future.delayed(Duration(milliseconds: 200));
+  await Future.delayed(Duration(milliseconds: waitTimeMs));
 
 
   expect(kReceiveList.length, 1);
@@ -116,7 +116,7 @@ void sendAndReceiveTest(){
       for(int i=0; i<1024*1024; i++){
         expectData.add(0x00);
       }
-      await checkSendAndReceive(expectData);
+      await checkSendAndReceive(expectData, waitTimeMs: 500);
     });
 
     test('should be send and receive message 65536', () async{
@@ -127,7 +127,7 @@ void sendAndReceiveTest(){
         expectData.add(0x00);
       }
 
-      await checkSendAndReceive(expectData);
+      await checkSendAndReceive(expectData, waitTimeMs: 50);
     });
   });
 }

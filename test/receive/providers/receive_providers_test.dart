@@ -143,7 +143,8 @@ Future checkReceiveListLen(int expectLen, String sendData) async{//, MockSocket 
 }
 
 String convertMessageString({required name, sender='', data=''}){
-  return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
+  // return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
+  return SendFile.send(name: name, sender: sender, fileData: Uint8List.fromList(utf8.encode(data))).data;
 }
 
 void callbackActionTest(){
