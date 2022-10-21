@@ -85,8 +85,18 @@ Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
 
   await sendData(expectData);
 
-  await Future.delayed(Duration(milliseconds: waitTimeMs));
-
+  if(waitTimeMs < 1000){
+    await Future.delayed(Duration(milliseconds: waitTimeMs));
+  }
+  else{
+    for(int i=1; i<=waitTimeMs; i++){
+      if( (kReceiveList.length > 0) &&
+          (await File(kReceiveList[0].tempPath).exists())){
+        break;
+      }
+      await Future.delayed(Duration(milliseconds: 1));
+    }
+  }
 
   expect(kReceiveList.length, 1);
   File receiveFile = File(kReceiveList[0].tempPath);
@@ -116,7 +126,7 @@ void sendAndReceiveTest(){
       for(int i=0; i<1024*1024; i++){
         expectData.add(0x00);
       }
-      await checkSendAndReceive(expectData, waitTimeMs: 1000);
+      await checkSendAndReceive(expectData, waitTimeMs: 5000);
     });
 
     test('should be send and receive message 65536', () async{
