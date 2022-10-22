@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppTheme{
 
+  static const Color _backgroundColorLight = Colors.white;
+  static const Color _backgroundColorDark = Colors.black;
   static final Color? _secondaryBackgroundColorLight = Colors.grey[100];
   static final Color? _secondaryBackgroundColorDark = Colors.grey[600];
   static const Color _foregroundColorLight = Colors.black;
@@ -9,7 +11,7 @@ class AppTheme{
   static final Color? _foregroundColorDisableLight = Colors.grey[600];
   static final Color? _foregroundColorDisableDark = Colors.grey[600];
 
-  static const double _appBarElevation = 0.4;
+  static const double _appBarElevation = 0.0;
 
   static const Color _appBackgroundColorLight = Color(0xFFFFFFFF);
   static const Color _appBarColorLight = _appBackgroundColorLight;
@@ -19,6 +21,12 @@ class AppTheme{
   static const Color _appBarColorDark = _appBackgroundColorDark;
   static const Color _elevatedButtonColorDark = Color(0xFF505050);
   static const Color _iconColorDark = Color(0xFFFFFFFF);
+
+  static const Color _appIconColorLightBlue = Color(0xFF38B6FF);
+  static const Color _appIconColorGrassGreen = Color(0xFF7ED957);
+
+  static const Color appIconColor1 = _appIconColorLightBlue;
+  static const Color appIconColor2 = _appIconColorGrassGreen;
 
   static const MaterialColor materialWhite = MaterialColor(
     0xFFFFFFFF,
@@ -114,6 +122,17 @@ class AppTheme{
       foregroundColor = _foregroundColorDisableDark!;
     }
     return foregroundColor;
+  }
+
+  static Color getBackgroundColor(BuildContext context){
+    Color backgroundColor;
+    if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+      backgroundColor = _backgroundColorLight;
+    }
+    else{
+      backgroundColor = _backgroundColorDark;
+    }
+    return backgroundColor;
   }
 
   static Color getButtonForegroundColor(BuildContext context, bool enable){
