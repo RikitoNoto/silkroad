@@ -5,4 +5,4 @@ import 'package:platform/platform.dart';
 void main() {
   runApp(const SilkRoadApp(platform: LocalPlatform(),));
 }
-
+//TODO: i18n

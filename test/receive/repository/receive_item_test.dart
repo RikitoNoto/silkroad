@@ -4,9 +4,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../../spy/path_provider_spy.dart';
 
@@ -72,7 +69,7 @@ void accessorTest(){
 }
 
 
-ReceiveItem createItem({iconData=Icons.image, name='test.dart', data: '', sender: 'no name'}){
+ReceiveItem createItem({iconData=Icons.image, name='test.dart', data='', sender='no name'}){
   return ReceiveItem(
     iconData: iconData,
     name: name,
@@ -80,7 +77,7 @@ ReceiveItem createItem({iconData=Icons.image, name='test.dart', data: '', sender
     sender: sender);
 }
 
-ReceiveItem createItemWithoutIcon({name='test.dart', data: '', sender: 'no name'}){
+ReceiveItem createItemWithoutIcon({name='test.dart', data='', sender='no name'}){
   return ReceiveItem(
       name: name,
       data: Uint8List.fromList(utf8.encode(data)),
@@ -149,13 +146,13 @@ void iconTest(){
 void tempFileTest(){
   group('create temp file test', () {
     test('should be create temp file.', () async{
-      ReceiveItem item = createItem(name: 'temp.dart');
+      createItem(name: 'temp.dart');
       await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
       expect(await File(p.join(kTempDir.path, 'temp.dart')).exists(), isTrue);
     });
 
     test('should be write receive content.', () async{
-      ReceiveItem item = createItem(name: 'temp.dart', data: 'should be write receive content.');
+      createItem(name: 'temp.dart', data: 'should be write receive content.');
       await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
       File file = File(p.join(kTempDir.path, 'temp.dart'));
       expect(await file.exists(), isTrue);
