@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import 'package:silkroad/app_theme.dart';
+
 ///
 /// receive item builder
 ///
 mixin _ListItemBuilder{
-  static const double _iconSize = 40.0;                     /// icon size
+  static const double _iconSize = 30.0;                     /// icon size
   static const double _sizeAndSenderWidth = 64.0;           /// size and sender column width
 
   static const Color _itemLightModeColor = Colors.white;      /// white mode item color
@@ -17,8 +19,8 @@ mixin _ListItemBuilder{
   /// text style： file name
   static TextStyle get _fileNameTextStyle => TextStyle(
     color: _itemForegroundColor,
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
+    fontSize: 20,
+    // fontWeight: FontWeight.bold,
   );
 
   /// text style： sender
@@ -65,33 +67,34 @@ mixin _ListItemBuilder{
       child: Slidable(
         startActionPane: _buildStartAction(onDelete),
         endActionPane: _buildEndAction(onSave),
-        child: Container(
-          decoration: _decorationItem,
-          child: IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      _buildIcon(iconData),     // icon
-                      _buildFileName(name),     // file name
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: _sizeAndSenderWidth,
-                  child: Column(
-                    children: <Widget>[
-                      _buildFileSize(size),   // file size
-                      _buildSender(sender),   // sender
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        child: _buildCardItem(name: name, size: size, sender: sender, iconData: iconData),
+        // child: Container(
+        //   decoration: _decorationItem,
+        //   child: IntrinsicHeight(
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //       children: [
+        //         Expanded(
+        //           child: Row(
+        //             children: [
+        //               _buildIcon(iconData),     // icon
+        //               _buildFileName(name),     // file name
+        //             ],
+        //           ),
+        //         ),
+        //         SizedBox(
+        //           width: _sizeAndSenderWidth,
+        //           child: Column(
+        //             children: <Widget>[
+        //               _buildFileSize(size),   // file size
+        //               _buildSender(sender),   // sender
+        //             ],
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ),
     );
   }
@@ -140,11 +143,63 @@ mixin _ListItemBuilder{
     );
   }
 
+  static Widget _buildCardItem(
+    {
+      required String name,
+      IconData? iconData,
+      required String size,
+      required String sender,
+    }
+  ){
+    return Container(
+      decoration: _decorationItem,
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  _buildIcon(iconData),     // icon
+                  _buildFileName(name),     // file name
+                ],
+              ),
+            ),
+            SizedBox(
+              width: _sizeAndSenderWidth,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Column(
+                  children: <Widget>[
+                    _buildFileSize(size),   // file size
+                    _buildSender(sender),   // sender
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   static Widget _buildIcon(IconData? iconData)
   {
-    return Icon(iconData,
-      color: _itemForegroundColor,
-      size: _iconSize,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      child: Container(
+        padding: const EdgeInsets.all(5.0),
+        decoration: const BoxDecoration(
+          // borderRadius: BorderRadius.circular(100),
+          shape: BoxShape.circle,
+          color: AppTheme.appIconColor2,
+        ),
+        child: Icon(iconData,
+          color: Colors.white,
+          size: _iconSize,
+
+        ),
+      ),
     );
   }
 
@@ -164,14 +219,14 @@ mixin _ListItemBuilder{
     );
   }
 
-  static Widget _buildFileSize(int size)
+  static Widget _buildFileSize(String size)
   {
     return Flexible(
       flex: 5,
       child: Container(
         padding: const EdgeInsets.only(bottom: 2),
         alignment: Alignment.bottomRight,
-        child: Text(size.toString() + 'b',
+        child: Text(size.toString(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.right,
@@ -218,11 +273,11 @@ class ReceiveListItem extends StatelessWidget{
   final int index;
   final IconData iconData;            /// icon
   final String name;                  /// file name
-  final int size;                     /// file size
+  final String size;                  /// file size
   final String sender;                /// sender name
   final Animation<double> animation;  /// size animation
-  void Function(BuildContext context)? onSave;
-  void Function(BuildContext context)? onDelete;
+  final void Function(BuildContext context)? onSave;
+  final void Function(BuildContext context)? onDelete;
 
   final Animatable<Offset> _offsetAnimation = Tween<Offset>(
     end: Offset.zero,
@@ -258,7 +313,7 @@ class ReceiveListItemRemoving extends StatelessWidget{
   final int index;
   final IconData iconData;            /// icon
   final String name;                  /// file name
-  final int size;                     /// file size
+  final String size;                  /// file size
   final String sender;                /// sender name
   final Animation<double> animation;  /// size animation
 

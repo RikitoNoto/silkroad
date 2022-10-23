@@ -32,14 +32,14 @@ class ReceivePageState extends State<ReceivePage>
   late final ReceiveProvider provider;
 
   final List<ReceiveItem> _debugReceiveItems = [
-    ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(0), sender: "update"),
+    ReceiveItem(iconData: Icons.system_update, name: "system", data: Uint8List(1025), sender: "update"),
     ReceiveItem(iconData: Icons.add_moderator, name: "moderator", data: Uint8List(0), sender: "adder"),
-    ReceiveItem(iconData: Icons.add_task, name: "task", data: Uint8List(0), sender: "adder"),
-    ReceiveItem(iconData: Icons.wifi_tethering_error_outlined, name: "error", data: Uint8List(0), sender: "buglover"),
-    ReceiveItem(iconData: Icons.volume_mute_sharp, name: "volume", data: Uint8List(0), sender: "pin"),
-    ReceiveItem(iconData: Icons.video_stable, name: "video", data: Uint8List(0), sender: "ummm"),
-    ReceiveItem(iconData: Icons.turn_sharp_right, name: "turn", data: Uint8List(0), sender: "right"),
-    ReceiveItem(iconData: Icons.timer_10, name: "timer", data: Uint8List(0), sender: "cool"),
+    ReceiveItem(iconData: Icons.add_task, name: "task", data: Uint8List(1024*1024), sender: "adder"),
+    ReceiveItem(iconData: Icons.wifi_tethering_error_outlined, name: "error", data: Uint8List(6541), sender: "buglover"),
+    ReceiveItem(iconData: Icons.volume_mute_sharp, name: "volume", data: Uint8List(65536), sender: "pin"),
+    ReceiveItem(iconData: Icons.video_stable, name: "video", data: Uint8List(10), sender: "ummm"),
+    ReceiveItem(iconData: Icons.turn_sharp_right, name: "turn", data: Uint8List(1024*1024*3), sender: "right"),
+    ReceiveItem(iconData: Icons.timer_10, name: "timer", data: Uint8List(645891), sender: "cool"),
   ];
 
   @override
@@ -132,7 +132,7 @@ class ReceivePageState extends State<ReceivePage>
       index: index,
       iconData: _receiveList[index].iconData,
       name: _receiveList[index].name,
-      size: _receiveList[index].size,
+      size: _receiveList[index].sizeStr,
       sender: _receiveList[index].sender,
       animation: animation,
       onSave: (context) => provider.save(index),
@@ -146,7 +146,7 @@ class ReceivePageState extends State<ReceivePage>
       index: index,
       iconData: item.iconData,
       name: item.name,
-      size: item.size,
+      size: item.sizeStr,
       sender: item.sender,
       animation: animation
     );
