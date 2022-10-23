@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:silkroad/app_theme.dart';
+//TODO: change item slider in pc.
 
 ///
 /// receive item builder
