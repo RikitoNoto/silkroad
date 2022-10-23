@@ -13,8 +13,8 @@ import 'package:platform/platform.dart';
 import 'package:silkroad/home/home.dart';
 
 import 'package:silkroad/app.dart';
-import 'package:silkroad/send/views/send_view.dart';
-import 'package:silkroad/receive/views/receive_view.dart';
+import 'package:silkroad/send/send.dart';
+import 'package:silkroad/receive/receive.dart';
 
 void main() {
   testWidgets('display the home page when start application', (WidgetTester tester) async {
