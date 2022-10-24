@@ -97,7 +97,7 @@ class ReceiveProvider with ChangeNotifier {
     }
   }
 
-  /// for debug
+  @visibleForTesting
   void overwriteAddressList(List<String> addressList){
     if(kDebugMode){
       _ipList.clear();

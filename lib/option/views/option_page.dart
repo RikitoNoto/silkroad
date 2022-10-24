@@ -20,19 +20,17 @@ class _OptionPageState extends State<OptionPage> {
       child: Scaffold(
         body: CustomScrollView(
           slivers: <Widget>[
-            SliverAppBar(
+            const SliverAppBar(
               floating: true,
               pinned: false,
               snap: false,
-              title: const Text('Option'),
+              title: Text('Option'),
             ),
 
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   return Container(
-                    // color: index.isOdd ? Colors.white : Colors.black12,
-                    // height: 100.0,
                     child: OptionNumberInput(label: '$index'),
                   );
                 },
@@ -55,14 +53,23 @@ class OptionNumberInput extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
     return Card(
       borderOnForeground: false,
       elevation: 0.0,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
         child: Row(
           children: [
-            Text(this.label),
+            SizedBox(
+              width: screenSize.width * 0.3,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
             Expanded(
               child: TextField(
 
