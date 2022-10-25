@@ -16,6 +16,7 @@ void main() {
 
   valueGetTest();
   valueSetTest();
+  valueSetAndGetTest();
 }
 
 Future setValueSpy(String key, Object value) async{
@@ -88,6 +89,16 @@ void valueSetTest() {
     test('should be raise error when set invalid type', () async {
       OptionManager option = OptionManager();
       expect(()async => (await option.set('key', option)), throwsA(const TypeMatcher<ArgumentError>()));
+    });
+  });
+}
+
+void valueSetAndGetTest() {
+  group('value set and get test', () {
+    test('should be set and get value [1]', () async {
+      checkSetValue('int', 1);
+      OptionManager option = OptionManager();
+      expect(option.get('int'), 1);
     });
   });
 }
