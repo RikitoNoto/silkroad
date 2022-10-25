@@ -13,16 +13,26 @@ class OptionManager{
     _sharedPreferences = await SharedPreferences.getInstance();
   }
 
-  // static final Map<String, Object> _key = <String, Object>{};
-  //
-  // static void readAllValue() async{
-  //   for(String key in (await SharedPreferences.getInstance()).getKeys()){
-  //     _key[key] = (await SharedPreferences.getInstance()).get(key);
-  //   }
-  // }
-
   Object? get(String key){
     return _sharedPreferences.get(key);
+  }
+
+  Future set(String key, Object value) async{
+    if(value is int){
+      await _sharedPreferences.setInt(key, value);
+    }
+    else if(value is double){
+      await _sharedPreferences.setDouble(key, value);
+    }
+    else if(value is String){
+      await _sharedPreferences.setString(key, value);
+    }
+    else if(value is bool){
+      await _sharedPreferences.setBool(key, value);
+    }
+    else{
+      throw ArgumentError('invalid type. should be set type [int], [double], [String], [bool].');
+    }
   }
 
 }
