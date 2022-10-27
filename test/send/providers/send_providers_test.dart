@@ -209,10 +209,10 @@ void sendMessageTest(){
     });
 
     test('should be send default port [32099] when not set port ', () async{
-      OptionManager().set(Params.port.toString(), 33333);
+      (await SharedPreferences.getInstance()).remove(Params.port.toString());
       setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
-      checkCalledSend(expectPort: 33333, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
+      checkCalledSend(expectPort: 32099, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });
   });
 }
