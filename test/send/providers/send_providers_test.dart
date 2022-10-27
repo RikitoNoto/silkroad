@@ -6,9 +6,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/comm/comm.dart';
+import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
+import 'package:silkroad/option/params.dart';
 
 import 'send_providers_test.mocks.dart';
 
@@ -22,6 +25,10 @@ CommunicationIF<Socket> _buildSpy(){
   return kTcpMock;
 }
 
+void setPort(int port){
+  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+}
+
 @GenerateMocks([Socket])
 @GenerateMocks([Tcp])
 @GenerateMocks([File])
@@ -33,6 +40,8 @@ void main() {
     kSocketMock = MockSocket();
     kProvider = SendProvider(builder: _buildSpy);
     kProvider.file = kFileMock;
+    setPort(32099);
+    OptionManager.initialize();
   });
   ipTest();
   fileSetTest();
@@ -190,6 +199,20 @@ void sendMessageTest(){
       setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
       checkCalledSend(data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
+    });
+
+    test('should be change port number[33333]', () async{
+      OptionManager().set(Params.port.toString(), 33333);
+      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(expectPort: 33333, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
+    });
+
+    test('should be send default port [32099] when not set port ', () async{
+      OptionManager().set(Params.port.toString(), 33333);
+      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(expectPort: 33333, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });
   });
 }

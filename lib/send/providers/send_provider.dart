@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:silkroad/comm/comm.dart';
+import 'package:silkroad/parameter.dart';
 
 typedef SendClientFactoryFunc<T> = CommunicationIF<T> Function();
 
@@ -33,7 +34,7 @@ class SendProvider with ChangeNotifier {
     File? file = _file;
     CommunicationIF<Socket>? communicator = builder();
 
-    Socket? socket = await communicator.connect('$ip:32099');
+    Socket? socket = await communicator.connect('$ip:${OptionManager().get(Params.port.toString())}');
 
     // connection is success and
     // file is exist
