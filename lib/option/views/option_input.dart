@@ -15,8 +15,9 @@ abstract class OptionInput extends StatelessWidget{
 
   static OptionInput construct(Params param, {Key? key}){
     Object? value = OptionManager().get(param.toString());
-    switch(param){
-      case Params.port: /// port number is input number param.
+
+    switch(param.inputType){
+      case InputType.numberText: /// port number is input number param.
         return OptionNumberInput(label: param.label, key: key, onChanged: _createCallbackForInput(param), initialValue: value is String ? value : null,);
     }
   }
