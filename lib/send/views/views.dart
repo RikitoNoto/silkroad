@@ -1,1 +1,1 @@
-export 'send_view.dart';
+export 'send_page.dart';

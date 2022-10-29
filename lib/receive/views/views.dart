@@ -1,1 +1,1 @@
-export 'receive_view.dart';
+export 'receive_page.dart';

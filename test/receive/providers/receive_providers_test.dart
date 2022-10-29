@@ -10,6 +10,7 @@ import 'package:network_info_plus/network_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:platform/platform.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'receive_providers_test.mocks.dart';
 
@@ -19,6 +20,7 @@ import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/parameter.dart';
 import '../../spy/path_provider_spy.dart';
 
 
@@ -28,6 +30,10 @@ late ReceiveProvider kProvider;
 late MockTcp kMockHost;
 late MockSocket kMockSocket;
 ReceiveCallback<Socket>? kReceiveCallbackSpy;
+
+void setPort(int port){
+  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+}
 
 @GenerateMocks([Tcp])
 @GenerateMocks([Socket])
@@ -48,6 +54,8 @@ void main() {
     kMockHost = MockTcp();
     kMockSocket = MockSocket();
     kReceiveCallbackSpy = null;
+    setPort(32099);
+    await OptionManager.initialize();
   });
 
   tearDown(() async{
@@ -116,12 +124,24 @@ void portTest() {
   group('port open and close test', () {
 
     test('should be open port when call the open method', () async{
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
+      await checkOpenPort("192.168.1.1", 32099, true, true, kMockHost);
+    });
+
+    test('should be open port when call the open method [1000]', () async{
+      setPort(1000);
+      await OptionManager.initialize();
+      await checkOpenPort("192.168.1.1", 1000, true, true, kMockHost);
+    });
+
+    test('should be open port when parameter is null', () async{
+      (await SharedPreferences.getInstance()).remove(Params.port.toString());
+      await OptionManager.initialize();
+      await checkOpenPort("192.168.1.1", 32099, true, true, kMockHost);
     });
 
     test('should be close port when call the close method', () async{
       when(kMockHost.close()).thenAnswer((_)=> Future.value(null));
-      await checkOpenPort("192.168.1.1", ReceiveProvider.portNo, true, true, kMockHost);
+      await checkOpenPort("192.168.1.1", 32099, true, true, kMockHost);
       verifyNever(kMockHost.close());
       kProvider.close();
       verify(kMockHost.close());
@@ -131,7 +151,7 @@ void portTest() {
 
 Future<void> setupCallbackAction({
   String ip = '192.168.1.1',
-  int port = ReceiveProvider.portNo,
+  int port = 32099,
 }) async{
   kReceiveCallbackSpy = await openPort(ip, port);
   if(kReceiveCallbackSpy == null) fail("could not get receive callback.");
@@ -143,7 +163,6 @@ Future checkReceiveListLen(int expectLen, String sendData) async{//, MockSocket 
 }
 
 String convertMessageString({required name, sender='', data=''}){
-  // return 'SEND_FILE\nname:$name\nsender:$sender\n\n$data';
   return SendFile.send(name: name, sender: sender, fileData: Uint8List.fromList(utf8.encode(data))).data;
 }
 

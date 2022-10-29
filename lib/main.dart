@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'app.dart';
 import 'package:platform/platform.dart';
 
-void main() {
+import 'package:silkroad/option/option_manager.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await initialize();
   runApp(const SilkRoadApp(platform: LocalPlatform(),));
+}
+
+Future initialize() async{
+  OptionManager.initialize();
 }
 //TODO: i18n

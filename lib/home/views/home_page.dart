@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
-//TODO: create option page.
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
@@ -52,6 +52,13 @@ class _HomePageState extends State<HomePage> {
                     iconColor: AppTheme.appIconColor2,
                     onPressed: () => Navigator.pushNamed(context, '/receive'),
                   ),
+                  _buildActionSelectButton(
+                    context,
+                    label: 'Option',
+                    iconData: Icons.settings,
+                    iconColor: Colors.grey,
+                    onPressed: () => Navigator.pushNamed(context, '/option'),
+                  ),
                 ],
               ),
             ),
@@ -63,7 +70,25 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  Widget _buildActionSelectButton(BuildContext context, {required String label, required String svgPath, required Color iconColor, void Function()? onPressed}){
+  Widget _buildActionSelectButton(BuildContext context, {required String label, String? svgPath, IconData? iconData, required Color iconColor, void Function()? onPressed}){
+    if( ((svgPath == null) && (iconData == null)) ||
+        ((svgPath != null) && (iconData != null)) ) throw ArgumentError('there is no icon data. set svgPath or iconData which one.');
+
+    Widget icon;
+    if(svgPath != null){
+      icon =SvgPicture.asset(
+        svgPath,
+        fit: BoxFit.scaleDown,
+        color: Colors.white,
+      );
+    }
+    else{ // if(iconData != null){
+      icon = Icon(
+        iconData,
+        color: Colors.white,
+      );
+    }
+
     return ElevatedButton(
       key: ValueKey<String>(label),
       onPressed: onPressed,
@@ -84,11 +109,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(5),
                   color: iconColor,
                 ),
-                child: SvgPicture.asset(
-                  svgPath,
-                  fit: BoxFit.scaleDown,
-                  color: Colors.white,
-                ),
+                child: icon,
               ),
               SizedBox(width: 10,),
               Expanded(
