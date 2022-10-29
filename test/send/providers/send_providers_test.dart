@@ -44,15 +44,15 @@ Future setParam(String key , Object value) async{
 @GenerateMocks([File])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUp((){
+  setUp(()async{
     kSendData = null;
     kFileMock = MockFile();
     kTcpMock = MockTcp();
     kSocketMock = MockSocket();
     kProvider = SendProvider(builder: _buildSpy);
     kProvider.file = kFileMock;
-    setParam(Params.port.toString(), 32099);
-    setParam(Params.name.toString(), '');
+    await setParam(Params.port.toString(), 32099);
+    await setParam(Params.name.toString(), '');
   });
   ipTest();
   fileSetTest();
