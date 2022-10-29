@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:platform/platform.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
@@ -14,6 +15,7 @@ import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/comm/message.dart';
+import 'package:silkroad/parameter.dart';
 
 import 'spy/path_provider_spy.dart';
 
@@ -27,6 +29,11 @@ Widget _removeItemBuilderSpy(ReceiveItem item, int index, BuildContext context, 
   return Text('');
 }
 
+Future setPort(int port) async{
+  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+  await OptionManager.initialize();
+}
+
 Future _setUp() async{
   await pathProviderSetUp();
 
@@ -37,6 +44,7 @@ Future _setUp() async{
   );
   kSendProvider = SendProvider();
   kReceiveProvider = ReceiveProvider(platform: LocalPlatform(), receiveList: kReceiveList);
+  await setPort(32099);
 }
 
 Future _tearDown() async{
@@ -63,7 +71,6 @@ void main() {
   Directory tempDir = Directory(p.join(spyRootDir.path, 'temp'));
   setUpAll(() async{
     PathProviderPlatformSpy.temporaryPath = tempDir.path;
-    OptionManager.initialize();
     await _dummyTest(); //FIXME: why this dummy test? if this test is not run, fail a test of [sendAndReceiveTest] in code magic.
   });
 
@@ -161,6 +168,11 @@ void sendAndReceiveTest(){
       }
 
       await checkSendAndReceive(expectData, waitTimeMs: 50);
+    });
+
+    test('should be send and receive message after change port', () async{
+      await setPort(1000);
+      await checkSendAndReceive(<int>[0x00, 0x01]);
     });
   });
 }
