@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:network_info_plus/network_info_plus.dart';
 import 'package:platform/platform.dart';
-import 'package:silkroad/comm/communication_if.dart';
 
 import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/tcp.dart';
@@ -11,6 +9,8 @@ import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
+import 'package:silkroad/parameter.dart';
+import 'package:silkroad/global.dart';
 
 typedef ReceiveHostFactoryFunc<T> = CommunicationIF<T> Function();
 
@@ -20,7 +20,6 @@ class ReceiveProvider with ChangeNotifier {
     _ipList.add(_currentIp);
     fetchIpAddresses();
   }
-  static const portNo = 32099;
   final ReceiveHostFactoryFunc<Socket> builder;
   CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
@@ -40,7 +39,7 @@ class ReceiveProvider with ChangeNotifier {
   Future<bool> open() async{
     _hostComm = builder();
 
-    _hostComm!.listen('$currentIp:$portNo', receiveCallback: _onReceive);
+    _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
     return true;
   }
 

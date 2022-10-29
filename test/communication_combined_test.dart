@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:platform/platform.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -62,6 +63,7 @@ void main() {
   Directory tempDir = Directory(p.join(spyRootDir.path, 'temp'));
   setUpAll(() async{
     PathProviderPlatformSpy.temporaryPath = tempDir.path;
+    OptionManager.initialize();
     await _dummyTest(); //FIXME: why this dummy test? if this test is not run, fail a test of [sendAndReceiveTest] in code magic.
   });
 
