@@ -43,6 +43,7 @@ Future setParam(String key , Object value) async{
 @GenerateMocks([Tcp])
 @GenerateMocks([File])
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   setUp((){
     kSendData = null;
     kFileMock = MockFile();
