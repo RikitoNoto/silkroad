@@ -171,7 +171,7 @@ void sendAndReceiveTest(){
     });
 
     test('should be send and receive message after change port', () async{
-      await setPort(1000);
+      await setPort(55555);
       await checkSendAndReceive(<int>[0x00, 0x01]);
     });
   });
