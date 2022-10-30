@@ -18,6 +18,7 @@ import 'package:silkroad/receive/receive.dart';
 import 'package:silkroad/parameter.dart';
 
 void main() async{
+  TestWidgetsFlutterBinding.ensureInitialized();
   await OptionManager.initialize();
 
   testWidgets('display the home page when start application', (WidgetTester tester) async {
