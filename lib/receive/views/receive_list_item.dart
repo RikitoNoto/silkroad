@@ -98,7 +98,10 @@ mixin _ListItemBuilderPc {
                 title: Text(name),
                 children: <Widget>[
                   SimpleDialogOption(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      if(onSave != null) onSave(context);
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       child: Row(
                         children: <Widget>[
@@ -110,7 +113,10 @@ mixin _ListItemBuilderPc {
                     ),
                   ),
                   SimpleDialogOption(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      if(onDelete != null) onDelete(context);
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       child: Row(
                           children: <Widget>[
