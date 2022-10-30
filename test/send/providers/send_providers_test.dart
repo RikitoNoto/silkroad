@@ -20,22 +20,15 @@ late MockFile kFileMock;
 late MockTcp kTcpMock;
 late MockSocket kSocketMock;
 late Message? kSendData;
+late Map<String, Object> kParamMap;
 
 CommunicationIF<Socket> _buildSpy(){
   return kTcpMock;
 }
 
 Future setParam(String key , Object value) async{
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  Map<String, Object> map = {};
-  for(String currentKey in sharedPreferences.getKeys()){
-    Object? paramValue = sharedPreferences.get(currentKey);
-    if(paramValue != null){
-      map[currentKey] = paramValue;
-    }
-  }
-  map[key] = value;
-  SharedPreferences.setMockInitialValues(map);
+  kParamMap[key] = value;
+  SharedPreferences.setMockInitialValues(kParamMap);
   await OptionManager.initialize();
 }
 
@@ -51,8 +44,11 @@ void main() {
     kSocketMock = MockSocket();
     kProvider = SendProvider(builder: _buildSpy);
     kProvider.file = kFileMock;
+    kParamMap = <String, Object>{};
     await setParam(Params.port.toString(), 32099);
     await setParam(Params.name.toString(), '');
+  });
+  tearDown(()async{
   });
   ipTest();
   fileSetTest();

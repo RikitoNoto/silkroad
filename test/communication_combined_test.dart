@@ -22,6 +22,7 @@ late SendProvider kSendProvider;
 late ReceiveProvider kReceiveProvider;
 late AnimatedListItemModel<ReceiveItem> kReceiveList;
 late GlobalKey<AnimatedListState> kGlobalKey;
+late Map<String, Object> kParamMap;
 
 
 Widget _removeItemBuilderSpy(ReceiveItem item, int index, BuildContext context, Animation<double> animation){
@@ -29,16 +30,8 @@ Widget _removeItemBuilderSpy(ReceiveItem item, int index, BuildContext context, 
 }
 
 Future setParam(String key , Object value) async{
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  Map<String, Object> map = {};
-  for(String currentKey in sharedPreferences.getKeys()){
-    Object? paramValue = sharedPreferences.get(currentKey);
-    if(paramValue != null){
-      map[currentKey] = paramValue;
-    }
-  }
-  map[key] = value;
-  SharedPreferences.setMockInitialValues(map);
+  kParamMap[key] = value;
+  SharedPreferences.setMockInitialValues(kParamMap);
   await OptionManager.initialize();
 }
 
@@ -52,6 +45,7 @@ Future _setUp() async{
   );
   kSendProvider = SendProvider();
   kReceiveProvider = ReceiveProvider(platform: const LocalPlatform(), receiveList: kReceiveList);
+  kParamMap = <String, Object>{};
   await setParam(Params.port.toString(), 32099);
 }
 
