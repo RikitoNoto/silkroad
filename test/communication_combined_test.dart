@@ -9,7 +9,6 @@ import 'package:platform/platform.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -23,14 +22,16 @@ late SendProvider kSendProvider;
 late ReceiveProvider kReceiveProvider;
 late AnimatedListItemModel<ReceiveItem> kReceiveList;
 late GlobalKey<AnimatedListState> kGlobalKey;
+late Map<String, Object> kParamMap;
 
 
 Widget _removeItemBuilderSpy(ReceiveItem item, int index, BuildContext context, Animation<double> animation){
-  return Text('');
+  return const Text('');
 }
 
-Future setPort(int port) async{
-  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+Future setParam(String key , Object value) async{
+  kParamMap[key] = value;
+  SharedPreferences.setMockInitialValues(kParamMap);
   await OptionManager.initialize();
 }
 
@@ -43,8 +44,9 @@ Future _setUp() async{
     removedItemBuilder: _removeItemBuilderSpy,
   );
   kSendProvider = SendProvider();
-  kReceiveProvider = ReceiveProvider(platform: LocalPlatform(), receiveList: kReceiveList);
-  await setPort(32099);
+  kReceiveProvider = ReceiveProvider(platform: const LocalPlatform(), receiveList: kReceiveList);
+  kParamMap = <String, Object>{};
+  await setParam(Params.port.toString(), 32099);
 }
 
 Future _tearDown() async{
@@ -59,7 +61,7 @@ Future _dummyTest() async{
 
   await sendData([0x00]);
 
-  await Future.delayed(Duration(milliseconds: 200));
+  await Future.delayed(const Duration(milliseconds: 200));
 
   await _tearDown();
 }
@@ -90,7 +92,7 @@ Future openPort() async{
   kReceiveProvider.selectIp('127.0.0.1');
   kReceiveProvider.open();
 
-  await Future.delayed(Duration(milliseconds: 1));
+  await Future.delayed(const Duration(milliseconds: 1));
 }
 
 Future sendData(List<int> expectData) async{
@@ -123,7 +125,7 @@ Future checkSendAndReceive(List<int> expectData, {int waitTimeMs=10}) async{
           (await File(kReceiveList[0].tempPath).exists())){
         break;
       }
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
     }
   }
 
@@ -151,7 +153,7 @@ void sendAndReceiveTest(){
       await checkSendAndReceive(expectData);
     });
 
-    test('should be send and receive message 1024kbyte', () async{
+    test('should be send and receive message 1024k byte', () async{
       List<int> expectData = [];
       for(int i=0; i<1024*1024; i++){
         expectData.add(0x00);
@@ -171,7 +173,7 @@ void sendAndReceiveTest(){
     });
 
     test('should be send and receive message after change port', () async{
-      await setPort(32100);
+      await setParam(Params.port.toString(), 32100);
       await checkSendAndReceive(<int>[0x00, 0x01]);
     });
   });

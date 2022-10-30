@@ -7,7 +7,7 @@ import 'package:silkroad/option/option_manager.dart';
 abstract class OptionInput extends StatelessWidget{
   const OptionInput({super.key});
 
-  static void Function(String) _createCallbackForInput(Params param){
+  static void Function(String) createCallbackForInput(Params param){
     return (value){
       OptionManager().set(param.toString(), value);
     };
@@ -17,27 +17,24 @@ abstract class OptionInput extends StatelessWidget{
     Object? value = OptionManager().get(param.toString());
 
     switch(param.inputType){
-      case InputType.numberText: /// port number is input number param.
-        return OptionNumberInput(label: param.label, key: key, onChanged: _createCallbackForInput(param), initialValue: value is String ? value : null,);
+      case InputType.numberText:
+        return OptionNumberInput(label: param.label, key: key, onChanged: createCallbackForInput(param), initialValue: value is String ? value : null,);
+      case InputType.text:
+        return OptionInputText(label: param.label, key: key, onChanged: createCallbackForInput(param), initialValue: value is String ? value : null,);
     }
   }
 }
 
-class OptionNumberInput extends OptionInput{
-  const OptionNumberInput({
-    required this.label,
-    this.onChanged,
-    this.initialValue,
-    super.key,
-  });
+abstract class OptionInputBase extends OptionInput{
+  const OptionInputBase({super.key});
 
-  final String label;
-  final void Function(String)? onChanged;
-  final String? initialValue;
-
-
-  @override
-  Widget build(BuildContext context) {
+  Widget constructInputField(BuildContext context, {
+    required String label,
+    void Function(String)? onChanged,
+    String? initialValue,
+    List<TextInputFormatter>? inputFormatters,
+    TextInputType? keyboardType,}
+  ) {
     Size screenSize = MediaQuery.of(context).size;
     return Card(
       borderOnForeground: false,
@@ -58,8 +55,8 @@ class OptionNumberInput extends OptionInput{
             Expanded(
               child: TextField(
                 onChanged: onChanged,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                keyboardType: TextInputType.number,
+                inputFormatters: inputFormatters,
+                keyboardType: keyboardType,
                 controller: TextEditingController(text: initialValue),
               ),
             ),
@@ -67,5 +64,81 @@ class OptionNumberInput extends OptionInput{
         ),
       ),
     );
+  }
+
+}
+
+class OptionInputText extends OptionInputBase{
+  const OptionInputText({
+    required this.label,
+    this.onChanged,
+    this.initialValue,
+    super.key,
+  });
+
+  final String label;
+  final void Function(String)? onChanged;
+  final String? initialValue;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return super.constructInputField(context, label: label, onChanged: onChanged, initialValue: initialValue);
+  }
+}
+
+class OptionNumberInput extends OptionInputBase{
+  const OptionNumberInput({
+    required this.label,
+    this.onChanged,
+    this.initialValue,
+    super.key,
+  });
+
+  final String label;
+  final void Function(String)? onChanged;
+  final String? initialValue;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return super.constructInputField(
+      context,
+      label: label,
+      onChanged: onChanged,
+      initialValue: initialValue,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      keyboardType: TextInputType.number,
+
+    );
+    // Size screenSize = MediaQuery.of(context).size;
+    // return Card(
+    //   borderOnForeground: false,
+    //   elevation: 0.0,
+    //   child: Padding(
+    //     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
+    //     child: Row(
+    //       children: [
+    //         SizedBox(
+    //           width: screenSize.width * 0.3,
+    //           child: Text(
+    //             label,
+    //             style: const TextStyle(
+    //               fontSize: 16,
+    //             ),
+    //           ),
+    //         ),
+    //         Expanded(
+    //           child: TextField(
+    //             onChanged: onChanged,
+    //             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    //             keyboardType: TextInputType.number,
+    //             controller: TextEditingController(text: initialValue),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

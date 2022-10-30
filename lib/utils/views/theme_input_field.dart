@@ -10,6 +10,7 @@ class ThemeInputField extends StatefulWidget {
     this.onChanged,
     this.inputFormatters,
     this.keyboardType,
+    this.initialValue,
   });
 
   final String? labelText;
@@ -18,6 +19,7 @@ class ThemeInputField extends StatefulWidget {
   final Function(String)? onChanged;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
+  final String? initialValue;
 
   @override
   State<ThemeInputField> createState() => _ThemeInputFieldState();
@@ -40,6 +42,7 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
         inputFormatters: widget.inputFormatters,
         keyboardType: widget.keyboardType,
         cursorColor: _getFocusColor(context),
+        controller: widget.initialValue != null ? TextEditingController(text: widget.initialValue) : null,
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(

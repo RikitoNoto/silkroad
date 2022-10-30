@@ -9,14 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:platform/platform.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/home/home.dart';
 
 import 'package:silkroad/app.dart';
 import 'package:silkroad/send/send.dart';
 import 'package:silkroad/receive/receive.dart';
+import 'package:silkroad/parameter.dart';
 
-void main() {
+void main() async{
+  TestWidgetsFlutterBinding.ensureInitialized();
+  Map<String, Object> map = <String, Object>{};
+  map[Params.name.toString()] = '';
+  SharedPreferences.setMockInitialValues(map);
+  await OptionManager.initialize();
+
   testWidgets('display the home page when start application', (WidgetTester tester) async {
     await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform(),));
     await tester.pumpAndSettle();

@@ -20,28 +20,35 @@ late MockFile kFileMock;
 late MockTcp kTcpMock;
 late MockSocket kSocketMock;
 late Message? kSendData;
+late Map<String, Object> kParamMap;
 
 CommunicationIF<Socket> _buildSpy(){
   return kTcpMock;
 }
 
-void setPort(int port){
-  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+Future setParam(String key , Object value) async{
+  kParamMap[key] = value;
+  SharedPreferences.setMockInitialValues(kParamMap);
+  await OptionManager.initialize();
 }
 
 @GenerateMocks([Socket])
 @GenerateMocks([Tcp])
 @GenerateMocks([File])
 void main() {
-  setUp((){
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUp(()async{
     kSendData = null;
     kFileMock = MockFile();
     kTcpMock = MockTcp();
     kSocketMock = MockSocket();
     kProvider = SendProvider(builder: _buildSpy);
     kProvider.file = kFileMock;
-    setPort(32099);
-    OptionManager.initialize();
+    kParamMap = <String, Object>{};
+    await setParam(Params.port.toString(), 32099);
+    await setParam(Params.name.toString(), '');
+  });
+  tearDown(()async{
   });
   ipTest();
   fileSetTest();
@@ -122,7 +129,7 @@ void ipTest(){
   });
 }
 
-void setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? data, Result sendResult=Result.success, bool connectionResult=true}){
+Future setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? data, Result sendResult=Result.success, bool connectionResult=true, String? sender}) async{
   when(kFileMock.exists()).thenAnswer((_) => Future.value(isFileExist));
   when(kFileMock.path).thenAnswer((_) => p.join(fileName));
   when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(data ?? Uint8List(0)));
@@ -132,6 +139,7 @@ void setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? d
     return Future.value(sendResult);
   });
   when(kTcpMock.close()).thenAnswer((_)=>Future.value(null));
+  await setParam(Params.name.toString(), sender ?? '');
 }
 
 void checkCalledSend({
@@ -171,46 +179,52 @@ void checkCalledSend({
 void sendMessageTest(){
   group('send message test', () {
     test('should be connect and send to socket default', () async{
-      setupSendMocks();
+      await setupSendMocks();
       expect(await kProvider.send(), isTrue);
       checkCalledSend(expectIp: '0.0.0.0', expectPort: 32099);
     });
 
     test('should be connect and send to socket [192.168.12.1]', () async{
-      setupSendMocks();
+      await setupSendMocks();
       setIpAddressToProvider('192.168.12.1');
       expect(await kProvider.send(), isTrue);
       checkCalledSend(expectIp: '192.168.12.1', expectPort: 32099);
     });
 
     test('should be fail and not send message if file is none', () async{
-      setupSendMocks(fileName: 'name', isFileExist: false);
+      await setupSendMocks(fileName: 'name', isFileExist: false);
       expect(await kProvider.send(), isFalse);
       checkCalledSend(checkNeverSend: true);
     });
 
     test('should be fail and not send message if connection is fail', () async{
-      setupSendMocks(fileName: 'name', isFileExist: false, connectionResult: false);
+      await setupSendMocks(fileName: 'name', isFileExist: false, connectionResult: false);
       expect(await kProvider.send(), isFalse);
       checkCalledSend(checkNeverSend: true);
     });
 
     test('should be send message empty data when file data is empty', () async{
-      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
       checkCalledSend(data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });
 
+    test('should be send message sender when option name is set [senderA]', () async{
+      await setupSendMocks(fileName: 'name', sender: 'senderA', data: Uint8List.fromList(utf8.encode('')));
+      expect(await kProvider.send(), isTrue);
+      checkCalledSend(data: SendFile.send(name: 'name', sender: 'senderA', fileData: Uint8List.fromList(utf8.encode(''))));
+    });
+
     test('should be change port number[33333]', () async{
-      OptionManager().set(Params.port.toString(), 33333);
-      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      await setParam(Params.port.toString(), 33333);
+      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
       checkCalledSend(expectPort: 33333, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });
 
     test('should be send default port [32099] when not set port ', () async{
       (await SharedPreferences.getInstance()).remove(Params.port.toString());
-      setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
+      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
       checkCalledSend(expectPort: 32099, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
     });

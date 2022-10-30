@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
+import 'package:silkroad/parameter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +14,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
+    Object? name = OptionManager().get(Params.name.toString());
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -23,13 +24,15 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: SizedBox(
                 height: 50,
                 child: ThemeInputField(
                   labelText: 'Your name',
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  initialValue: name is String ? name : null,
+                  onChanged: OptionInput.createCallbackForInput(Params.name),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                 ),
               ),
             ),
@@ -111,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: icon,
               ),
-              SizedBox(width: 10,),
+              const SizedBox(width: 10,),
               Expanded(
                 child: Text(
                   label,

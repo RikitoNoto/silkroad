@@ -43,7 +43,8 @@ class SendProvider with ChangeNotifier {
         (file != null) &&
         (await file.exists())){
 
-      await communicator.send(socket, SendFile.send(name: p.basename(file.path), sender: '', fileData: await file.readAsBytes()));
+      Object? sender = OptionManager().get(Params.name.toString());
+      await communicator.send(socket, SendFile.send(name: p.basename(file.path), sender: sender?.toString() ?? '', fileData: await file.readAsBytes()));
       sendResult = true;
     }
 
