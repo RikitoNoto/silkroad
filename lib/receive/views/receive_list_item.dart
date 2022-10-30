@@ -83,13 +83,49 @@ mixin _ListItemBuilderPc {
       BuildContext context,
       {
         required Widget child,
+        required String name,
         EdgeInsetsGeometry? padding,
         void Function(BuildContext context)? onDelete,
         void Function(BuildContext context)? onSave,
       })
   {
     return ElevatedButton(
-      onPressed: ()=>{},
+      onPressed: (){
+        showDialog(
+          context: context,
+          builder: (context) {
+            return SimpleDialog(
+                title: Text(name),
+                children: <Widget>[
+                  SimpleDialogOption(
+                    onPressed: () => Navigator.pop(context),
+                    child: Container(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text('Save',)
+                          ),
+                        ]
+                      ),
+                    ),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () => Navigator.pop(context),
+                    child: Container(
+                      child: Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: Text('Delete', style: TextStyle(color: Colors.red),)
+                            ),
+                          ]
+                      ),
+                    ),
+                  ),
+                ],
+            );
+          },
+        );
+      },
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -170,6 +206,7 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
       default:
         return buildListItemPc(
           context,
+          name: name,
           onSave: onSave,
           onDelete: onDelete,
           child: _buildCardItem(context, iconData: iconData, name: name, size: size, sender: sender),
