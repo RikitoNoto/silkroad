@@ -7,27 +7,21 @@ import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
 
-typedef SendClientFactoryFunc<T> = CommunicationIF<T> Function();
 
 class SendProvider with ChangeNotifier {
-  SendProvider({this.builder = _build});
+  SendProvider({this.builder = kCommunicationFactory});
 
   static const String fileNameNoSelect = 'No select';
 
   final List<int> _ip = <int>[0, 0, 0, 0];
   File? _file;
-  final SendClientFactoryFunc<Socket> builder;
+  final CommunicationFactoryFunc<Socket> builder;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
   String get fileName {
     File? file = _file;
     return file != null ? p.basename(_file!.path) : fileNameNoSelect;
-  }
-
-  //TODO: move global.
-  static CommunicationIF<Socket> _build(){
-    return Tcp();
   }
 
   Future<bool> send() async{

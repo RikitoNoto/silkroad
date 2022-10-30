@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:platform/platform.dart';
 
 import 'package:silkroad/comm/communication_if.dart';
-import 'package:silkroad/comm/tcp.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
@@ -12,15 +11,14 @@ import 'package:silkroad/utils/platform_saver.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/global.dart';
 
-typedef ReceiveHostFactoryFunc<T> = CommunicationIF<T> Function();
 
 class ReceiveProvider with ChangeNotifier {
-  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = _build}) : _receiveList = receiveList
+  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = kCommunicationFactory}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();
   }
-  final ReceiveHostFactoryFunc<Socket> builder;
+  final CommunicationFactoryFunc<Socket> builder;
   CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
@@ -31,10 +29,6 @@ class ReceiveProvider with ChangeNotifier {
 
   final List<String> _ipList = <String>[];  /// ip address list
   List<String> get ipList => _ipList;
-
-  static CommunicationIF<Socket> _build(){
-    return Tcp();
-  }
 
   Future<bool> open() async{
     _hostComm = builder();
