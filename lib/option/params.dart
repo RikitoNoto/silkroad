@@ -15,7 +15,7 @@ extension ParamInputType on Params{
   InputType get inputType {
     switch(this){
       case Params.name:
-        return InputType.numberText;
+        return InputType.text;
       case Params.port:
         return InputType.numberText;
     }
@@ -23,6 +23,7 @@ extension ParamInputType on Params{
 }
 
 enum InputType{
+  text,
   numberText,
 }
 
