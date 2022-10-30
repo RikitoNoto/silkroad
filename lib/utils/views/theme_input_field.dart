@@ -42,7 +42,7 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
         inputFormatters: widget.inputFormatters,
         keyboardType: widget.keyboardType,
         cursorColor: _getFocusColor(context),
-        controller: TextEditingController(text: widget.initialValue),
+        controller: widget.initialValue != null ? TextEditingController(text: widget.initialValue) : null,
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(

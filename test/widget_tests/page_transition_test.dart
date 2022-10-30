@@ -15,8 +15,11 @@ import 'package:silkroad/home/home.dart';
 import 'package:silkroad/app.dart';
 import 'package:silkroad/send/send.dart';
 import 'package:silkroad/receive/receive.dart';
+import 'package:silkroad/parameter.dart';
 
-void main() {
+void main() async{
+  await OptionManager.initialize();
+
   testWidgets('display the home page when start application', (WidgetTester tester) async {
     await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform(),));
     await tester.pumpAndSettle();
