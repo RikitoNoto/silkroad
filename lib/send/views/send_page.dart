@@ -4,8 +4,9 @@ import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:silkroad/send/providers/send_provider.dart';
 
+import 'package:silkroad/app_theme.dart';
+import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 
 class SendPage extends StatefulWidget {
@@ -43,7 +44,7 @@ class _SendPageState extends State<SendPage>{
             title: const Text("Send"),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.send),
+                icon: const Icon(Icons.send, color: AppTheme.appIconColor1,),
                 onPressed: () {
                   provider.send();
                 },

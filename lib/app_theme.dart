@@ -28,6 +28,8 @@ class AppTheme{
   static const Color appIconColor1 = _appIconColorLightBlue;
   static const Color appIconColor2 = _appIconColorGrassGreen;
 
+  static const String appFontFamily = 'Noto_Sans_JP';
+
   static const MaterialColor materialWhite = MaterialColor(
     0xFFFFFFFF,
     <int, Color>{
@@ -73,6 +75,7 @@ class AppTheme{
         backgroundColor: MaterialStateProperty.all<Color>(_elevatedButtonColorLight),
       ),
     ),
+    fontFamily: appFontFamily,
   );
 
   /// app theme dark
@@ -86,6 +89,13 @@ class AppTheme{
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(_elevatedButtonColorDark),
       ),
+    ),
+
+    textTheme: ThemeData.dark().textTheme.apply(
+      fontFamily: appFontFamily,
+    ),
+    primaryTextTheme: ThemeData.dark().textTheme.apply(
+      fontFamily: appFontFamily,
     ),
   );
 
