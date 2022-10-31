@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/utils/views/character_logo.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('SilkRoad'),
+          title: CharacterLogo(),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,

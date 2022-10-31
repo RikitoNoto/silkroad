@@ -47,7 +47,7 @@ abstract class OptionInputBase extends OptionInput{
               width: screenSize.width * 0.3,
               child: Text(
                 label,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyText2?.copyWith(
                   fontSize: 16,
                 ),
               ),
