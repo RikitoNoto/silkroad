@@ -83,7 +83,7 @@ class _SendPageState extends State<SendPage>{
         child: IntrinsicHeight(
           child: Row(
             children: [
-              //TODO: input action next does not work, because input field is in other state.
+              //FIXME: input action next does not work, because input field is in other state.
               _buildOctetField(0,),
               _buildComma(),
               _buildOctetField(1,),
