@@ -129,6 +129,7 @@ class ReceivePageState extends State<ReceivePage>
   Widget _buildItem(BuildContext context, int index, Animation<double> animation)
   {
     return ReceiveListItem(
+      platform: widget.platform,
       index: index,
       iconData: _receiveList[index].iconData,
       name: _receiveList[index].name,
@@ -143,6 +144,7 @@ class ReceivePageState extends State<ReceivePage>
   Widget _removeItem(ReceiveItem item, int index, BuildContext context, Animation<double> animation)
   {
     return ReceiveListItemRemoving(
+      platform: widget.platform,
       index: index,
       iconData: item.iconData,
       name: item.name,
