@@ -137,10 +137,10 @@ class AppTheme{
   static Color getBackgroundColor(BuildContext context){
     Color backgroundColor;
     if(MediaQuery.platformBrightnessOf(context) == Brightness.light) {
-      backgroundColor = _backgroundColorLight;
+      backgroundColor = _appBackgroundColorLight;
     }
     else{
-      backgroundColor = _backgroundColorDark;
+      backgroundColor = _appBackgroundColorDark;
     }
     return backgroundColor;
   }
