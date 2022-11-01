@@ -11,6 +11,7 @@ import 'package:silkroad/global.dart';
 import 'receive_list_item.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
+import 'package:silkroad/i18n/translations.g.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({
@@ -80,7 +81,7 @@ class ReceivePageState extends State<ReceivePage>
       create: (context) => provider,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Receive"),
+          title: Text(t.actions.receive),
           actions: _getDebugActions(),
         ),
 

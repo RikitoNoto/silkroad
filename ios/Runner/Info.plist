@@ -51,5 +51,10 @@
     <string>to save images received</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>to save images received</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+       <string>en</string>
+       <string>ja</string>
+    </array>
 </dict>
 </plist>

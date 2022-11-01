@@ -111,34 +111,5 @@ class OptionNumberInput extends OptionInputBase{
       keyboardType: TextInputType.number,
 
     );
-    // Size screenSize = MediaQuery.of(context).size;
-    // return Card(
-    //   borderOnForeground: false,
-    //   elevation: 0.0,
-    //   child: Padding(
-    //     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
-    //     child: Row(
-    //       children: [
-    //         SizedBox(
-    //           width: screenSize.width * 0.3,
-    //           child: Text(
-    //             label,
-    //             style: const TextStyle(
-    //               fontSize: 16,
-    //             ),
-    //           ),
-    //         ),
-    //         Expanded(
-    //           child: TextField(
-    //             onChanged: onChanged,
-    //             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-    //             keyboardType: TextInputType.number,
-    //             controller: TextEditingController(text: initialValue),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

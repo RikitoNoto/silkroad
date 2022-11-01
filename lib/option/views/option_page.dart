@@ -3,6 +3,7 @@ import 'package:platform/platform.dart';
 
 import 'option_input.dart';
 import '../params.dart';
+import 'package:silkroad/i18n/translations.g.dart';
 
 class OptionPage extends StatefulWidget {
   const OptionPage({super.key, required this.platform});
@@ -23,11 +24,11 @@ class _OptionPageState extends State<OptionPage> {
       child: Scaffold(
         body: CustomScrollView(
           slivers: <Widget>[
-            const SliverAppBar(
+            SliverAppBar(
               floating: true,
               pinned: false,
               snap: false,
-              title: Text('Option'),
+              title: Text(t.actions.option),
             ),
 
             SliverList(

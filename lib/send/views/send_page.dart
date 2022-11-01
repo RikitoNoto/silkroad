@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -8,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
+import 'package:silkroad/i18n/translations.g.dart';
 
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
@@ -19,7 +19,7 @@ class SendPage extends StatefulWidget {
 class _SendPageState extends State<SendPage>{
   late final SendProvider provider;
 
-  static const String _ipFieldLabelText = 'Receiver Ipaddress';
+  static final String _ipFieldLabelText = t.send.receiverAddress;
   static const double _ipFieldOutPadding = 10.0;
   static const TextStyle _ipFieldCommaTextStyle = TextStyle(
     fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ class _SendPageState extends State<SendPage>{
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("Send"),
+            title: Text(t.actions.send),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.send, color: AppTheme.appIconColor1,),
@@ -166,7 +166,7 @@ class _SendPageState extends State<SendPage>{
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: ElevatedButton.icon(
-            label: const Text("select file"),
+            label: Text(t.send.selectFile),
             icon: const Icon(Icons.search),
             onPressed: () async {
               FilePickerResult? result = await FilePicker.platform.pickFiles();

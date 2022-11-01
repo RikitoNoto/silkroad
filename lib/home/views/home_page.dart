@@ -4,6 +4,7 @@ import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/utils/views/character_logo.dart';
+import 'package:silkroad/i18n/translations.g.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -44,21 +45,21 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   _buildActionSelectButton(
                     context,
-                    label: 'Send',
+                    label: t.actions.send,
                     svgPath: 'assets/svg_icons/transfer-out.svg',
                     iconColor: AppTheme.appIconColor1,
                     onPressed: () => Navigator.pushNamed(context, '/send'),
                   ),
                   _buildActionSelectButton(
                     context,
-                    label: 'Receive',
+                    label: t.actions.receive,
                     svgPath: 'assets/svg_icons/transfer-in.svg',
                     iconColor: AppTheme.appIconColor2,
                     onPressed: () => Navigator.pushNamed(context, '/receive'),
                   ),
                   _buildActionSelectButton(
                     context,
-                    label: 'Option',
+                    label: t.actions.option,
                     iconData: Icons.settings,
                     iconColor: Colors.grey,
                     onPressed: () => Navigator.pushNamed(context, '/option'),

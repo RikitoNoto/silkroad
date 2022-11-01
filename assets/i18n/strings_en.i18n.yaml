@@ -1,0 +1,15 @@
+
+
+actions:
+  send    : 'Send'
+  receive : 'Receive'
+  option  : 'Option'
+
+send:
+  receiverAddress : 'Receiver Ipaddress'
+  selectFile      : 'select file'
+  fileNone        : 'No select'
+
+params:
+  name      : 'Your name'
+  port      : 'Port number'
