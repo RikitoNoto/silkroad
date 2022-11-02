@@ -200,7 +200,7 @@ void sendMessageTest(){
     test('should be fail and not send message if connection is fail', () async{
       await setupSendMocks(fileName: 'name', isFileExist: false, connectionResult: false);
       expect(await kProvider.send(), isFalse);
-      checkCalledSend(checkNeverSend: true);
+      checkCalledSend(checkNeverSend: true, checkNeverClose: true);
     });
 
     test('should be send message empty data when file data is empty', () async{
@@ -227,6 +227,22 @@ void sendMessageTest(){
       await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
       expect(await kProvider.send(), isTrue);
       checkCalledSend(expectPort: 32099, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
+    });
+
+    test('should be return false if fail connection.', () async{
+      await setupSendMocks();
+      when(kTcpMock.connect(any)).thenAnswer((_)=>throw const SocketException('fail'));
+      try{expect(await kProvider.send(), isFalse);}
+      catch (e){fail('could not catch exception in send method.');}
+      checkCalledSend(checkNeverSend: true, checkNeverClose: true,);
+    });
+
+    test('should be return false if fail send.', () async{
+      await setupSendMocks();
+      when(kTcpMock.send(any, any)).thenAnswer((_)=>throw const SocketException('fail'));
+      try{expect(await kProvider.send(), isFalse);}
+      catch (e){fail('could not catch exception in send method.');}
+      checkCalledSend();
     });
   });
 }

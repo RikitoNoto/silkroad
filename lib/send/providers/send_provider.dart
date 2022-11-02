@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
@@ -26,24 +27,40 @@ class SendProvider with ChangeNotifier {
   }
 
   Future<bool> send() async{
+
     bool sendResult = false;
     File? file = _file;
     CommunicationIF<Socket>? communicator = builder();
-
-    Socket? socket = await communicator.connect('$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
-
-    // connection is success and
-    // file is exist
-    if( (socket != null) &&
-        (file != null) &&
-        (await file.exists())){
-
-      Object? sender = OptionManager().get(Params.name.toString());
-      await communicator.send(socket, SendFile.send(name: p.basename(file.path), sender: sender?.toString() ?? '', fileData: await file.readAsBytes()));
-      sendResult = true;
+    Socket? socket;
+    try {
+      socket = await communicator.connect(
+          '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
+    }
+    catch(e){
+      ;
     }
 
-    await communicator.close();
+    // connection is success
+    if(socket != null){
+      // file is exist
+      if( (file != null) && (await file.exists())) {
+        Object? sender = OptionManager().get(Params.name.toString());
+        try {
+          await communicator.send(socket, SendFile.send(
+              name: p.basename(file.path),
+              sender: sender?.toString() ?? '',
+              fileData: await file.readAsBytes()));
+          sendResult = true;
+        }catch(e){
+          ;
+        }
+
+      }
+
+      await communicator.close();
+    }
+
+
     return sendResult;
   }
 
