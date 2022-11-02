@@ -6,12 +6,13 @@ import 'package:path/path.dart' as p;
 import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/i18n/translations.g.dart';
 
 
 class SendProvider with ChangeNotifier {
   SendProvider({this.builder = kCommunicationFactory});
 
-  static const String fileNameNoSelect = 'No select';
+  static final String fileNameNoSelect = t.send.fileNone;
 
   final List<int> _ip = <int>[0, 0, 0, 0];
   File? _file;

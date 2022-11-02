@@ -25,6 +25,7 @@ dependencies:
   mime_type: ^1.0.0
   gallery_saver: ^2.3.2
   shared_preferences: ^2.0.15
+  fast_i18n: ^5.12.6
 
 dev_dependencies:
   flutter_test:

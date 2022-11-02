@@ -1,0 +1,15 @@
+
+actions:
+  send    : '送信'
+  receive : '受信'
+  option  : '設定'
+
+send:
+  receiverAddress : '受信者のIPアドレス'
+  selectFile      : 'ファイルを選択'
+  fileNone        : 'ファイル無し'
+
+params:
+  name      : '名前'
+  port      : 'ポート番号'
+

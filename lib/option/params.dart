@@ -1,11 +1,12 @@
+import 'package:silkroad/i18n/translations.g.dart';
 
 extension ParamLabel on Params{
   String get label {
     switch(this){
       case Params.name:
-        return 'Name';
+        return t.params.name;
       case Params.port:
-        return 'Port number';
+        return t.params.port;
     }
   }
 }
