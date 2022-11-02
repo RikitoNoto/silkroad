@@ -59,8 +59,6 @@ class SendProvider with ChangeNotifier {
 
       await communicator.close();
     }
-
-
     return sendResult;
   }
 

@@ -3,9 +3,9 @@
  * Generated file. Do not edit.
  *
  * Locales: 2
- * Strings: 16 (8.0 per locale)
+ * Strings: 20 (10.0 per locale)
  *
- * Built on 2022-11-01 at 14:19 UTC
+ * Built on 2022-11-02 at 14:19 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -335,6 +335,8 @@ class _TranslationsSendEn {
 	String get receiverAddress => 'Receiver Ipaddress';
 	String get selectFile => 'select file';
 	String get fileNone => 'No select';
+	String get sendSuccess => 'send complete';
+	String get sendFailed => 'send failed. please check the devices in same network.';
 }
 
 // Path: params
@@ -391,6 +393,8 @@ class _TranslationsSendJa implements _TranslationsSendEn {
 	@override String get receiverAddress => '受信者のIPアドレス';
 	@override String get selectFile => 'ファイルを選択';
 	@override String get fileNone => 'ファイル無し';
+	@override String get sendSuccess => '送信完了しました';
+	@override String get sendFailed => '送信失敗しました。同じネットワーク内にいることを確認してください。';
 }
 
 // Path: params
@@ -416,6 +420,8 @@ extension on _TranslationsEn {
 			'send.receiverAddress': 'Receiver Ipaddress',
 			'send.selectFile': 'select file',
 			'send.fileNone': 'No select',
+			'send.sendSuccess': 'send complete',
+			'send.sendFailed': 'send failed. please check the devices in same network.',
 			'params.name': 'Your name',
 			'params.port': 'Port number',
 		};
@@ -431,6 +437,8 @@ extension on _TranslationsJa {
 			'send.receiverAddress': '受信者のIPアドレス',
 			'send.selectFile': 'ファイルを選択',
 			'send.fileNone': 'ファイル無し',
+			'send.sendSuccess': '送信完了しました',
+			'send.sendFailed': '送信失敗しました。同じネットワーク内にいることを確認してください。',
 			'params.name': '名前',
 			'params.port': 'ポート番号',
 		};
