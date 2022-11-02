@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
               child: SizedBox(
                 height: 50,
                 child: ThemeInputField(
-                  labelText: 'Your name',
+                  labelText: t.params.name,
                   initialValue: name is String ? name : null,
                   onChanged: OptionInput.createCallbackForInput(Params.name),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),

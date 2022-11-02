@@ -1,5 +1,4 @@
 
-
 actions:
   send    : '送信'
   receive : '受信'
