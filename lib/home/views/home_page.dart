@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                   label,
                   textAlign: TextAlign.left,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
                 ),
               ),

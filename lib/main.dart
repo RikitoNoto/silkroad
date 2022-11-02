@@ -15,4 +15,3 @@ void main() async{
 Future initialize() async{
   await OptionManager.initialize();
 }
-//TODO: i18n
