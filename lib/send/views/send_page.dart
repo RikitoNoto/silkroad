@@ -48,7 +48,7 @@ class _SendPageState extends State<SendPage>{
                 icon: const Icon(Icons.send, color: AppTheme.appIconColor1,),
                 onPressed: () async{
                   WaitProgressDialog.show(context); // show wait progress dialog.
-                  String message = await provider.send() ? t.send.sendSuccess : t.send.sendFailed;  // send.
+                  String message = (await provider.send()).message;  // send.
                   if (!mounted) return;
                   WaitProgressDialog.close(context); // close wait progress dialog.
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));

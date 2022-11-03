@@ -3,9 +3,9 @@
  * Generated file. Do not edit.
  *
  * Locales: 2
- * Strings: 20 (10.0 per locale)
+ * Strings: 24 (12.0 per locale)
  *
- * Built on 2022-11-02 at 14:19 UTC
+ * Built on 2022-11-03 at 13:03 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -335,8 +335,7 @@ class _TranslationsSendEn {
 	String get receiverAddress => 'Receiver Ipaddress';
 	String get selectFile => 'select file';
 	String get fileNone => 'No select';
-	String get sendSuccess => 'send complete';
-	String get sendFailed => 'send failed. please check the devices in same network.';
+	late final _TranslationsSendSendResultEn sendResult = _TranslationsSendSendResultEn._(_root);
 }
 
 // Path: params
@@ -348,6 +347,19 @@ class _TranslationsParamsEn {
 	// Translations
 	String get name => 'Your name';
 	String get port => 'Port number';
+}
+
+// Path: send.sendResult
+class _TranslationsSendSendResultEn {
+	_TranslationsSendSendResultEn._(this._root);
+
+	final _TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	String get success => 'send complete';
+	String get connectionFail => 'send failed. please check the devices are in same network.';
+	String get lostFile => 'did not find the file.';
+	String get sendFail => 'did not send the file to the connected device.';
 }
 
 // Path: <root>
@@ -393,8 +405,7 @@ class _TranslationsSendJa implements _TranslationsSendEn {
 	@override String get receiverAddress => '受信者のIPアドレス';
 	@override String get selectFile => 'ファイルを選択';
 	@override String get fileNone => 'ファイル無し';
-	@override String get sendSuccess => '送信完了しました';
-	@override String get sendFailed => '送信失敗しました。同じネットワーク内にいることを確認してください。';
+	@override late final _TranslationsSendSendResultJa sendResult = _TranslationsSendSendResultJa._(_root);
 }
 
 // Path: params
@@ -406,6 +417,19 @@ class _TranslationsParamsJa implements _TranslationsParamsEn {
 	// Translations
 	@override String get name => '名前';
 	@override String get port => 'ポート番号';
+}
+
+// Path: send.sendResult
+class _TranslationsSendSendResultJa implements _TranslationsSendSendResultEn {
+	_TranslationsSendSendResultJa._(this._root);
+
+	@override final _TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get success => '送信完了しました';
+	@override String get connectionFail => '送信失敗しました。同じネットワーク内にいることを確認してください。';
+	@override String get lostFile => 'ファイルがありません。';
+	@override String get sendFail => '接続先のデバイスに送信できません。';
 }
 
 /// Flat map(s) containing all translations.
@@ -420,8 +444,10 @@ extension on _TranslationsEn {
 			'send.receiverAddress': 'Receiver Ipaddress',
 			'send.selectFile': 'select file',
 			'send.fileNone': 'No select',
-			'send.sendSuccess': 'send complete',
-			'send.sendFailed': 'send failed. please check the devices in same network.',
+			'send.sendResult.success': 'send complete',
+			'send.sendResult.connectionFail': 'send failed. please check the devices are in same network.',
+			'send.sendResult.lostFile': 'did not find the file.',
+			'send.sendResult.sendFail': 'did not send the file to the connected device.',
 			'params.name': 'Your name',
 			'params.port': 'Port number',
 		};
@@ -437,8 +463,10 @@ extension on _TranslationsJa {
 			'send.receiverAddress': '受信者のIPアドレス',
 			'send.selectFile': 'ファイルを選択',
 			'send.fileNone': 'ファイル無し',
-			'send.sendSuccess': '送信完了しました',
-			'send.sendFailed': '送信失敗しました。同じネットワーク内にいることを確認してください。',
+			'send.sendResult.success': '送信完了しました',
+			'send.sendResult.connectionFail': '送信失敗しました。同じネットワーク内にいることを確認してください。',
+			'send.sendResult.lostFile': 'ファイルがありません。',
+			'send.sendResult.sendFail': '接続先のデバイスに送信できません。',
 			'params.name': '名前',
 			'params.port': 'ポート番号',
 		};

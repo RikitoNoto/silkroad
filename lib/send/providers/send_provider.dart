@@ -9,6 +9,31 @@ import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 
+enum SendResult{
+  success,
+  lostFile,
+  connectionFail,
+  sendFail,
+}
+
+extension SendResultMessage on SendResult{
+  String get message{
+    switch(this){
+      case SendResult.success:
+        return t.send.sendResult.success;
+
+      case SendResult.lostFile:
+        return t.send.sendResult.lostFile;
+
+      case SendResult.connectionFail:
+        return t.send.sendResult.connectionFail;
+
+      case SendResult.sendFail:
+        return t.send.sendResult.sendFail;
+    }
+  }
+}
+
 
 class SendProvider with ChangeNotifier {
   SendProvider({this.builder = kCommunicationFactory});
@@ -26,9 +51,9 @@ class SendProvider with ChangeNotifier {
     return file != null ? p.basename(_file!.path) : fileNameNoSelect;
   }
 
-  Future<bool> send() async{
+  Future<SendResult> send() async{
 
-    bool sendResult = false;
+    SendResult sendResult = SendResult.success;
     File? file = _file;
     CommunicationIF<Socket>? communicator = builder();
     Socket? socket;
@@ -37,7 +62,7 @@ class SendProvider with ChangeNotifier {
           '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
     }
     catch(e){
-      ;
+      sendResult = SendResult.connectionFail;
     }
 
     // connection is success
@@ -50,15 +75,22 @@ class SendProvider with ChangeNotifier {
               name: p.basename(file.path),
               sender: sender?.toString() ?? '',
               fileData: await file.readAsBytes()));
-          sendResult = true;
+          // sendResult = true;
         }catch(e){
-          ;
+          sendResult = SendResult.sendFail;
         }
 
+      }
+      else{
+        sendResult = SendResult.lostFile;
       }
 
       await communicator.close();
     }
+    else{
+      sendResult = SendResult.connectionFail;
+    }
+
     return sendResult;
   }
 

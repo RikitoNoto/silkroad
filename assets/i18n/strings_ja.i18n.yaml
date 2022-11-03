@@ -8,8 +8,11 @@ send:
   receiverAddress : '受信者のIPアドレス'
   selectFile      : 'ファイルを選択'
   fileNone        : 'ファイル無し'
-  sendSuccess     : '送信完了しました'
-  sendFailed      : '送信失敗しました。同じネットワーク内にいることを確認してください。'
+  sendResult:
+    success         : '送信完了しました'
+    connectionFail  : '送信失敗しました。同じネットワーク内にいることを確認してください。'
+    lostFile        : 'ファイルがありません。'
+    sendFail        : '接続先のデバイスに送信できません。'
 
 params:
   name      : '名前'
