@@ -8,6 +8,11 @@ send:
   receiverAddress : 'Receiver Ipaddress'
   selectFile      : 'select file'
   fileNone        : 'No select'
+  sendResult:
+    success         : 'send complete'
+    connectionFail  : 'send failed. please check the devices are in same network.'
+    lostFile        : 'did not find the file.'
+    sendFail        : 'did not send the file to the connected device.'
 
 params:
   name      : 'Your name'

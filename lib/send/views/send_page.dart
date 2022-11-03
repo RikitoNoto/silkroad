@@ -8,6 +8,7 @@ import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
+import 'package:silkroad/utils/views/wait_progress_dialog.dart';
 
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
@@ -45,8 +46,12 @@ class _SendPageState extends State<SendPage>{
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.send, color: AppTheme.appIconColor1,),
-                onPressed: () {
-                  provider.send();
+                onPressed: () async{
+                  WaitProgressDialog.show(context); // show wait progress dialog.
+                  String message = (await provider.send()).message;  // send.
+                  if (!mounted) return;
+                  WaitProgressDialog.close(context); // close wait progress dialog.
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
                 },
               )
             ],
