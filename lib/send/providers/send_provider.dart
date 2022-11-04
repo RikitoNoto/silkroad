@@ -35,12 +35,15 @@ extension SendResultMessage on SendResult{
 }
 
 
-class SendProvider with ChangeNotifier {
-  SendProvider({this.builder = kCommunicationFactory});
+class SendProvider with ChangeNotifier, IpaddressFetcher {
+  SendProvider({this.builder = kCommunicationFactory}) {
+    fetchIpaddress();
+  }
 
   static final String fileNameNoSelect = t.send.fileNone;
 
   final List<int> _ip = <int>[0, 0, 0, 0];
+  final List<String> _myIpList = <String>[];
   File? _file;
   final CommunicationFactoryFunc<Socket> builder;
 
@@ -49,6 +52,10 @@ class SendProvider with ChangeNotifier {
   String get fileName {
     File? file = _file;
     return file != null ? p.basename(_file!.path) : fileNameNoSelect;
+  }
+
+  Future fetchIpaddress() async{
+    _myIpList.addAll(await fetchIpv4Addresses());
   }
 
   Future<SendResult> send() async{
