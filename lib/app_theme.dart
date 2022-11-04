@@ -24,6 +24,7 @@ class AppTheme{
 
   static const Color _appIconColorLightBlue = Color(0xFF38B6FF);
   static const Color _appIconColorGrassGreen = Color(0xFF7ED957);
+  static const Color _appSelectionHandleColor = Color(0xFF2196F3);
 
   static const Color appIconColor1 = _appIconColorLightBlue;
   static const Color appIconColor2 = _appIconColorGrassGreen;
@@ -74,6 +75,9 @@ class AppTheme{
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(_elevatedButtonColorLight),
       ),
+    ),
+    textSelectionTheme: const TextSelectionThemeData(
+      selectionHandleColor: _appSelectionHandleColor,
     ),
     fontFamily: appFontFamily,
   );
