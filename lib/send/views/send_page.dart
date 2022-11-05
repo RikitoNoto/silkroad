@@ -70,7 +70,23 @@ class _SendPageState extends State<SendPage>{
       children: [
         _buildIpField(context), // ip address input field
         _buildFileSelector(),   // file selector
-        Consumer<SendProvider>(
+        _buildMyIpList(context),
+      ]
+    );
+  }
+
+  Widget _buildMyIpList(BuildContext context){
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.all(10.0),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'My IP addresses',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        child: Consumer<SendProvider>(
           builder: (context, provider, child) => ListView.builder(
             itemCount: provider.myIpCount,
             itemBuilder: (BuildContext context, int index) {
@@ -78,7 +94,7 @@ class _SendPageState extends State<SendPage>{
             },
           ),
         ),
-      ]
+      ),
     );
   }
 
