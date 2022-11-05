@@ -81,16 +81,16 @@ class _SendPageState extends State<SendPage>{
       padding: const EdgeInsets.all(10.0),
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: 'My IP addresses',
+          labelText: 'Sendable Destination',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
         child: Consumer<SendProvider>(
           builder: (context, provider, child) => ListView.builder(
-            itemCount: provider.myIpCount,
+            itemCount: provider.addressRangeCount,
             itemBuilder: (BuildContext context, int index) {
-              return Text(provider.myIpList[index]);
+              return Text(provider.addressRange[index]);
             },
           ),
         ),

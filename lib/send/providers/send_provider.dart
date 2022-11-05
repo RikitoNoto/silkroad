@@ -43,7 +43,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   static final String fileNameNoSelect = t.send.fileNone;
 
   final List<int> _ip = <int>[0, 0, 0, 0];
-  final List<String> _myIpList = <String>[];
+  final List<String> _addressRange = <String>[];
   File? _file;
   final CommunicationFactoryFunc<Socket> builder;
 
@@ -54,11 +54,17 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     return file != null ? p.basename(_file!.path) : fileNameNoSelect;
   }
 
-  int get myIpCount => _myIpList.length;
-  List<String> get myIpList => _myIpList;
+  int get addressRangeCount => _addressRange.length;
+  List<String> get addressRange => _addressRange;
 
   Future fetchIpAddress() async{
-    _myIpList.addAll(await fetchIpv4Addresses());
+    _addressRange.clear();
+    Set<String> addressRangeSet = <String>{};
+    for(String address in await fetchIpv4Addresses()){
+      List<String> range = IpAddressUtility.getIpAddressRange(address);
+      addressRangeSet.add('${range[0]}~${range[1]}');
+    }
+    _addressRange.addAll(addressRangeSet.toList());
     notifyListeners();
   }
 
