@@ -70,6 +70,14 @@ class _SendPageState extends State<SendPage>{
       children: [
         _buildIpField(context), // ip address input field
         _buildFileSelector(),   // file selector
+        Consumer<SendProvider>(
+          builder: (context, provider, child) => ListView.builder(
+            itemCount: provider.myIpCount,
+            itemBuilder: (BuildContext context, int index) {
+              return Text(provider.myIpList[index]);
+            },
+          ),
+        ),
       ]
     );
   }

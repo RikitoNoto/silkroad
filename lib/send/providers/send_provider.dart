@@ -37,7 +37,7 @@ extension SendResultMessage on SendResult{
 
 class SendProvider with ChangeNotifier, IpaddressFetcher {
   SendProvider({this.builder = kCommunicationFactory}) {
-    fetchIpaddress();
+    fetchIpAddress();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -54,8 +54,12 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     return file != null ? p.basename(_file!.path) : fileNameNoSelect;
   }
 
-  Future fetchIpaddress() async{
+  int get myIpCount => _myIpList.length;
+  List<String> get myIpList => _myIpList;
+
+  Future fetchIpAddress() async{
     _myIpList.addAll(await fetchIpv4Addresses());
+    notifyListeners();
   }
 
   Future<SendResult> send() async{
