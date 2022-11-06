@@ -70,31 +70,7 @@ class _SendPageState extends State<SendPage>{
       children: [
         _buildIpField(context), // ip address input field
         _buildFileSelector(),   // file selector
-        _buildMyIpList(context),
       ]
-    );
-  }
-
-  Widget _buildMyIpList(BuildContext context){
-    return Container(
-      height: 100,
-      padding: const EdgeInsets.all(10.0),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: 'Sendable Destination',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-        child: Consumer<SendProvider>(
-          builder: (context, provider, child) => ListView.builder(
-            itemCount: provider.addressRangeCount,
-            itemBuilder: (BuildContext context, int index) {
-              return Text(provider.addressRange[index]);
-            },
-          ),
-        ),
-      ),
     );
   }
 
@@ -109,19 +85,39 @@ class _SendPageState extends State<SendPage>{
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        child: IntrinsicHeight(
-          child: Row(
-            children: [
-              //FIXME: input action next does not work, because input field is in other state.
-              _buildOctetField(0,),
-              _buildComma(),
-              _buildOctetField(1,),
-              _buildComma(),
-              _buildOctetField(2,),
-              _buildComma(),
-              _buildOctetField(3, textInputAction: TextInputAction.done,),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  //FIXME: input action next does not work, because input field is in other state.
+                  _buildOctetField(0,),
+                  _buildComma(),
+                  _buildOctetField(1,),
+                  _buildComma(),
+                  _buildOctetField(2,),
+                  _buildComma(),
+                  _buildOctetField(3, textInputAction: TextInputAction.done,),
+                ],
+              ),
+            ),
+
+            Text('[${t.send.sendableAddress}]', textAlign: TextAlign.left,),
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10.0),
+
+              child: Consumer<SendProvider>(
+                builder: (context, provider, child) => ListView.builder(
+                  itemCount: provider.addressRangeCount,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Text(provider.addressRange[index]);
+                  },
+                ),
+              ),
+            )
+          ]
         ),
       ),
     );
