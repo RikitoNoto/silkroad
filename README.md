@@ -22,3 +22,6 @@ The IP address in the same network is similar to your self IP address.</br>
 ### Receive
 1. select device IP address.
 2. push the play button.
+
+## Attention
+Android or iPhone can receive only an image or a movie.
