@@ -5,6 +5,7 @@ import 'package:platform/platform.dart';
 
 import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/message.dart';
+import 'package:silkroad/comm/ipaddress_utility.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/repository/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
@@ -12,7 +13,7 @@ import 'package:silkroad/parameter.dart';
 import 'package:silkroad/global.dart';
 
 
-class ReceiveProvider with ChangeNotifier {
+class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = kCommunicationFactory}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
@@ -56,11 +57,7 @@ class ReceiveProvider with ChangeNotifier {
   }
 
   void fetchIpAddresses() async {
-    for(NetworkInterface interface in await NetworkInterface.list()){
-      for(InternetAddress address in interface.addresses){
-        if(address.type == InternetAddressType.IPv4) _ipList.add(address.address);
-      }
-    }
+    _ipList.addAll(await fetchIpv4Addresses());
     notifyListeners();
   }
 
