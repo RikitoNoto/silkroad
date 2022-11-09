@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:path/path.dart' as p;
+import 'package:platform/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/comm/comm.dart';
@@ -42,7 +43,7 @@ void main() {
     kFileMock = MockFile();
     kTcpMock = MockTcp();
     kSocketMock = MockSocket();
-    kProvider = SendProvider(builder: _buildSpy);
+    kProvider = SendProvider(builder: _buildSpy, platform: const LocalPlatform());
     kProvider.file = kFileMock;
     kParamMap = <String, Object>{};
     await setParam(Params.port.toString(), 32099);

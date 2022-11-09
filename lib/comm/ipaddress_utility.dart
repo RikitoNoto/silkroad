@@ -1,8 +1,29 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:platform/platform.dart';
+import 'package:network_info_plus/network_info_plus.dart';
+
 mixin IpaddressFetcher {
-  Future<List<String>> fetchIpv4Addresses() async {
+  Future<List<String>> fetchIpv4Addresses(Platform platform) async {
+    if(platform.isAndroid){
+      return _fetchIpv4AddressesForAndroid();
+    }
+    else{
+      return _fetchIpv4AddressesForPcAndIos();
+    }
+  }
+
+  Future<List<String>> _fetchIpv4AddressesForAndroid() async {
+    List<String> addressList = <String>[];
+    String? ip = await NetworkInfo().getWifiIP();
+    if(ip != null){
+      addressList.add(ip);
+    }
+    return addressList;
+  }
+
+  Future<List<String>> _fetchIpv4AddressesForPcAndIos() async {
     List<String> addressList = <String>[];
     for(NetworkInterface interface in await NetworkInterface.list()){
       for(InternetAddress address in interface.addresses){
@@ -11,6 +32,7 @@ mixin IpaddressFetcher {
     }
     return addressList;
   }
+
 }
 
 class IpAddressUtility{

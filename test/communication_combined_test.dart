@@ -43,7 +43,7 @@ Future _setUp() async{
     listKey: kGlobalKey,
     removedItemBuilder: _removeItemBuilderSpy,
   );
-  kSendProvider = SendProvider();
+  kSendProvider = SendProvider(platform: const LocalPlatform());
   kReceiveProvider = ReceiveProvider(platform: const LocalPlatform(), receiveList: kReceiveList);
   kParamMap = <String, Object>{};
   await setParam(Params.port.toString(), 32099);

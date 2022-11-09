@@ -57,7 +57,7 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   }
 
   void fetchIpAddresses() async {
-    _ipList.addAll(await fetchIpv4Addresses());
+    _ipList.addAll(await fetchIpv4Addresses(platform));
     notifyListeners();
   }
 

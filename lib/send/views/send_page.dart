@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:platform/platform.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -31,7 +32,7 @@ class _SendPageState extends State<SendPage>{
   void initState() {
     super.initState();
 
-    provider = SendProvider();
+    provider = SendProvider(platform: const LocalPlatform());
   }
 
   @override
