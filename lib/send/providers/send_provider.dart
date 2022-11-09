@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
+import 'package:platform/platform.dart';
 
 import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
@@ -36,7 +37,7 @@ extension SendResultMessage on SendResult{
 
 
 class SendProvider with ChangeNotifier, IpaddressFetcher {
-  SendProvider({this.builder = kCommunicationFactory}) {
+  SendProvider({this.builder = kCommunicationFactory, required this.platform}) {
     fetchIpAddress();
   }
 
@@ -46,6 +47,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final List<String> _addressRange = <String>[];
   File? _file;
   final CommunicationFactoryFunc<Socket> builder;
+  final Platform platform;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -60,7 +62,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   Future fetchIpAddress() async{
     _addressRange.clear();
     Set<String> addressRangeSet = <String>{};
-    for(String address in await fetchIpv4Addresses()){
+    for(String address in await fetchIpv4Addresses(platform)){
       List<String> range = IpAddressUtility.getIpAddressRange(address);
       addressRangeSet.add('${range[0]}~${range[1]}');
     }
