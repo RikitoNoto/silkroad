@@ -7,6 +7,8 @@
 SilkRoadは、マルチプラットフォームに対応したファイル転送アプリケーションです。
 例えば、iphoneからandroid、androidからmacOSなど、機種を問わずファイルを転送できます。
 
+[Webサイト](https://rikitonoto.github.io/silkroad.github.io/)
+
 
 ## 使い方
 使用には送信側と受信側の2つのデバイスが必要です。

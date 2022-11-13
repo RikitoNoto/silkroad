@@ -6,6 +6,8 @@
 ## Introduction
 SilkRoad allows sending and receiving a file on most platforms.
 
+[Web site](https://rikitonoto.github.io/silkroad.github.io/)
+
 
 ## How to use
 To use this application need two platforms.
