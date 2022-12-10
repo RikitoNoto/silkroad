@@ -1,11 +1,14 @@
 <img width="80" src="../assets/icon/icon.png">
 
 # SilkRoad
-[English](../README.md)
+[English](../README.md)<br/>
+<a href='https://play.google.com/store/apps/details?id=io.github.silkroad.io.github.rikitonoto&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/ja/badges/static/images/badges/en_badge_web_generic.png' height=90px/></a>
 
 ## SilkRoadとは
 SilkRoadは、マルチプラットフォームに対応したファイル転送アプリケーションです。
 例えば、iphoneからandroid、androidからmacOSなど、機種を問わずファイルを転送できます。
+
+[Webサイト](https://rikitonoto.github.io/silkroad.github.io/)
 
 
 ## 使い方

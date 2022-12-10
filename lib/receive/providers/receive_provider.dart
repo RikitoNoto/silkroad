@@ -34,7 +34,7 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   Future<bool> open() async{
     _hostComm = builder();
 
-    _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
+    await _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
     return true;
   }
 
