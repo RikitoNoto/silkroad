@@ -14,7 +14,7 @@ Map<Command, _MessageFactoryMethod> _commandToClassTable = {
 
 abstract class Message{
   factory Message(Uint8List data){
-    String? commandStr = RegExp('^(.*)\n').firstMatch(String.fromCharCodes(data))?.group(1);
+    String? commandStr = RegExp('^(.*)\n').firstMatch(utf8.decode(data))?.group(1);
 
     Command command = _commandConvertTable[commandStr] != null ?  _commandConvertTable[commandStr]! : Command.none;
 
@@ -77,9 +77,8 @@ class SendFile implements Message{
   static const int dataIndexSender = 2;
 
   SendFile.receive({required receiveData}){
-    RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(String.fromCharCodes(receiveData));
+    RegExpMatch? dataSplitter = RegExp('(.*?)^\n(.*)', dotAll: true, multiLine: true).firstMatch(utf8.decode(receiveData));
     String header = dataSplitter?.group(1) ?? '';
-//    fileData = Uint8List.fromList(utf8.encode(dataSplitter?.group(2) ?? ''));
     List<int>? dataList;
     if(dataSplitter?.group(2) != ''){
       dataList = dataSplitter?.group(2)?.split(',').map<int>((String item)=>int.parse(item)).toList();
@@ -101,7 +100,6 @@ class SendFile implements Message{
       'name:$name\n'                                // file name
       'sender:$sender\n'                            // sender
       '\n'                                          // separator
-//      '${String.fromCharCodes(fileData)}'           // file data
       '${fileData.map<String>((int value) => value.toString()).join(',')}'           // file data
       ;
   }
