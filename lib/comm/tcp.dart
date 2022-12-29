@@ -110,7 +110,7 @@ class Tcp implements CommunicationIF<Socket>{
   @override
   Future<Result> send(Socket connection, Message data) async {
     connection.write('${utf8.encode(data.data).length}\n${data.data}');
-    // connection.write(data.data);
+    //NOTE: write method convert the data to string of utf-16.
     return Future.value(Result.success);
   }
 
