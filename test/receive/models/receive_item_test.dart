@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import '../../spy/path_provider_spy.dart';
 
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/models/receive_item.dart';
 
 
 void main() {

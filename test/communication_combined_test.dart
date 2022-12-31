@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/models/receive_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/parameter.dart';
