@@ -7,7 +7,7 @@ import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/comm/ipaddress_utility.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/models/receive_item.dart';
 import 'package:silkroad/utils/platform_saver.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/global.dart';
