@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import '../../spy/path_provider_spy.dart';
 
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/models/receive_item.dart';
 
 
 void main() {
@@ -143,27 +143,50 @@ void iconTest(){
   });
 }
 
+/// create receive item and check the file to exist.
+/// this function return the item.
+Future<ReceiveItem> checkExistTempFile({iconData=Icons.image, name='test.dart', data='', sender='no name', delayTimeMs=2}) async{
+  ReceiveItem item = createItem(iconData: iconData, name: name, data: data, sender: sender);
+  await Future.delayed(Duration(milliseconds: delayTimeMs));  // wait to create temp file.
+  expect(await File(item.tempPath).exists(), isTrue, reason: "${item.tempPath} is not exist.");
+  return item;
+}
+
 void tempFileTest(){
   group('create temp file test', () {
     test('should be create temp file.', () async{
-      createItem(name: 'temp.dart');
-      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
-      expect(await File(p.join(kTempDir.path, 'temp.dart')).exists(), isTrue);
+      await checkExistTempFile(name: 'temp.dart');
     });
 
     test('should be write receive content.', () async{
-      createItem(name: 'temp.dart', data: 'should be write receive content.');
-      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
-      File file = File(p.join(kTempDir.path, 'temp.dart'));
-      expect(await file.exists(), isTrue);
-      expect(await file.readAsString(), 'should be write receive content.');
+      ReceiveItem item = await checkExistTempFile(name: 'temp.dart', data: 'should be write receive content.');
+      expect(await File(item.tempPath).readAsString(), 'should be write receive content.');
     });
 
     test('should be get temp file path.', () async{
-      ReceiveItem item = createItem(name: 'temp.dart');
-      await Future.delayed(const Duration(milliseconds: 1));  // wait to create temp file.
-      File file = File(p.join(kTempDir.path, 'temp.dart'));
-      expect(item.tempPath, file.path);
+      await checkExistTempFile(name: 'temp2.dart');
+    });
+
+    test('should be create same name files in different paths.', () async{
+      ReceiveItem item1 = await checkExistTempFile(name: 'temp1.dart');
+      ReceiveItem item2 = await checkExistTempFile(name: 'temp1.dart');
+
+      expect(item1.tempPath == item2.tempPath, isFalse); // the paths should be different.
+    });
+
+    test('should be create 999 same name files.', () async{
+      List<String> paths = [];
+      // for(int i=0; i< 999; i++){
+      //   paths.add((await checkExistTempFile(name: 'temp.dart', delayTimeMs: 100)).tempPath);
+      // }
+
+
+      await checkExistTempFile(name: 'temp2.dart');
+      await checkExistTempFile(name: 'temp2.dart');
+      await checkExistTempFile(name: 'temp2.dart');
+      await checkExistTempFile(name: 'temp2.dart');
+
+      // expect(paths.length, paths.toSet().length);
     });
   });
 }

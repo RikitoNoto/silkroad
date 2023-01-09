@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:io';
 
@@ -43,12 +44,32 @@ class ReceiveItem{
     }
   }
 
-  Future _createTempFile({required name, required Uint8List data}) async{
-    File tempFile = File(p.join((await getTemporaryDirectory()).path, name));
-    await tempFile.create();
+  Future _createTempFile({required name, required Uint8List data, String? dirPath}) async{
+    dirPath ??= (await getTemporaryDirectory()).path; // set the default dir path.
 
-    await tempFile.writeAsBytes(data);
-    _tempPath = tempFile.path;
+    File tempFile = File(p.join(dirPath, name));
+
+    // if the file of the same name is exit.
+    if(await tempFile.exists()){
+      for(int i=0; i<1000; i++){
+        Directory dir = Directory(p.join(dirPath, i.toString()));
+        if(!(await dir.exists())){
+          await dir.create();
+          return await _createTempFile(name: name, data: data, dirPath: dir.path);
+        }
+      }
+      throw ArgumentError();
+      // Directory dir = Directory(p.join(dirPath, '0'));
+      // await dir.create();
+      // return await _createTempFile(name: name, data: data, dirPath: dir.path);
+    }
+    // the file of the same name does not exit.
+    else{
+      // create the file.
+      await tempFile.create();
+      await tempFile.writeAsBytes(data);
+      _tempPath = tempFile.path;
+    }
   }
 
   static String _convertSizeStr(int size){
