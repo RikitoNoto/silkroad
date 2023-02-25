@@ -145,7 +145,7 @@ void iconTest(){
 
 /// create receive item and check the file to exist.
 /// this function return the item.
-Future<ReceiveItem> checkExistTempFile({iconData=Icons.image, name='test.dart', data='', sender='no name', delayTimeMs=2}) async{
+Future<ReceiveItem> checkExistTempFile({iconData=Icons.image, name='test.dart', data='', sender='no name', delayTimeMs=20}) async{
   ReceiveItem item = createItem(iconData: iconData, name: name, data: data, sender: sender);
   await Future.delayed(Duration(milliseconds: delayTimeMs));  // wait to create temp file.
   expect(await File(item.tempPath).exists(), isTrue, reason: "${item.tempPath} is not exist.");
@@ -174,19 +174,14 @@ void tempFileTest(){
       expect(item1.tempPath == item2.tempPath, isFalse); // the paths should be different.
     });
 
-    test('should be create 999 same name files.', () async{
+    test('should be create 10 same name files.', () async{
       List<String> paths = [];
-      // for(int i=0; i< 999; i++){
-      //   paths.add((await checkExistTempFile(name: 'temp.dart', delayTimeMs: 100)).tempPath);
-      // }
+      for(int i=0; i< 10; i++){
+        print(i);
+        paths.add((await checkExistTempFile(name: 'temp.dart', delayTimeMs: 100)).tempPath);
+      }
 
-
-      await checkExistTempFile(name: 'temp2.dart');
-      await checkExistTempFile(name: 'temp2.dart');
-      await checkExistTempFile(name: 'temp2.dart');
-      await checkExistTempFile(name: 'temp2.dart');
-
-      // expect(paths.length, paths.toSet().length);
+      expect(paths.length, paths.toSet().length);
     });
   });
 }

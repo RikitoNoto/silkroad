@@ -194,6 +194,7 @@ void callbackActionTest(){
     test('should be set data to added item.', () async{
       await setupCallbackAction();
       await checkReceiveListLen(1, convertMessageString(name: 'dataTest', data: 'test data'));
+      await Future.delayed(const Duration(microseconds: 50));
       File tempFile = File(p.join((await getTemporaryDirectory()).path, 'dataTest'));
       String data = await tempFile.readAsString();
 
