@@ -11,3 +11,5 @@ typedef CommunicationFactoryFunc<T> = CommunicationIF<T> Function();
 CommunicationIF<Socket> kCommunicationFactory(){
   return Tcp();
 }
+
+typedef SimpleFactoryFunc<T> = T Function();

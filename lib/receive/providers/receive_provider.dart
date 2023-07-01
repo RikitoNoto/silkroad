@@ -7,22 +7,26 @@ import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/comm/ipaddress_utility.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/entity/receive_item.dart';
+import 'package:silkroad/receive/repository/receive_repository.dart';
 import 'package:silkroad/utils/platform_saver.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/global.dart';
 
 
 class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
-  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder = kCommunicationFactory}) : _receiveList = receiveList
+  //TODO: delete required of builder.
+  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, required this.builder}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();
+    _receiver = builder();
   }
-  final CommunicationFactoryFunc<Socket> builder;
+  final SimpleFactoryFunc<ReceiveRepository> builder;
   CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
+  late final ReceiveRepository _receiver;
 
 
   String _currentIp = '';                   /// selected ip address
@@ -32,9 +36,10 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   List<String> get ipList => _ipList;
 
   Future<bool> open() async{
-    _hostComm = builder();
+    _receiver.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
+    // _hostComm = builder();
 
-    await _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
+    // await _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
     return true;
   }
 
