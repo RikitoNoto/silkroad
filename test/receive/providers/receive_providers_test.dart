@@ -62,36 +62,40 @@ void main() {
     await pathProviderTearDown();
   });
 
-  // callbackActionTest();
+  callbackActionTest();
   ipAddressTest();
   itemActionTest();
   portTest();
 }
 
 void ipAddressTest(){
-  // group('ip address test', () {
-  //   test('should be not set ip address when the ip list is empty', () {
-  //     kProvider.overwriteAddressList(<String>[]);
-  //     kProvider.selectIp('192.168.1.100');
-  //     expect(kProvider.currentIp, '');
-  //   });
-  //
-  //   test('should be set ip address when the ip is include in the ip list', () {
-  //     kProvider.overwriteAddressList(<String>['192.168.1.100']);
-  //     kProvider.selectIp('192.168.1.100');
-  //     expect(kProvider.currentIp, '192.168.1.100');
-  //   });
-  //
-  //   test('should be return false when the ip is not include in the ip list(empty)', () {
-  //     kProvider.overwriteAddressList(<String>[]);
-  //     expect(kProvider.isEnableIp('192.168.1.100'), isFalse);
-  //   });
-  //
-  //   test('should be return true when the ip is include in the ip list', () {
-  //     kProvider.overwriteAddressList(<String>['192.168.1.100']);
-  //     expect(kProvider.isEnableIp('192.168.1.100'), isTrue);
-  //   });
-  // });
+  group('ip address test', () {
+    test('should be not set ip address when the ip list is empty', () {
+      ReceiveProvider provider = constructProvider();
+      provider.overwriteAddressList(<String>[]);
+      provider.selectIp('192.168.1.100');
+      expect(provider.currentIp, '');
+    });
+
+    test('should be set ip address when the ip is include in the ip list', () {
+      ReceiveProvider provider = constructProvider();
+      provider.overwriteAddressList(<String>['192.168.1.100']);
+      provider.selectIp('192.168.1.100');
+      expect(provider.currentIp, '192.168.1.100');
+    });
+
+    test('should be return false when the ip is not include in the ip list(empty)', () {
+      ReceiveProvider provider = constructProvider();
+      provider.overwriteAddressList(<String>[]);
+      expect(provider.isEnableIp('192.168.1.100'), isFalse);
+    });
+
+    test('should be return true when the ip is include in the ip list', () {
+      ReceiveProvider provider = constructProvider();
+      provider.overwriteAddressList(<String>['192.168.1.100']);
+      expect(provider.isEnableIp('192.168.1.100'), isTrue);
+    });
+  });
 }
 
 Future<ReceiveCallback<Socket>?> openPort(String ip, int port) async{
@@ -124,7 +128,6 @@ void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String 
     verify(repo.listen('$ip:$port'));
   }
 }
-//TODO: add Test => after should be increase _receiveList's item.
 
 ReceiveProvider constructProvider({
   AnimatedListItemModel? receiveList,
@@ -202,7 +205,7 @@ Future<void> setupCallbackAction({
 //   return SendFile.send(name: name, sender: sender, fileData: Uint8List.fromList(utf8.encode(data))).data;
 // }
 //
-// void callbackActionTest(){
+void callbackActionTest(){
 //   group('callback action test', () {
 //
 //     test('should be not increment list len when receive no command.', () async{
@@ -244,8 +247,8 @@ Future<void> setupCallbackAction({
 //       expect(kReceiveList[1].name, 'B');
 //     });
 //   });
-//
-// }
+
+}
 
 void itemActionTest() {
   group('delete display by item action test', (){
