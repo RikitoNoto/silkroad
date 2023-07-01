@@ -129,15 +129,27 @@ void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String 
 ReceiveProvider constructProvider({
   AnimatedListItemModel? receiveList,
   Platform? platform,
-  required ReceiveRepository repository,
+  ReceiveRepository? repository,
 }){
   return ReceiveProvider(
     receiveList: receiveList ?? kReceiveList,
     platform: platform ?? const LocalPlatform(),
     builder: (){
-      return repository;
+      return repository ?? MockReceiveRepository();
     },
   );
+}
+
+AnimatedListItemModel<ReceiveItem> constructListItem(List<ReceiveItem> items){
+  AnimatedListItemModel<ReceiveItem> itemList = AnimatedListItemModel<ReceiveItem>(
+    listKey: GlobalKey<AnimatedListState>(),
+    removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
+  );
+
+  for(ReceiveItem item in items){
+    itemList.append(item);
+  }
+  return itemList;
 }
 
 void portTest() {
@@ -236,25 +248,28 @@ Future<void> setupCallbackAction({
 // }
 
 void itemActionTest() {
-  // group('delete display by item action test', (){
-  //
-  //   test('should be able to delete item.', () async{
-  //     kReceiveList.append(ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'));
-  //     kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
-  //     kProvider.removeAt(0);
-  //     expect(kReceiveList.length, 0);
-  //   });
-  //
-  //   test('should be able to delete selected item.', () async{
-  //     kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
-  //     kReceiveList.append(ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'));
-  //     kReceiveList.append(ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'));
-  //     kProvider = ReceiveProvider(receiveList: kReceiveList, platform: LocalPlatform());
-  //     kProvider.removeAt(1);
-  //     expect(kReceiveList.length, 2);
-  //     expect(kReceiveList[0].name, 'no target');
-  //     expect(kReceiveList[1].name, 'no target');
-  //   });
-  //
-  // });
+  group('delete display by item action test', (){
+    test('should be able to delete item.', () async{
+      AnimatedListItemModel<ReceiveItem> itemList = constructListItem([
+        ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'),
+      ]);
+      ReceiveProvider provider = constructProvider(receiveList: itemList);
+      provider.removeAt(0);
+      expect(itemList.length, 0);
+    });
+
+    test('should be able to delete selected item.', () async{
+      AnimatedListItemModel<ReceiveItem> itemList = constructListItem([
+        ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'),
+        ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'),
+        ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'),
+      ]);
+      ReceiveProvider provider = constructProvider(receiveList: itemList);
+      provider.removeAt(1);
+      expect(itemList.length, 2);
+      expect(itemList[0].name, 'no target');
+      expect(itemList[1].name, 'no target');
+    });
+
+  });
 }
