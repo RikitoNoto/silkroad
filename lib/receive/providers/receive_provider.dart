@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:platform/platform.dart';
 
-import 'package:silkroad/comm/communication_if.dart';
-import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/comm/ipaddress_utility.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/entity/receive_item.dart';
@@ -23,7 +19,6 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
     _receiver = builder();
   }
   final SimpleFactoryFunc<ReceiveRepository> builder;
-  CommunicationIF<Socket>? _hostComm;
   final AnimatedListItemModel _receiveList;
   final Platform platform;
   late final ReceiveRepository _receiver;
@@ -35,16 +30,14 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   final List<String> _ipList = <String>[];  /// ip address list
   List<String> get ipList => _ipList;
 
-  Future<bool> open() async{
-    _receiver.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
-    // _hostComm = builder();
-
-    // await _hostComm!.listen('$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}', receiveCallback: _onReceive);
-    return true;
+  Future open() async{
+    String endPoint = '$currentIp:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}';
+    await for(ReceiveItem item in _receiver.listen(endPoint)){
+      _receiveList.append(item);
+    }
   }
 
   void close(){
-    // _hostComm?.close();
     _receiver.close();
   }
 
@@ -81,17 +74,6 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
 
   void removeAt(int index){
     _receiveList.removeAt(index);
-  }
-
-  void _onReceive(Socket socket, Message data) {
-    if(data is SendFile){
-      ReceiveItem item = ReceiveItem(
-        name: data.name,
-        data: data.fileData,
-        sender: data.sender,
-      );
-      _receiveList.append(item);
-    }
   }
 
   @visibleForTesting

@@ -1,34 +1,23 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:network_info_plus/network_info_plus.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:platform/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:silkroad/receive/providers/providers.dart';
 
 import 'receive_providers_test.mocks.dart';
 
-import 'package:silkroad/comm/communication_if.dart';
 import 'package:silkroad/receive/repository/receive_repository.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/parameter.dart';
-import 'package:camel/camel.dart';
 import '../../spy/path_provider_spy.dart';
 
 
-late AnimatedListItemModel<ReceiveItem> kReceiveList;
-late ReceiveProvider kProvider;
-
-ReceiveCallback<Socket>? kReceiveCallbackSpy;
 
 Future setPort(int port) async{
   SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
@@ -36,33 +25,22 @@ Future setPort(int port) async{
 }
 
 @GenerateMocks([ReceiveRepository])
+@GenerateMocks([ReceiveItem])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setUpAll((){
-    kReceiveList = AnimatedListItemModel<ReceiveItem>(
-      listKey: GlobalKey<AnimatedListState>(),
-      removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
-    );
     PathProviderPlatformSpy.temporaryPath = kTempDir.path;
   });
 
   setUp(() async{
     await pathProviderSetUp();
-    kReceiveList.clear();
-    // kProvider = ReceiveProvider(
-    //   receiveList: kReceiveList,
-    //   platform: LocalPlatform(),
-    //
-    // );
-
-    kReceiveCallbackSpy = null;
   });
 
   tearDown(() async{
     await pathProviderTearDown();
   });
 
-  callbackActionTest();
+  afterReceiveTest();
   ipAddressTest();
   itemActionTest();
   portTest();
@@ -98,23 +76,24 @@ void ipAddressTest(){
   });
 }
 
-Future<ReceiveCallback<Socket>?> openPort(String ip, int port) async{
-  kProvider.overwriteAddressList(<String>[ip]);
-  kProvider.selectIp(ip);
-
-  if(!await kProvider.open()) fail('fail open');
-  return kReceiveCallbackSpy;
-}
-
-void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String ip, int port, bool isCalled, List<ReceiveItem> receiveSpy) async{
-  StreamController<ReceiveItem> streamController = StreamController<ReceiveItem>();
+Future checkOpenPort(
+  MockReceiveRepository repo,
+  ReceiveProvider provider,
+  String ip,
+  int port,
+  List<ReceiveItem> receiveSpy,
+  {
+    StreamController<ReceiveItem>? streamController,
+  }
+) async{
+  streamController ??= StreamController<ReceiveItem>();
 
   // construct listen mock.
   when(repo.listen(any)).thenAnswer((_) {
     for(ReceiveItem item in receiveSpy){
-      streamController.sink.add(item);
+      streamController!.sink.add(item);
     }
-    return streamController.stream;
+    return streamController!.stream;
   });
 
   // set ip address
@@ -122,11 +101,9 @@ void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String 
   provider.selectIp(ip);
   await setPort(port);
 
-  provider.open();
+  await provider.open();
 
-  if(isCalled){
-    verify(repo.listen('$ip:$port'));
-  }
+  verify(repo.listen('$ip:$port'));
 }
 
 ReceiveProvider constructProvider({
@@ -135,7 +112,7 @@ ReceiveProvider constructProvider({
   ReceiveRepository? repository,
 }){
   return ReceiveProvider(
-    receiveList: receiveList ?? kReceiveList,
+    receiveList: receiveList ?? constructListItem([]),
     platform: platform ?? const LocalPlatform(),
     builder: (){
       return repository ?? MockReceiveRepository();
@@ -161,21 +138,21 @@ void portTest() {
     test('should be open port when call the open method', () async{
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
-      checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, true, []);
+      checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, []);
     });
 
     test('should be open port when call the open method [1000]', () async{
       await setPort(1000);
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
-      checkOpenPort(mockRepo, provider, "192.168.1.1", 1000, true, []);
+      checkOpenPort(mockRepo, provider, "192.168.1.1", 1000, []);
     });
 
     test('should be open port when parameter is null', () async{
       (await SharedPreferences.getInstance()).remove(Params.port.toString());
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
-      checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, true, []);
+      checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, []);
     });
 
     test('should be close port when call the close method', () async{
@@ -188,66 +165,35 @@ void portTest() {
   });
 }
 
-Future<void> setupCallbackAction({
-  String ip = '192.168.1.1',
-  int port = 32099,
-}) async{
-  kReceiveCallbackSpy = await openPort(ip, port);
-  if(kReceiveCallbackSpy == null) fail("could not get receive callback.");
+Future<AnimatedListItemModel<ReceiveItem>> setupAfterReceiveTest(List<ReceiveItem> receiveItems) async{
+  MockReceiveRepository mockRepo = MockReceiveRepository();
+  StreamController<ReceiveItem> streamController = StreamController<ReceiveItem>();
+  AnimatedListItemModel<ReceiveItem> itemList = constructListItem([]);
+  ReceiveProvider provider = constructProvider(repository: mockRepo, receiveList: itemList);
+  checkOpenPort(mockRepo, provider, "127.0.0.1", 32099, receiveItems,
+    streamController: streamController,
+  );
+  await Future.delayed(const Duration(milliseconds: 10));
+  streamController.close();
+
+  return itemList;
 }
 
-// Future checkReceiveListLen(int expectLen, String sendData) async{//, MockSocket mockSocket, MockTcp mockHost) async{
-//   await kReceiveCallbackSpy!(kMockSocket, Message(Uint8List.fromList(utf8.encode(sendData))));
-//   expect(kReceiveList.length, expectLen);
-// }
-//
-// String convertMessageString({required name, sender='', data=''}){
-//   return SendFile.send(name: name, sender: sender, fileData: Uint8List.fromList(utf8.encode(data))).data;
-// }
-//
-void callbackActionTest(){
-//   group('callback action test', () {
-//
-//     test('should be not increment list len when receive no command.', () async{
-//       await setupCallbackAction();
-//       checkReceiveListLen(0, '');
-//     });
-//
-//     test('should be increment list len when receive send file command.', () async{
-//       await setupCallbackAction();
-//       checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
-//     });
-//
-//     test('should be set name to added item.', () async{
-//       await setupCallbackAction();
-//       checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
-//       expect(kReceiveList[0].name, 'A');
-//     });
-//
-//     test('should be set sender to added item.', () async{
-//       await setupCallbackAction();
-//       await checkReceiveListLen(1, convertMessageString(name: 'senderTest', sender: 'sender'));
-//       expect(kReceiveList[0].sender, 'sender');
-//     });
-//
-//     test('should be set data to added item.', () async{
-//       await setupCallbackAction();
-//       await checkReceiveListLen(1, convertMessageString(name: 'dataTest', data: 'test data'));
-//       File tempFile = File(p.join((await getTemporaryDirectory()).path, 'dataTest'));
-//       String data = await tempFile.readAsString();
-//
-//       expect(data, 'test data');
-//     });
-//
-//     test('should be add to end item.', () async{
-//       await setupCallbackAction();
-//       await checkReceiveListLen(1, convertMessageString(name: 'A', data: '!'));
-//       await checkReceiveListLen(2, convertMessageString(name: 'B', data: '!'));
-//       expect(kReceiveList[0].name, 'A');
-//       expect(kReceiveList[1].name, 'B');
-//     });
-//   });
+void afterReceiveTest(){
+  group('after receive data test', () {
+    test('should be increase item list after received item.', () async{
+      MockReceiveItem itemMock1 = MockReceiveItem();
+      MockReceiveItem itemMock2 = MockReceiveItem();
+      AnimatedListItemModel<ReceiveItem> itemList = await setupAfterReceiveTest([
+        itemMock1,
+        itemMock2,
+      ]);
 
+      expect(itemList.length, 2);
+      expect(itemList[0], itemMock1);
+      expect(itemList[1], itemMock2);
+    });
+  });
 }
 
 void itemActionTest() {
