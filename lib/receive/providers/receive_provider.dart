@@ -44,7 +44,8 @@ class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
   }
 
   void close(){
-    _hostComm?.close();
+    // _hostComm?.close();
+    _receiver.close();
   }
 
   /// change [_currentIp].

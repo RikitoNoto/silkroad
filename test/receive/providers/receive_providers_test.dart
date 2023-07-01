@@ -30,8 +30,9 @@ late ReceiveProvider kProvider;
 
 ReceiveCallback<Socket>? kReceiveCallbackSpy;
 
-void setPort(int port){
+Future setPort(int port) async{
   SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+  await OptionManager.initialize();
 }
 
 @GenerateMocks([ReceiveRepository])
@@ -55,8 +56,6 @@ void main() {
     // );
 
     kReceiveCallbackSpy = null;
-    setPort(32099);
-    await OptionManager.initialize();
   });
 
   tearDown(() async{
@@ -103,7 +102,7 @@ Future<ReceiveCallback<Socket>?> openPort(String ip, int port) async{
   return kReceiveCallbackSpy;
 }
 
-void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String ip, int port, bool isCalled, List<ReceiveItem> receiveSpy){
+void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String ip, int port, bool isCalled, List<ReceiveItem> receiveSpy) async{
   StreamController<ReceiveItem> streamController = StreamController<ReceiveItem>();
 
   // construct listen mock.
@@ -117,7 +116,7 @@ void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String 
   // set ip address
   provider.overwriteAddressList([ip]);
   provider.selectIp(ip);
-  setPort(port);
+  await setPort(port);
 
   provider.open();
 
@@ -127,56 +126,50 @@ void checkOpenPort(MockReceiveRepository repo, ReceiveProvider provider, String 
 }
 //TODO: add Test => after should be increase _receiveList's item.
 
+ReceiveProvider constructProvider({
+  AnimatedListItemModel? receiveList,
+  Platform? platform,
+  required ReceiveRepository repository,
+}){
+  return ReceiveProvider(
+    receiveList: receiveList ?? kReceiveList,
+    platform: platform ?? const LocalPlatform(),
+    builder: (){
+      return repository;
+    },
+  );
+}
+
 void portTest() {
   group('port open and close test', () {
 
     test('should be open port when call the open method', () async{
       MockReceiveRepository mockRepo = MockReceiveRepository();
-      ReceiveProvider provider = ReceiveProvider(
-        receiveList: kReceiveList,
-        platform: LocalPlatform(),
-        builder: (){
-          return mockRepo;
-        },
-      );
+      ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, true, []);
     });
 
     test('should be open port when call the open method [1000]', () async{
-      setPort(1000);
-      await OptionManager.initialize();
+      await setPort(1000);
       MockReceiveRepository mockRepo = MockReceiveRepository();
-      ReceiveProvider provider = ReceiveProvider(
-        receiveList: kReceiveList,
-        platform: LocalPlatform(),
-        builder: (){
-          return mockRepo;
-        },
-      );
+      ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 1000, true, []);
     });
 
     test('should be open port when parameter is null', () async{
       (await SharedPreferences.getInstance()).remove(Params.port.toString());
-      // await OptionManager.initialize();
       MockReceiveRepository mockRepo = MockReceiveRepository();
-      ReceiveProvider provider = ReceiveProvider(
-        receiveList: kReceiveList,
-        platform: LocalPlatform(),
-        builder: (){
-          return mockRepo;
-        },
-      );
+      ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, true, []);
     });
 
-    // test('should be close port when call the close method', () async{
-    //   when(kMockHost.close()).thenAnswer((_)=> Future.value(null));
-    //   await checkOpenPort("192.168.1.1", 32099, true, true, kMockHost);
-    //   verifyNever(kMockHost.close());
-    //   kProvider.close();
-    //   verify(kMockHost.close());
-    // });
+    test('should be close port when call the close method', () async{
+      MockReceiveRepository mockRepo = MockReceiveRepository();
+      ReceiveProvider provider = constructProvider(repository: mockRepo);
+      when(mockRepo.close());
+      provider.close();
+      verify(mockRepo.close()); // should be call the repository.close.
+    });
   });
 }
 
