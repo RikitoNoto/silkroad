@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -34,7 +35,7 @@ Future setParam(String key , Object value) async{
   await OptionManager.initialize();
 }
 
-@GenerateMocks([SendRepository])
+@GenerateNiceMocks([MockSpec<SendRepository>()])
 @GenerateMocks([Socket])
 @GenerateMocks([Tcp])
 @GenerateMocks([File])
@@ -183,37 +184,152 @@ void checkCalledSend({
 SendProvider constructProvider({
   Platform? platform,
   SendRepository? repository,
+  File? file,
 }){
-  return SendProvider(
+  SendProvider provider = SendProvider(
     platform: platform ?? const LocalPlatform(),
     builder: (){
       return repository ?? MockSendRepository();
     },
   );
+  if(file != null) provider.file = file;
+  return provider;
 }
 
 void sendMessageTest(){
+  MockSendRepository setupConnectAndSend({
+    String connectionId = "",
+  }){
+    MockSendRepository mockRepo = MockSendRepository();
+    when(mockRepo.connect(any)).thenAnswer((_) => Future.value(connectionId));
+    when(mockRepo.send(any, any)).thenAnswer((_) => Future.value(null));
+    return mockRepo;
+  }
+
+  MockFile createFileMock({
+    bool isExist = true,
+    String path = "",
+    String data = "",
+  }){
+    MockFile mockFile = MockFile();
+    when(mockFile.exists()).thenAnswer((_) => Future.value(isExist));
+    when(mockFile.path).thenAnswer((_) => p.join(path));
+    when(mockFile.readAsBytes()).thenAnswer((_) => Future.value(Uint8List.fromList(utf8.encode(data))));
+    return mockFile;
+  }
+
   group('connect test', () {
       test('should be to call the connect method with default end point', () async{
-        MockSendRepository mockRepo = MockSendRepository();
-        SendProvider provider = constructProvider(repository: mockRepo);
-        when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
+        MockSendRepository mockRepo = setupConnectAndSend();
+        MockFile mockFile = createFileMock();
+        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
         await provider.send();
 
         verify(mockRepo.connect("0.0.0.0:32099"));
       });
 
       test('should be to call the connect method with args end point', () async{
-        MockSendRepository mockRepo = MockSendRepository();
-        SendProvider provider = constructProvider(repository: mockRepo);
+        MockSendRepository mockRepo = setupConnectAndSend(connectionId: "connection_id_1");
+        MockFile mockFile = createFileMock();
+        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
         setParam(Params.port.toString(), 32100);
         setIpAddressToProvider("1.1.1.1", provider: provider);
-        when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
         await provider.send();
 
         verify(mockRepo.connect("1.1.1.1:32099"));
       });
+
+      test('should be do not call the connect method when a file does not set', () async{
+        MockSendRepository mockRepo = setupConnectAndSend(connectionId: "connection_id_1");
+        SendProvider provider = constructProvider(repository: mockRepo);
+        SendResult result = await provider.send();
+
+        verifyNever(mockRepo.connect(any));
+        expect(result, SendResult.lostFile);
+      });
+
+      checkVerifyNever({
+        MockFile? file,
+        MockSendRepository? repository,
+      }) async {
+        MockSendRepository mockRepo = repository ?? setupConnectAndSend(connectionId: "connection_id_1");
+        MockFile mockFile = file ?? createFileMock(isExist: false);
+        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+        SendResult result = await provider.send();
+
+        verifyNever(mockRepo.connect(any));
+        expect(result, SendResult.lostFile);
+      }
+
+      test('should be do not call the connect method when a file does not exist', () async{
+        checkVerifyNever(file: createFileMock(isExist: false));
+      });
   });
+
+  group('send test', () {
+    test('should be call a send method', () async{
+      MockSendRepository mockRepo = MockSendRepository();
+      MockFile mockFile = createFileMock();
+
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
+      SendResult result = await provider.send();
+
+      verify(mockRepo.send("connection_id_1", Uint8List.fromList(utf8.encode("file"))));
+      expect(result, SendResult.success);
+    });
+
+    checkVerifyNever({
+      MockFile? file,
+      MockSendRepository? repository,
+      required SendResult result,
+    }) async {
+      MockSendRepository mockRepo = repository ?? MockSendRepository();
+      MockFile mockFile = file ?? createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      SendResult result = await provider.send();
+
+      verifyNever(mockRepo.send(any, any));
+      expect(result, result);
+    }
+
+    test('should be do not call a send method when a file does not set', () async{
+      MockSendRepository mockRepo = MockSendRepository();
+      SendProvider provider = constructProvider(repository: mockRepo);
+      SendResult result = await provider.send();
+
+      verifyNever(mockRepo.send(any, any));
+      expect(result, SendResult.lostFile);
+    });
+
+    test('should be do not call a send method when a file does not exist', () async{
+      checkVerifyNever(file: createFileMock(isExist: false), result: SendResult.lostFile);
+    });
+
+    test('should be do not call a send method when connection failed', () async{
+      MockSendRepository repo = MockSendRepository();
+      when(repo.connect(any)).thenAnswer((_) => Future(() => null));
+      checkVerifyNever(repository: repo, result: SendResult.connectionFail);
+    });
+
+    test('should be do not call a send method when connection failed with an exception', () async{
+      MockSendRepository repo = MockSendRepository();
+      when(repo.connect(any)).thenAnswer((_) => Future(() => throw const OSError()));
+      checkVerifyNever(repository: repo, result: SendResult.connectionFail);
+    });
+
+    test('should be return sendfail status when send failed with an exception', () async{
+      MockSendRepository mockRepo = MockSendRepository();
+      MockFile mockFile = createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
+      when(mockRepo.send(any, any)).thenAnswer((_) => throw const OSError());
+      SendResult result = await provider.send();
+
+      expect(result, SendResult.sendFail);
+    });
+  });
+
   //   test('should be connect and send to socket [192.168.12.1]', () async{
   //     await setupSendMocks();
   //     setIpAddressToProvider('192.168.12.1');

@@ -154,25 +154,30 @@ class _FakeFileSystemEntity_11 extends _i1.SmartFake
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
-  MockSendRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
-  _i4.Future<String> connect(String? connectionPoint) => (super.noSuchMethod(
+  _i4.Future<String?> connect(String? connectionPoint) => (super.noSuchMethod(
         Invocation.method(
           #connect,
           [connectionPoint],
         ),
-        returnValue: _i4.Future<String>.value(''),
-      ) as _i4.Future<String>);
+        returnValue: _i4.Future<String?>.value(),
+        returnValueForMissingStub: _i4.Future<String?>.value(),
+      ) as _i4.Future<String?>);
   @override
-  _i4.Future<dynamic> send(_i6.Uint8List? data) => (super.noSuchMethod(
+  _i4.Future<dynamic> send(
+    String? dest,
+    _i6.Uint8List? data,
+  ) =>
+      (super.noSuchMethod(
         Invocation.method(
           #send,
-          [data],
+          [
+            dest,
+            data,
+          ],
         ),
         returnValue: _i4.Future<dynamic>.value(),
+        returnValueForMissingStub: _i4.Future<dynamic>.value(),
       ) as _i4.Future<dynamic>);
   @override
   void close() => super.noSuchMethod(
