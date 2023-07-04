@@ -80,20 +80,12 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     if(file == null) return SendResult.lostFile;
     if(!(await file.exists())) return SendResult.lostFile;
 
-    // connection
-    String? id;
-    try {
-      id = await _sender.connect('$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
-    }catch(e) {
-      return SendResult.connectionFail;
-    }
-    if(id == null) return SendResult.connectionFail;
-
     // send
     try {
-      await _sender.send(id, <String, String>{
-        "title": p.basename(file.path),
-        "data": utf8.decode(await file.readAsBytes()),
+      await _sender.send('$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}',
+        <String, String>{
+          "title": p.basename(file.path),
+          "data": utf8.decode(await file.readAsBytes()),
       });
     }
     catch(e){

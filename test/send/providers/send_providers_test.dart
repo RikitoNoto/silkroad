@@ -201,7 +201,7 @@ void sendMessageTest(){
     String connectionId = "",
   }){
     MockSendRepository mockRepo = MockSendRepository();
-    when(mockRepo.connect(any)).thenAnswer((_) => Future.value(connectionId));
+    // when(mockRepo.connect(any)).thenAnswer((_) => Future.value(connectionId));
     when(mockRepo.send(any, any)).thenAnswer((_) => Future.value(null));
     return mockRepo;
   }
@@ -218,64 +218,17 @@ void sendMessageTest(){
     return mockFile;
   }
 
-  group('connect test', () {
-      test('should be to call the connect method with default end point', () async{
-        MockSendRepository mockRepo = setupConnectAndSend();
-        MockFile mockFile = createFileMock();
-        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
-        await provider.send();
-
-        verify(mockRepo.connect("0.0.0.0:32099"));
-      });
-
-      test('should be to call the connect method with args end point', () async{
-        MockSendRepository mockRepo = setupConnectAndSend(connectionId: "connection_id_1");
-        MockFile mockFile = createFileMock();
-        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
-        setParam(Params.port.toString(), 32100);
-        setIpAddressToProvider("1.1.1.1", provider: provider);
-        await provider.send();
-
-        verify(mockRepo.connect("1.1.1.1:32099"));
-      });
-
-      test('should be do not call the connect method when a file does not set', () async{
-        MockSendRepository mockRepo = setupConnectAndSend(connectionId: "connection_id_1");
-        SendProvider provider = constructProvider(repository: mockRepo);
-        SendResult result = await provider.send();
-
-        verifyNever(mockRepo.connect(any));
-        expect(result, SendResult.lostFile);
-      });
-
-      checkVerifyNever({
-        MockFile? file,
-        MockSendRepository? repository,
-      }) async {
-        MockSendRepository mockRepo = repository ?? setupConnectAndSend(connectionId: "connection_id_1");
-        MockFile mockFile = file ?? createFileMock(isExist: false);
-        SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
-        SendResult result = await provider.send();
-
-        verifyNever(mockRepo.connect(any));
-        expect(result, SendResult.lostFile);
-      }
-
-      test('should be do not call the connect method when a file does not exist', () async{
-        checkVerifyNever(file: createFileMock(isExist: false));
-      });
-  });
-
   group('send test', () {
     test('should be call a send method', () async{
       MockSendRepository mockRepo = MockSendRepository();
       MockFile mockFile = createFileMock();
 
       SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
-      when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
+      await setParam(Params.port.toString(), 32100);
+      setIpAddressToProvider("1.1.1.1", provider: provider);
       SendResult result = await provider.send();
 
-      verify(mockRepo.send("connection_id_1", any));
+      verify(mockRepo.send("1.1.1.1:32100", any));
       expect(result, SendResult.success);
     });
 
@@ -304,29 +257,6 @@ void sendMessageTest(){
 
     test('should be do not call a send method when a file does not exist', () async{
       checkVerifyNever(file: createFileMock(isExist: false), result: SendResult.lostFile);
-    });
-
-    test('should be do not call a send method when connection failed', () async{
-      MockSendRepository repo = MockSendRepository();
-      when(repo.connect(any)).thenAnswer((_) => Future(() => null));
-      checkVerifyNever(repository: repo, result: SendResult.connectionFail);
-    });
-
-    test('should be do not call a send method when connection failed with an exception', () async{
-      MockSendRepository repo = MockSendRepository();
-      when(repo.connect(any)).thenAnswer((_) => Future(() => throw const OSError()));
-      checkVerifyNever(repository: repo, result: SendResult.connectionFail);
-    });
-
-    test('should be return sendfail status when send failed with an exception', () async{
-      MockSendRepository mockRepo = MockSendRepository();
-      MockFile mockFile = createFileMock();
-      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
-      when(mockRepo.connect(any)).thenAnswer((_) => Future.value("connection_id_1"));
-      when(mockRepo.send(any, any)).thenAnswer((_) => throw const OSError());
-      SendResult result = await provider.send();
-
-      expect(result, SendResult.sendFail);
     });
   });
 

@@ -155,24 +155,15 @@ class _FakeFileSystemEntity_11 extends _i1.SmartFake
 /// See the documentation for Mockito's code generation for more information.
 class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
   @override
-  _i4.Future<String?> connect(String? connectionPoint) => (super.noSuchMethod(
-        Invocation.method(
-          #connect,
-          [connectionPoint],
-        ),
-        returnValue: _i4.Future<String?>.value(),
-        returnValueForMissingStub: _i4.Future<String?>.value(),
-      ) as _i4.Future<String?>);
-  @override
   _i4.Future<dynamic> send(
-    String? dest,
+    String? connectionPoint,
     Map<String, String>? data,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
           #send,
           [
-            dest,
+            connectionPoint,
             data,
           ],
         ),
