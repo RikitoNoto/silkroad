@@ -330,6 +330,27 @@ void sendMessageTest(){
     });
   });
 
+  group('close test', () {
+    test('should be to call the close method when the send method return a success', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await provider.send();
+
+      verify(mockRepo.close());
+    });
+
+    test('should be to call the close method when the send method throw exception', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      when(mockRepo.send(any, any)).thenAnswer((_) => throw const OSError());
+      await provider.send();
+
+      verify(mockRepo.close());
+    });
+  });
+
   //   test('should be connect and send to socket [192.168.12.1]', () async{
   //     await setupSendMocks();
   //     setIpAddressToProvider('192.168.12.1');

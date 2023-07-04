@@ -94,49 +94,11 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
       await _sender.send(id, Uint8List.fromList(utf8.encode("file")));
     }
     catch(e){
+      _sender.close();
       return SendResult.sendFail;
     }
+    _sender.close();
     return SendResult.success;
-    //
-    // SendResult sendResult = SendResult.success;
-    // File? file = _file;
-    // CommunicationIF<Socket>? communicator = builder();
-    // Socket? socket;
-    // try {
-    //   socket = await communicator.connect(
-    //       '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
-    // }
-    // catch(e){
-    //   sendResult = SendResult.connectionFail;
-    // }
-    //
-    // // connection is success
-    // if(socket != null){
-    //   // file is exist
-    //   if( (file != null) && (await file.exists())) {
-    //     Object? sender = OptionManager().get(Params.name.toString());
-    //     try {
-    //       await communicator.send(socket, SendFile.send(
-    //           name: p.basename(file.path),
-    //           sender: sender?.toString() ?? '',
-    //           fileData: await file.readAsBytes()));
-    //       // sendResult = true;
-    //     }catch(e){
-    //       sendResult = SendResult.sendFail;
-    //     }
-    //
-    //   }
-    //   else{
-    //     sendResult = SendResult.lostFile;
-    //   }
-    //
-    //   await communicator.close();
-    // }
-    // else{
-    //   sendResult = SendResult.connectionFail;
-    // }
-    //
-    // return sendResult;
   }
 
   void setOctet(int octet, int value){
