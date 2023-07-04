@@ -11,8 +11,7 @@ import 'package:silkroad/global.dart';
 
 
 class ReceiveProvider with ChangeNotifier, IpaddressFetcher{
-  //TODO: delete required of builder.
-  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, required this.builder}) : _receiveList = receiveList
+  ReceiveProvider({required this.platform, required AnimatedListItemModel receiveList, this.builder=kReceiveRepositoryDefault}) : _receiveList = receiveList
   {
     _ipList.add(_currentIp);
     fetchIpAddresses();

@@ -39,9 +39,9 @@ extension SendResultMessage on SendResult{
 
 
 class SendProvider with ChangeNotifier, IpaddressFetcher {
-  SendProvider({this.builder, required this.platform}) {
+  SendProvider({this.builder=kSendRepositoryDefault, required this.platform}) {
     fetchIpAddress();
-    _sender = builder!();
+    _sender = builder();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -49,8 +49,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final List<int> _ip = <int>[0, 0, 0, 0];
   final List<String> _addressRange = <String>[];
   File? _file;
-  // final CommunicationFactoryFunc<Socket> builder;
-  final SimpleFactoryFunc<SendRepository>? builder;
+  final SimpleFactoryFunc<SendRepository> builder;
   final Platform platform;
   late final SendRepository _sender;
 
@@ -85,7 +84,8 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
       await _sender.send('$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}',
         <String, String>{
           "title": p.basename(file.path),
-          "data": utf8.decode(await file.readAsBytes()),
+          //FIXME: this should not do here what split data to list.(should be do in repository)
+          "data": (await file.readAsBytes()).map<String>((int value) => value.toString()).join(','),
       });
     }
     catch(e){

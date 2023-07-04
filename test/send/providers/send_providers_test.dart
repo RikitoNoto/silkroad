@@ -290,7 +290,7 @@ void sendMessageTest(){
 
       verify(mockRepo.send(any, <String, String>{
         "title": "file.file",
-        "data": "data",
+        "data": "100,97,116,97",
       }));
     });
 
@@ -302,7 +302,7 @@ void sendMessageTest(){
 
       verify(mockRepo.send(any, <String, String>{
         "title": "file.file1",
-        "data": "data1",
+        "data": "100,97,116,97,49",
       }));
     });
 
@@ -314,7 +314,7 @@ void sendMessageTest(){
 
       verify(mockRepo.send(any, <String, String>{
         "title": "file.file1",
-        "data": "data1",
+        "data": "100,97,116,97,49",
       }));
     });
   });
