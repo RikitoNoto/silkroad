@@ -91,7 +91,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
     // send
     try {
-      await _sender.send(id, Uint8List.fromList(utf8.encode("file")));
+      await _sender.send(id, <String, String>{
+        "title": p.basename(file.path),
+        "data": utf8.decode(await file.readAsBytes()),
+      });
     }
     catch(e){
       _sender.close();

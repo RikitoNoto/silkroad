@@ -166,7 +166,7 @@ class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
   @override
   _i4.Future<dynamic> send(
     String? dest,
-    _i6.Uint8List? data,
+    Map<String, String>? data,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
