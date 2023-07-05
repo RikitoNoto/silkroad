@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -8,6 +9,7 @@ import 'package:platform/platform.dart';
 import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 
 enum SendResult{
@@ -37,8 +39,9 @@ extension SendResultMessage on SendResult{
 
 
 class SendProvider with ChangeNotifier, IpaddressFetcher {
-  SendProvider({this.builder = kCommunicationFactory, required this.platform}) {
+  SendProvider({this.builder=kSendRepositoryDefault, required this.platform}) {
     fetchIpAddress();
+    _sender = builder();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -46,8 +49,9 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final List<int> _ip = <int>[0, 0, 0, 0];
   final List<String> _addressRange = <String>[];
   File? _file;
-  final CommunicationFactoryFunc<Socket> builder;
+  final SimpleFactoryFunc<SendRepository> builder;
   final Platform platform;
+  late final SendRepository _sender;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -71,46 +75,25 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<SendResult> send() async{
-
-    SendResult sendResult = SendResult.success;
     File? file = _file;
-    CommunicationIF<Socket>? communicator = builder();
-    Socket? socket;
+    if(file == null) return SendResult.lostFile;
+    if(!(await file.exists())) return SendResult.lostFile;
+
+    // send
     try {
-      socket = await communicator.connect(
-          '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
+      await _sender.send('$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}',
+        <String, String>{
+          "title": p.basename(file.path),
+          //FIXME: this should not do here what split data to list.(should be do in repository)
+          "data": (await file.readAsBytes()).map<String>((int value) => value.toString()).join(','),
+      });
     }
     catch(e){
-      sendResult = SendResult.connectionFail;
+      _sender.close();
+      return SendResult.sendFail;
     }
-
-    // connection is success
-    if(socket != null){
-      // file is exist
-      if( (file != null) && (await file.exists())) {
-        Object? sender = OptionManager().get(Params.name.toString());
-        try {
-          await communicator.send(socket, SendFile.send(
-              name: p.basename(file.path),
-              sender: sender?.toString() ?? '',
-              fileData: await file.readAsBytes()));
-          // sendResult = true;
-        }catch(e){
-          sendResult = SendResult.sendFail;
-        }
-
-      }
-      else{
-        sendResult = SendResult.lostFile;
-      }
-
-      await communicator.close();
-    }
-    else{
-      sendResult = SendResult.connectionFail;
-    }
-
-    return sendResult;
+    _sender.close();
+    return SendResult.success;
   }
 
   void setOctet(int octet, int value){

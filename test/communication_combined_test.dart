@@ -11,9 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
-import 'package:silkroad/receive/repository/receive_item.dart';
+import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
-import 'package:silkroad/comm/message.dart';
 import 'package:silkroad/parameter.dart';
 
 import 'spy/path_provider_spy.dart';
@@ -163,9 +162,8 @@ void sendAndReceiveTest(){
 
     test('should be send and receive message 65536', () async{
       List<int> expectData = [];
-      int headerSize = Uint8List.fromList(utf8.encode(SendFile.send(name: 'name', sender: '', fileData: Uint8List(0)).data)).length;
 
-      for(int i=0; i<65536 - headerSize - 5; i++){
+      for(int i=0; i<65536; i++){
         expectData.add(0x00);
       }
 

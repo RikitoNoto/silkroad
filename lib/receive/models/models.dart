@@ -1,1 +1,1 @@
-export 'receive_item.dart';
+export '../entity/receive_item.dart';

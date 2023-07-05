@@ -9,23 +9,17 @@ import 'package:path/path.dart' as p;
 import 'package:platform/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
+import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/option/params.dart';
 
 import 'send_providers_test.mocks.dart';
 
 late SendProvider kProvider;
 late MockFile kFileMock;
-late MockTcp kTcpMock;
 late MockSocket kSocketMock;
-late Message? kSendData;
 late Map<String, Object> kParamMap;
-
-CommunicationIF<Socket> _buildSpy(){
-  return kTcpMock;
-}
 
 Future setParam(String key , Object value) async{
   kParamMap[key] = value;
@@ -33,17 +27,15 @@ Future setParam(String key , Object value) async{
   await OptionManager.initialize();
 }
 
+@GenerateNiceMocks([MockSpec<SendRepository>()])
 @GenerateMocks([Socket])
-@GenerateMocks([Tcp])
 @GenerateMocks([File])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(()async{
-    kSendData = null;
     kFileMock = MockFile();
-    kTcpMock = MockTcp();
     kSocketMock = MockSocket();
-    kProvider = SendProvider(builder: _buildSpy, platform: const LocalPlatform());
+    kProvider = SendProvider(platform: const LocalPlatform(), builder: ()=>MockSendRepository());
     kProvider.file = kFileMock;
     kParamMap = <String, Object>{};
     await setParam(Params.port.toString(), 32099);
@@ -90,9 +82,10 @@ void fileNameTest(){
   });
 }
 
-void setIpAddressToProvider(String ip){
+void setIpAddressToProvider(String ip, {SendProvider? provider}){
+  provider ??= kProvider;
   ip.split('.').asMap().forEach((int i, String octet) {
-    kProvider.setOctet(i, int.parse(octet));
+    provider?.setOctet(i, int.parse(octet));
   });
 }
 
@@ -130,120 +123,141 @@ void ipTest(){
   });
 }
 
-Future setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? data, Result sendResult=Result.success, bool connectionResult=true, String? sender}) async{
-  when(kFileMock.exists()).thenAnswer((_) => Future.value(isFileExist));
-  when(kFileMock.path).thenAnswer((_) => p.join(fileName));
-  when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(data ?? Uint8List(0)));
-  when(kTcpMock.connect(any)).thenAnswer((_)=>Future.value(connectionResult ? kSocketMock : null));
-  when(kTcpMock.send(any, any)).thenAnswer((Invocation invocation) {
-    kSendData = invocation.positionalArguments[1];
-    return Future.value(sendResult);
-  });
-  when(kTcpMock.close()).thenAnswer((_)=>Future.value(null));
-  await setParam(Params.name.toString(), sender ?? '');
-}
-
-void checkCalledSend({
-  String expectIp='0.0.0.0',
-  int expectPort=32099,
-  Message? data,
-  bool checkNever=false,
-  bool checkNeverConnect=false,
-  bool checkNeverSend=false,
-  bool checkNeverClose=false,
+SendProvider constructProvider({
+  Platform? platform,
+  SendRepository? repository,
+  File? file,
 }){
-  if(checkNever) checkNeverConnect = checkNeverSend = checkNeverClose = checkNever;
-
-  if(!checkNeverConnect) {
-    verify(kTcpMock.connect('$expectIp:$expectPort'));
-  }
-  else{
-    verifyNever(kTcpMock.connect(any));
-  }
-
-  if(!checkNeverSend){
-    verify(kTcpMock.send(kSocketMock, any));
-    if(data != null){
-      expect(kSendData?.data, data.data);
-    }
-  }else{
-    verifyNever(kTcpMock.send(any, any));
-  }
-
-  if(!checkNeverClose){
-    verify(kTcpMock.close());
-  }else{
-    verifyNever(kTcpMock.close());
-  }
+  SendProvider provider = SendProvider(
+    platform: platform ?? const LocalPlatform(),
+    builder: (){
+      return repository ?? MockSendRepository();
+    },
+  );
+  if(file != null) provider.file = file;
+  return provider;
 }
 
 void sendMessageTest(){
-  group('send message test', () {
-    test('should be connect and send to socket default', () async{
-      await setupSendMocks();
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(expectIp: '0.0.0.0', expectPort: 32099);
+  MockSendRepository setupConnectAndSend({
+    String connectionId = "",
+  }){
+    MockSendRepository mockRepo = MockSendRepository();
+    // when(mockRepo.connect(any)).thenAnswer((_) => Future.value(connectionId));
+    when(mockRepo.send(any, any)).thenAnswer((_) => Future.value(null));
+    return mockRepo;
+  }
+
+  MockFile createFileMock({
+    bool isExist = true,
+    String path = "",
+    String data = "",
+  }){
+    MockFile mockFile = MockFile();
+    when(mockFile.exists()).thenAnswer((_) => Future.value(isExist));
+    when(mockFile.path).thenAnswer((_) => p.join(path));
+    when(mockFile.readAsBytes()).thenAnswer((_) => Future.value(Uint8List.fromList(utf8.encode(data))));
+    return mockFile;
+  }
+
+  group('send test', () {
+    test('should be call a send method', () async{
+      MockSendRepository mockRepo = MockSendRepository();
+      MockFile mockFile = createFileMock();
+
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await setParam(Params.port.toString(), 32100);
+      setIpAddressToProvider("1.1.1.1", provider: provider);
+      SendResult result = await provider.send();
+
+      verify(mockRepo.send("1.1.1.1:32100", any));
+      expect(result, SendResult.success);
     });
 
-    test('should be connect and send to socket [192.168.12.1]', () async{
-      await setupSendMocks();
-      setIpAddressToProvider('192.168.12.1');
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(expectIp: '192.168.12.1', expectPort: 32099);
+    checkVerifyNever({
+      MockFile? file,
+      MockSendRepository? repository,
+      required SendResult result,
+    }) async {
+      MockSendRepository mockRepo = repository ?? MockSendRepository();
+      MockFile mockFile = file ?? createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      SendResult result = await provider.send();
+
+      verifyNever(mockRepo.send(any, any));
+      expect(result, result);
+    }
+
+    test('should be do not call a send method when a file does not set', () async{
+      MockSendRepository mockRepo = MockSendRepository();
+      SendProvider provider = constructProvider(repository: mockRepo);
+      SendResult result = await provider.send();
+
+      verifyNever(mockRepo.send(any, any));
+      expect(result, SendResult.lostFile);
     });
 
-    test('should be fail and not send message if file is none', () async{
-      await setupSendMocks(fileName: 'name', isFileExist: false);
-      expect(await kProvider.send(), SendResult.lostFile);
-      checkCalledSend(checkNeverSend: true);
+    test('should be do not call a send method when a file does not exist', () async{
+      checkVerifyNever(file: createFileMock(isExist: false), result: SendResult.lostFile);
+    });
+  });
+
+  group('close test', () {
+    test('should be to call the close method when the send method return a success', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await provider.send();
+
+      verify(mockRepo.close());
     });
 
-    test('should be fail and not send message if connection is fail', () async{
-      await setupSendMocks(fileName: 'name', isFileExist: false, connectionResult: false);
-      expect(await kProvider.send(), SendResult.connectionFail);
-      checkCalledSend(checkNeverSend: true, checkNeverClose: true);
+    test('should be to call the close method when the send method throw exception', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock();
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      when(mockRepo.send(any, any)).thenAnswer((_) => throw const OSError());
+      await provider.send();
+
+      verify(mockRepo.close());
+    });
+  });
+
+  group('send file test', () {
+    test('should be to call the close method when the send method return a success', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock(path: "file.file", data: "data");
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await provider.send();
+
+      verify(mockRepo.send(any, <String, String>{
+        "title": "file.file",
+        "data": "100,97,116,97",
+      }));
     });
 
-    test('should be send message empty data when file data is empty', () async{
-      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
+    test('should be to call the close method when the send method return a success', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock(path: "file.file1", data: "data1");
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await provider.send();
+
+      verify(mockRepo.send(any, <String, String>{
+        "title": "file.file1",
+        "data": "100,97,116,97,49",
+      }));
     });
 
-    test('should be send message sender when option name is set [senderA]', () async{
-      await setupSendMocks(fileName: 'name', sender: 'senderA', data: Uint8List.fromList(utf8.encode('')));
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(data: SendFile.send(name: 'name', sender: 'senderA', fileData: Uint8List.fromList(utf8.encode(''))));
-    });
+    test('should be parse to the base name', () async{
+      MockSendRepository mockRepo = setupConnectAndSend();
+      MockFile mockFile = createFileMock(path: "path/file.file1", data: "data1");
+      SendProvider provider = constructProvider(repository: mockRepo, file: mockFile);
+      await provider.send();
 
-    test('should be change port number[33333]', () async{
-      await setParam(Params.port.toString(), 33333);
-      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(expectPort: 33333, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
-    });
-
-    test('should be send default port [32099] when not set port ', () async{
-      (await SharedPreferences.getInstance()).remove(Params.port.toString());
-      await setupSendMocks(fileName: 'name', data: Uint8List.fromList(utf8.encode('')));
-      expect(await kProvider.send(), SendResult.success);
-      checkCalledSend(expectPort: 32099, data: SendFile.send(name: 'name', sender: '', fileData: Uint8List.fromList(utf8.encode(''))));
-    });
-
-    test('should be return fail if fail connection.', () async{
-      await setupSendMocks();
-      when(kTcpMock.connect(any)).thenAnswer((_)=>throw const SocketException('fail'));
-      try{expect(await kProvider.send(), SendResult.connectionFail);}
-      catch (e){fail('could not catch exception in send method.');}
-      checkCalledSend(checkNeverSend: true, checkNeverClose: true,);
-    });
-
-    test('should be return fail if fail send.', () async{
-      await setupSendMocks();
-      when(kTcpMock.send(any, any)).thenAnswer((_)=>throw const SocketException('fail'));
-      try{expect(await kProvider.send(), SendResult.sendFail);}
-      catch (e){fail('could not catch exception in send method.');}
-      checkCalledSend();
+      verify(mockRepo.send(any, <String, String>{
+        "title": "file.file1",
+        "data": "100,97,116,97,49",
+      }));
     });
   });
 }
