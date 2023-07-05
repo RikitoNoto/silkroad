@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +9,6 @@ import 'package:path/path.dart' as p;
 import 'package:platform/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/option/option_manager.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
@@ -20,14 +18,8 @@ import 'send_providers_test.mocks.dart';
 
 late SendProvider kProvider;
 late MockFile kFileMock;
-late MockTcp kTcpMock;
 late MockSocket kSocketMock;
-late Message? kSendData;
 late Map<String, Object> kParamMap;
-
-CommunicationIF<Socket> _buildSpy(){
-  return kTcpMock;
-}
 
 Future setParam(String key , Object value) async{
   kParamMap[key] = value;
@@ -37,14 +29,11 @@ Future setParam(String key , Object value) async{
 
 @GenerateNiceMocks([MockSpec<SendRepository>()])
 @GenerateMocks([Socket])
-@GenerateMocks([Tcp])
 @GenerateMocks([File])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(()async{
-    kSendData = null;
     kFileMock = MockFile();
-    kTcpMock = MockTcp();
     kSocketMock = MockSocket();
     kProvider = SendProvider(platform: const LocalPlatform(), builder: ()=>MockSendRepository());
     kProvider.file = kFileMock;
@@ -132,53 +121,6 @@ void ipTest(){
       expect(kProvider.ip, '255.255.255.255');
     });
   });
-}
-
-Future setupSendMocks({String fileName='name', bool isFileExist=true, Uint8List? data, Result sendResult=Result.success, bool connectionResult=true, String? sender}) async{
-  when(kFileMock.exists()).thenAnswer((_) => Future.value(isFileExist));
-  when(kFileMock.path).thenAnswer((_) => p.join(fileName));
-  when(kFileMock.readAsBytes()).thenAnswer((_) => Future.value(data ?? Uint8List(0)));
-  when(kTcpMock.connect(any)).thenAnswer((_)=>Future.value(connectionResult ? kSocketMock : null));
-  when(kTcpMock.send(any, any)).thenAnswer((Invocation invocation) {
-    kSendData = invocation.positionalArguments[1];
-    return Future.value(sendResult);
-  });
-  when(kTcpMock.close()).thenAnswer((_)=>Future.value(null));
-  await setParam(Params.name.toString(), sender ?? '');
-}
-
-void checkCalledSend({
-  String expectIp='0.0.0.0',
-  int expectPort=32099,
-  Message? data,
-  bool checkNever=false,
-  bool checkNeverConnect=false,
-  bool checkNeverSend=false,
-  bool checkNeverClose=false,
-}){
-  if(checkNever) checkNeverConnect = checkNeverSend = checkNeverClose = checkNever;
-
-  if(!checkNeverConnect) {
-    verify(kTcpMock.connect('$expectIp:$expectPort'));
-  }
-  else{
-    verifyNever(kTcpMock.connect(any));
-  }
-
-  if(!checkNeverSend){
-    verify(kTcpMock.send(kSocketMock, any));
-    if(data != null){
-      expect(kSendData?.data, data.data);
-    }
-  }else{
-    verifyNever(kTcpMock.send(any, any));
-  }
-
-  if(!checkNeverClose){
-    verify(kTcpMock.close());
-  }else{
-    verifyNever(kTcpMock.close());
-  }
 }
 
 SendProvider constructProvider({

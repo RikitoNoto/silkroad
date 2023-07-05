@@ -10,9 +10,6 @@ import 'dart:typed_data' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i7;
-import 'package:silkroad/comm/communication_if.dart' as _i9;
-import 'package:silkroad/comm/message.dart' as _i10;
-import 'package:silkroad/comm/tcp.dart' as _i8;
 import 'package:silkroad/send/repository/send_repository.dart' as _i5;
 
 // ignore_for_file: type=lint
@@ -768,65 +765,6 @@ class MockSocket extends _i1.Mock implements _i2.Socket {
         ),
         returnValue: _i4.Future<dynamic>.value(),
       ) as _i4.Future<dynamic>);
-}
-
-/// A class which mocks [Tcp].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockTcp extends _i1.Mock implements _i8.Tcp {
-  MockTcp() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  @override
-  _i4.Future<_i2.Socket?> connect(String? to) => (super.noSuchMethod(
-        Invocation.method(
-          #connect,
-          [to],
-        ),
-        returnValue: _i4.Future<_i2.Socket?>.value(),
-      ) as _i4.Future<_i2.Socket?>);
-  @override
-  _i4.Future<void> listen(
-    String? bind, {
-    _i9.ConnectionCallback<_i2.Socket>? connectionCallback,
-    _i9.ReceiveCallback<_i2.Socket>? receiveCallback,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #listen,
-          [bind],
-          {
-            #connectionCallback: connectionCallback,
-            #receiveCallback: receiveCallback,
-          },
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
-  @override
-  _i4.Future<dynamic> close() => (super.noSuchMethod(
-        Invocation.method(
-          #close,
-          [],
-        ),
-        returnValue: _i4.Future<dynamic>.value(),
-      ) as _i4.Future<dynamic>);
-  @override
-  _i4.Future<_i9.Result> send(
-    _i2.Socket? connection,
-    _i10.Message? data,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #send,
-          [
-            connection,
-            data,
-          ],
-        ),
-        returnValue: _i4.Future<_i9.Result>.value(_i9.Result.success),
-      ) as _i4.Future<_i9.Result>);
 }
 
 /// A class which mocks [File].
