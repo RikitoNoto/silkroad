@@ -27,6 +27,7 @@ dependencies:
   shared_preferences: ^2.0.15
   fast_i18n: ^5.12.6
   camel:
+  lan_scanner: ^4.0.0
 
 dev_dependencies:
   flutter_test:

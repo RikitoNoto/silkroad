@@ -3,6 +3,9 @@ import 'dart:typed_data';
 
 import 'package:platform/platform.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:lan_scanner/lan_scanner.dart';
+
+export 'package:lan_scanner/lan_scanner.dart' show Host;
 
 mixin IpaddressFetcher {
   Future<List<String>> fetchIpv4Addresses(Platform platform) async {
@@ -26,17 +29,18 @@ mixin IpaddressFetcher {
     List<String> addressList = <String>[];
     for (NetworkInterface interface in await NetworkInterface.list()) {
       for (InternetAddress address in interface.addresses) {
-        if (address.type == InternetAddressType.IPv4)
+        if (address.type == InternetAddressType.IPv4) {
           addressList.add(address.address);
+        }
       }
     }
     return addressList;
   }
 
-  // Stream<NetworkDevice> fetchLocalDevices(String ipAddress) {
-  //   final scanner = LanScanner();
-
-  // }
+  Stream<Host> fetchLocalDevices(String ipAddress) {
+    final scanner = LanScanner();
+    return scanner.icmpScan(getNetworkAddress(ipAddress, 24));
+  }
 
   String getNetworkAddress(String ipAddress, int subnet) {
     final addressList = ipAddress.split(".");
