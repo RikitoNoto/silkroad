@@ -18,7 +18,7 @@ class SendPage extends StatefulWidget {
   State<SendPage> createState() => _SendPageState();
 }
 
-class _SendPageState extends State<SendPage>{
+class _SendPageState extends State<SendPage> {
   late final SendProvider provider;
 
   static final String _ipFieldLabelText = t.send.receiverAddress;
@@ -46,37 +46,38 @@ class _SendPageState extends State<SendPage>{
             title: Text(t.actions.send),
             actions: <Widget>[
               IconButton(
-                icon: const Icon(Icons.send, color: AppTheme.appIconColor1,),
-                onPressed: () async{
-                  WaitProgressDialog.show(context); // show wait progress dialog.
-                  String message = (await provider.send()).message;  // send.
+                icon: const Icon(
+                  Icons.send,
+                  color: AppTheme.appIconColor1,
+                ),
+                onPressed: () async {
+                  WaitProgressDialog.show(
+                      context); // show wait progress dialog.
+                  String message = (await provider.send()).message; // send.
                   if (!mounted) return;
-                  WaitProgressDialog.close(context); // close wait progress dialog.
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                  WaitProgressDialog.close(
+                      context); // close wait progress dialog.
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(message)));
                 },
               )
             ],
           ),
-
           body: _buildBody(context),
         ),
       ),
     );
   }
 
-
-  Widget _buildBody(BuildContext context)
-  {
-    return Column(
-      children: [
-        _buildIpField(context), // ip address input field
-        _buildFileSelector(),   // file selector
-      ]
-    );
+  Widget _buildBody(BuildContext context) {
+    return Column(children: [
+      _buildIpField(context), // ip address input field
+      _buildFileSelector(), // file selector
+      const _SendableList(),
+    ]);
   }
 
-  Widget _buildIpField(BuildContext context)
-  {
+  Widget _buildIpField(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(_ipFieldOutPadding),
       child: InputDecorator(
@@ -86,46 +87,52 @@ class _SendPageState extends State<SendPage>{
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  //FIXME: input action next does not work, because input field is in other state.
-                  _buildOctetField(0,),
-                  _buildComma(),
-                  _buildOctetField(1,),
-                  _buildComma(),
-                  _buildOctetField(2,),
-                  _buildComma(),
-                  _buildOctetField(3, textInputAction: TextInputAction.done,),
-                ],
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                //FIXME: input action next does not work, because input field is in other state.
+                _buildOctetField(
+                  0,
+                ),
+                _buildComma(),
+                _buildOctetField(
+                  1,
+                ),
+                _buildComma(),
+                _buildOctetField(
+                  2,
+                ),
+                _buildComma(),
+                _buildOctetField(
+                  3,
+                  textInputAction: TextInputAction.done,
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '[${t.send.sendableAddress}]',
+            textAlign: TextAlign.left,
+          ),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.all(10.0),
+            child: Consumer<SendProvider>(
+              builder: (context, provider, child) => ListView.builder(
+                itemCount: provider.addressRangeCount,
+                itemBuilder: (BuildContext context, int index) {
+                  return Text(provider.addressRange[index]);
+                },
               ),
             ),
-
-            Text('[${t.send.sendableAddress}]', textAlign: TextAlign.left,),
-            Container(
-              height: 50,
-              padding: const EdgeInsets.all(10.0),
-
-              child: Consumer<SendProvider>(
-                builder: (context, provider, child) => ListView.builder(
-                  itemCount: provider.addressRangeCount,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Text(provider.addressRange[index]);
-                  },
-                ),
-              ),
-            )
-          ]
-        ),
+          )
+        ]),
       ),
     );
   }
 
-  Widget _buildComma()
-  {
+  Widget _buildComma() {
     return Container(
       alignment: Alignment.bottomCenter,
       child: const Text(
@@ -136,17 +143,15 @@ class _SendPageState extends State<SendPage>{
     );
   }
 
-  Widget _buildOctetField(int octetNumber, {textInputAction=TextInputAction.next, Key? key})
-  {
+  Widget _buildOctetField(int octetNumber,
+      {textInputAction = TextInputAction.next, Key? key}) {
     return Expanded(
       child: SizedBox(
         height: 30,
-
         child: ThemeInputField(
           key: key,
           keyboardType: TextInputType.number,
-          onChanged: (String value)
-          {
+          onChanged: (String value) {
             provider.setOctet(octetNumber, int.parse(value));
           },
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -157,15 +162,13 @@ class _SendPageState extends State<SendPage>{
     );
   }
 
-  Widget _buildFileSelector()
-  {
+  Widget _buildFileSelector() {
     return Row(
       children: [
         Expanded(
           child: Container(
             padding: const EdgeInsets.only(left: 10),
-            decoration: const BoxDecoration(
-            ),
+            decoration: const BoxDecoration(),
             child: Row(
               children: [
                 const Padding(
@@ -207,3 +210,11 @@ class _SendPageState extends State<SendPage>{
   }
 }
 
+class _SendableList extends StatelessWidget {
+  const _SendableList();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
