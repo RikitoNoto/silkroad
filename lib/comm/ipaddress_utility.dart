@@ -39,7 +39,8 @@ mixin IpaddressFetcher {
 
   Stream<Host> fetchLocalDevices(String ipAddress) {
     final scanner = LanScanner();
-    return scanner.icmpScan(getNetworkAddress(ipAddress, 24));
+    return scanner
+        .icmpScan(getNetworkAddress(ipAddress, 24)); // subnet is fixed at 24
   }
 
   String getNetworkAddress(String ipAddress, int subnet) {
