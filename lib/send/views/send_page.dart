@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:camel/camel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:platform/platform.dart';
@@ -7,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
+import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/utils/views/wait_progress_dialog.dart';
@@ -74,6 +76,13 @@ class _SendPageState extends State<SendPage> {
       _buildIpField(context), // ip address input field
       _buildFileSelector(), // file selector
       const _SendableList(),
+      ElevatedButton(
+        onPressed: () async {
+          print(await SendRepositoryCamel()
+              .sendable("192.168.12", 32099, "192.168.12.155:32099"));
+        },
+        child: Text("send"),
+      ),
     ]);
   }
 

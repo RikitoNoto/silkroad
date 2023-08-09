@@ -62,25 +62,39 @@ class SendRepositoryCamel implements SendRepository {
     _listenSendableResponse(
         sendableList, camelReceive, _createConnectionPoint(bindPoint));
 
+    final hosts = <Host>[];
     await for (final host in fetchLocalDevices(subnet)) {
+      print(host.internetAddress.address);
+      hosts.add(host);
+      if(host.internetAddress.address == "192.168.12.155"){
+        break;
+      }
+    }
+
+    for(final host in hosts){
+      if(host.internetAddress.address == "192.168.12.155") continue;
       final connectionPoint = SocketConnectionPoint(
           address: host.internetAddress.address, port: sendPort);
       Tcp tcpSend = Tcp();
       Camel<Socket, SocketConnectionPoint> camelSend = Camel(tcpSend);
-
-      await camelSend.send(
-        connectionPoint,
-        Message.fromBody(
-          body: "",
-          command: "Sendable",
-        ),
-      );
+      try{
+        await camelSend.send(
+          connectionPoint,
+          Message.fromBody(
+            body: "",
+            command: "Sendable",
+          ),
+        ).timeout(Duration(seconds: 1));
+      }
+      catch(e){
+        print(e);
+      }
 
       camelSend.close();
     }
 
     await Future.delayed(Duration(seconds: 3));
-
+    camelReceive.close();
     return sendableList;
   }
 
@@ -97,7 +111,8 @@ class SendRepositoryCamel implements SendRepository {
 
   Stream<Host> fetchLocalDevices(String subnet) {
     final scanner = LanScanner();
-    return scanner.icmpScan(subnet);
+    return scanner.icmpScan(subnet,
+      scanThreads: 20,);
   }
 
   SocketConnectionPoint _createConnectionPoint(String connectionPoint) {
