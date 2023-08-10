@@ -61,11 +61,14 @@ class SendRepositoryCamel implements SendRepository {
     Camel<Socket, SocketConnectionPoint> camelReceive = Camel(tcpReceive);
 
     final sendibleList = <SendibleDevice>[];
-
-    _listenSendibleResponse(
-        sendibleList, camelReceive, _createConnectionPoint(bindPoint));
+    final bind = _createConnectionPoint(bindPoint);
+    _listenSendibleResponse(sendibleList, camelReceive, bind);
 
     await for (final host in fetchLocalDevices(subnet)) {
+      if (host.internetAddress.address == bind.address) {
+        continue;
+      }
+
       Isolate.spawn(_sendSendibleCommand, [
         host.internetAddress.address,
         sendPort,
