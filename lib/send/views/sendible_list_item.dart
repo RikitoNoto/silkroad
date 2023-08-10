@@ -128,9 +128,9 @@ mixin _ListItemBuilderPc {
   }
 }
 
-abstract class SendableListItemBase extends StatelessWidget
+abstract class SendibleListItemBase extends StatelessWidget
     with _ListItemBuilderPc, _ListItemBuilderMobile {
-  const SendableListItemBase({super.key});
+  const SendibleListItemBase({super.key});
   static const double _iconSize = 30.0;
 
   /// icon size
@@ -324,10 +324,10 @@ abstract class SendableListItemBase extends StatelessWidget
 }
 
 ///
-/// Sendable list item for add.
+/// Sendible list item for add.
 ///
-class SendableListItem extends SendableListItemBase {
-  SendableListItem({
+class SendibleListItem extends SendibleListItemBase {
+  SendibleListItem({
     required this.platform,
     required this.iconData,
     required this.name,
@@ -384,10 +384,10 @@ class SendableListItem extends SendableListItemBase {
 }
 
 ///
-/// Sendable list item for remove.
+/// Sendible list item for remove.
 ///
-class SendableListItemRemoving extends SendableListItemBase {
-  const SendableListItemRemoving({
+class SendibleListItemRemoving extends SendibleListItemBase {
+  const SendibleListItemRemoving({
     required this.platform,
     required this.address,
     required this.sender,

@@ -3,12 +3,12 @@ import 'dart:isolate';
 import 'package:camel/camel.dart';
 import 'dart:io';
 import 'package:lan_scanner/lan_scanner.dart';
-import 'package:silkroad/send/entities/sendable_device.dart';
+import 'package:silkroad/send/entities/sendible_device.dart';
 
 abstract class SendRepository {
   // Future<String?> connect(String connectionPoint);  // return connection's identifier
   Future send(String connectionPoint, Map<String, String> data);
-  Future<List<SendableDevice>> sendable(
+  Future<List<SendibleDevice>> sendible(
       String subnet, int sendPort, String bindPoint);
   void close();
 }
@@ -51,22 +51,22 @@ class SendRepositoryCamel implements SendRepository {
   }
 
   /// 1. Send Ping to all of same network device.
-  /// 2. Send Sendable command to existed response device.
+  /// 2. Send Sendible command to existed response device.
   /// 3. return existed response devices.
   @override
-  Future<List<SendableDevice>> sendable(
+  Future<List<SendibleDevice>> sendible(
       String subnet, int sendPort, String bindPoint,
       {timeout = const Duration(seconds: 3)}) async {
     Tcp tcpReceive = Tcp();
     Camel<Socket, SocketConnectionPoint> camelReceive = Camel(tcpReceive);
 
-    final sendableList = <SendableDevice>[];
+    final sendibleList = <SendibleDevice>[];
 
-    _listenSendableResponse(
-        sendableList, camelReceive, _createConnectionPoint(bindPoint));
+    _listenSendibleResponse(
+        sendibleList, camelReceive, _createConnectionPoint(bindPoint));
 
     await for (final host in fetchLocalDevices(subnet)) {
-      Isolate.spawn(_sendSendableCommand, [
+      Isolate.spawn(_sendSendibleCommand, [
         host.internetAddress.address,
         sendPort,
         const Duration(seconds: 1),
@@ -75,13 +75,13 @@ class SendRepositoryCamel implements SendRepository {
 
     await Future.delayed(timeout);
     camelReceive.close();
-    return sendableList;
+    return sendibleList;
   }
 
-  /// Send a Sendable command for receives the response.
+  /// Send a Sendible command for receives the response.
   /// This method should be called as other process.
   /// because it kill itself finally.
-  void _sendSendableCommand(List<Object> args) async {
+  void _sendSendibleCommand(List<Object> args) async {
     final ipAddress = args[0] as String;
     final port = args[1] as int;
     final timeout = args[2] as Duration;
@@ -96,7 +96,7 @@ class SendRepositoryCamel implements SendRepository {
             connectionPoint,
             Message.fromBody(
               body: "",
-              command: "Sendable",
+              command: "Sendible",
             ),
           )
           .timeout(timeout);
@@ -108,13 +108,13 @@ class SendRepositoryCamel implements SendRepository {
     Isolate.exit(); // kill the process itself.
   }
 
-  Future<void> _listenSendableResponse(
-      List<SendableDevice> responseList,
+  Future<void> _listenSendibleResponse(
+      List<SendibleDevice> responseList,
       Camel<Socket, SocketConnectionPoint> camel,
       SocketConnectionPoint connectionPoint) async {
     await for (final data in camel.listen(connectionPoint)) {
       responseList.add(
-        SendableDevice(ipAddress: data.connection.address.address),
+        SendibleDevice(ipAddress: data.connection.address.address),
       );
     }
   }

@@ -75,11 +75,11 @@ class _SendPageState extends State<SendPage> {
     return Column(children: [
       _buildIpField(context), // ip address input field
       _buildFileSelector(), // file selector
-      const _SendableList(),
+      const _SendibleList(),
       ElevatedButton(
         onPressed: () async {
           print(await SendRepositoryCamel()
-              .sendable("192.168.12", 32099, "192.168.12.4:32099"));
+              .sendible("192.168.12", 32099, "192.168.12.4:32099"));
         },
         child: Text("send"),
       ),
@@ -121,7 +121,7 @@ class _SendPageState extends State<SendPage> {
             ),
           ),
           Text(
-            '[${t.send.sendableAddress}]',
+            '[${t.send.sendibleAddress}]',
             textAlign: TextAlign.left,
           ),
           Container(
@@ -219,8 +219,8 @@ class _SendPageState extends State<SendPage> {
   }
 }
 
-class _SendableList extends StatelessWidget {
-  const _SendableList();
+class _SendibleList extends StatelessWidget {
+  const _SendibleList();
 
   @override
   Widget build(BuildContext context) {

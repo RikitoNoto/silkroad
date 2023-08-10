@@ -55,7 +55,7 @@ class ReceiveRepositoryCamel implements ReceiveRepository {
           }
           break;
 
-        case "Sendable":
+        case "Sendible":
           await receiver.send(
               SocketConnectionPoint(
                   address: data.connection.remoteAddress.address, port: port),

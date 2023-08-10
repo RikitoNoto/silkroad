@@ -11,7 +11,7 @@ import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/i18n/translations.g.dart';
-import 'package:silkroad/send/views/sendable_list_item.dart';
+import 'package:silkroad/send/views/sendible_list_item.dart';
 
 import '../../utils/models/animated_list_item_model.dart';
 
@@ -49,10 +49,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     _sender = builder();
     _listKey = listKey ?? GlobalKey<AnimatedListState>();
 
-    _sendableList = AnimatedListItemModel<String>(
+    _sendibleList = AnimatedListItemModel<String>(
       listKey: _listKey,
       removedItemBuilder: (address, index, context, animation) =>
-          SendableListItemRemoving(
+          SendibleListItemRemoving(
         platform: platform,
         index: index,
         animation: animation,
@@ -72,7 +72,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   late final SendRepository _sender;
 
   late final GlobalKey<AnimatedListState> _listKey;
-  late final AnimatedListItemModel<String> _sendableList;
+  late final AnimatedListItemModel<String> _sendibleList;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -128,5 +128,5 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     notifyListeners();
   }
 
-  Future<void> searchSendableDevices() async {}
+  Future<void> searchSendibleDevices() async {}
 }
