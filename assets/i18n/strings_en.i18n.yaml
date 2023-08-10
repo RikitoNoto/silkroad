@@ -1,20 +1,19 @@
-
 actions:
-  send    : 'Send'
-  receive : 'Receive'
-  option  : 'Option'
+  send: "Send"
+  receive: "Receive"
+  option: "Option"
 
 send:
-  receiverAddress : 'Receiver Ipaddress'
-  selectFile      : 'select file'
-  fileNone        : 'No select'
-  sendableAddress: 'Sendable Destination'
+  receiverAddress: "Receiver Ipaddress"
+  selectFile: "select file"
+  fileNone: "No select"
+  sendibleAddress: "Sendible Destination"
   sendResult:
-    success         : 'send complete'
-    connectionFail  : 'send failed. please check the devices are in same network.'
-    lostFile        : 'did not find the file.'
-    sendFail        : 'did not send the file to the connected device.'
+    success: "send complete"
+    connectionFail: "send failed. please check the devices are in same network."
+    lostFile: "did not find the file."
+    sendFail: "did not send the file to the connected device."
 
 params:
-  name      : 'Your name'
-  port      : 'Port number'
+  name: "Your name"
+  port: "Port number"

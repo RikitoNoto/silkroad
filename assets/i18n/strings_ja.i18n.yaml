@@ -1,21 +1,19 @@
-
 actions:
-  send    : '送信'
-  receive : '受信'
-  option  : '設定'
+  send: "送信"
+  receive: "受信"
+  option: "設定"
 
 send:
-  receiverAddress : '受信者のIPアドレス'
-  selectFile      : 'ファイルを選択'
-  fileNone        : 'ファイル無し'
-  sendableAddress: '送信可能アドレス'
+  receiverAddress: "受信者のIPアドレス"
+  selectFile: "ファイルを選択"
+  fileNone: "ファイル無し"
+  sendibleAddress: "送信可能アドレス"
   sendResult:
-    success         : '送信完了しました'
-    connectionFail  : '送信失敗しました。同じネットワーク内にいることを確認してください。'
-    lostFile        : 'ファイルがありません。'
-    sendFail        : '接続先のデバイスに送信できません。'
+    success: "送信完了しました"
+    connectionFail: "送信失敗しました。同じネットワーク内にいることを確認してください。"
+    lostFile: "ファイルがありません。"
+    sendFail: "接続先のデバイスに送信できません。"
 
 params:
-  name      : '名前'
-  port      : 'ポート番号'
-
+  name: "名前"
+  port: "ポート番号"
