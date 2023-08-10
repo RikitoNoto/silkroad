@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:camel/camel.dart';
 import 'dart:io';
 import 'package:lan_scanner/lan_scanner.dart';
@@ -53,7 +55,8 @@ class SendRepositoryCamel implements SendRepository {
   /// 3. return existed response devices.
   @override
   Future<List<SendableDevice>> sendable(
-      String subnet, int sendPort, String bindPoint) async {
+      String subnet, int sendPort, String bindPoint,
+      {timeout = const Duration(seconds: 3)}) async {
     Tcp tcpReceive = Tcp();
     Camel<Socket, SocketConnectionPoint> camelReceive = Camel(tcpReceive);
 
@@ -62,40 +65,47 @@ class SendRepositoryCamel implements SendRepository {
     _listenSendableResponse(
         sendableList, camelReceive, _createConnectionPoint(bindPoint));
 
-    final hosts = <Host>[];
     await for (final host in fetchLocalDevices(subnet)) {
-      print(host.internetAddress.address);
-      hosts.add(host);
-      if(host.internetAddress.address == "192.168.12.155"){
-        break;
-      }
+      Isolate.spawn(_sendSendableCommand, [
+        host.internetAddress.address,
+        sendPort,
+        const Duration(seconds: 1),
+      ]);
     }
 
-    for(final host in hosts){
-      if(host.internetAddress.address == "192.168.12.155") continue;
-      final connectionPoint = SocketConnectionPoint(
-          address: host.internetAddress.address, port: sendPort);
-      Tcp tcpSend = Tcp();
-      Camel<Socket, SocketConnectionPoint> camelSend = Camel(tcpSend);
-      try{
-        await camelSend.send(
-          connectionPoint,
-          Message.fromBody(
-            body: "",
-            command: "Sendable",
-          ),
-        ).timeout(Duration(seconds: 1));
-      }
-      catch(e){
-        print(e);
-      }
-
-      camelSend.close();
-    }
-
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(timeout);
     camelReceive.close();
     return sendableList;
+  }
+
+  /// Send a Sendable command for receives the response.
+  /// This method should be called as other process.
+  /// because it kill itself finally.
+  void _sendSendableCommand(List<Object> args) async {
+    final ipAddress = args[0] as String;
+    final port = args[1] as int;
+    final timeout = args[2] as Duration;
+
+    final connectionPoint =
+        SocketConnectionPoint(address: ipAddress, port: port);
+    Tcp tcpSend = Tcp();
+    Camel<Socket, SocketConnectionPoint> camelSend = Camel(tcpSend);
+    try {
+      await camelSend
+          .send(
+            connectionPoint,
+            Message.fromBody(
+              body: "",
+              command: "Sendable",
+            ),
+          )
+          .timeout(timeout);
+    } catch (e) {
+      // time out or connection failed
+    }
+
+    camelSend.close();
+    Isolate.exit(); // kill the process itself.
   }
 
   Future<void> _listenSendableResponse(
@@ -111,8 +121,10 @@ class SendRepositoryCamel implements SendRepository {
 
   Stream<Host> fetchLocalDevices(String subnet) {
     final scanner = LanScanner();
-    return scanner.icmpScan(subnet,
-      scanThreads: 20,);
+    return scanner.icmpScan(
+      subnet,
+      scanThreads: 20,
+    );
   }
 
   SocketConnectionPoint _createConnectionPoint(String connectionPoint) {
