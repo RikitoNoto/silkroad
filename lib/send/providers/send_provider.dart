@@ -116,8 +116,9 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<void> searchDevices() async {
-    final port =
-        int.parse(OptionManager().get(Params.port.toString()).toString());
+    final port = int.parse(
+        OptionManager().get(Params.port.toString())?.toString() ??
+            kDefaultPort.toString());
     final networkAddresses = <String>[];
     for (String address in _myAddresses) {
       final networkAddress =
