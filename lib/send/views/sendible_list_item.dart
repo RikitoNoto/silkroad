@@ -178,6 +178,7 @@ abstract class SendibleListItemBase extends StatelessWidget
     required Platform platform,
     required index,
     required sender,
+    required String ipAddress,
     void Function(BuildContext context)? onDelete,
     void Function(BuildContext context)? onSave,
   }) {
@@ -205,6 +206,7 @@ abstract class SendibleListItemBase extends StatelessWidget
           child: _buildCardItem(
             context,
             sender: sender,
+            ipAddress: ipAddress,
           ),
         );
 
@@ -213,7 +215,11 @@ abstract class SendibleListItemBase extends StatelessWidget
           context,
           onSave: onSave,
           onDelete: onDelete,
-          child: _buildCardItem(context, sender: sender),
+          child: _buildCardItem(
+            context,
+            sender: sender,
+            ipAddress: ipAddress,
+          ),
         );
     }
   }
@@ -221,6 +227,7 @@ abstract class SendibleListItemBase extends StatelessWidget
   Widget _buildCardItem(
     BuildContext context, {
     required String sender,
+    required String ipAddress,
   }) {
     return Container(
       // decoration: _decorationItem,
@@ -231,6 +238,7 @@ abstract class SendibleListItemBase extends StatelessWidget
             Expanded(
               child: Row(
                 children: [
+                  Text(ipAddress),
                   // _buildIcon(iconData), // icon
                   // _buildFileName(name), // file name
                 ],
@@ -329,10 +337,8 @@ abstract class SendibleListItemBase extends StatelessWidget
 class SendibleListItem extends SendibleListItemBase {
   SendibleListItem({
     required this.platform,
-    required this.iconData,
-    required this.name,
-    required this.size,
     required this.sender,
+    required this.ipAddress,
     required this.animation,
     required this.index,
     this.onSave,
@@ -341,16 +347,12 @@ class SendibleListItem extends SendibleListItemBase {
   });
 
   final int index;
-  final IconData iconData;
-
-  /// icon
-  final String name;
-
-  /// file name
-  final String size;
 
   /// file size
   final String sender;
+
+  /// ip address
+  final String ipAddress;
 
   /// sender name
   final Animation<double> animation;
@@ -375,6 +377,7 @@ class SendibleListItem extends SendibleListItemBase {
         context,
         platform: platform,
         index: index,
+        ipAddress: ipAddress,
         sender: sender,
         onSave: onSave,
         onDelete: onDelete,
@@ -389,7 +392,7 @@ class SendibleListItem extends SendibleListItemBase {
 class SendibleListItemRemoving extends SendibleListItemBase {
   const SendibleListItemRemoving({
     required this.platform,
-    required this.address,
+    required this.ipAddress,
     required this.sender,
     required this.animation,
     required this.index,
@@ -401,7 +404,7 @@ class SendibleListItemRemoving extends SendibleListItemBase {
   /// file size
   final String sender;
 
-  final String address;
+  final String ipAddress;
 
   /// sender name
   final Animation<double> animation;
@@ -414,7 +417,10 @@ class SendibleListItemRemoving extends SendibleListItemBase {
     return SizeTransition(
       sizeFactor: animation,
       child: _buildListItem(context,
-          platform: platform, index: index, sender: sender),
+          ipAddress: ipAddress,
+          platform: platform,
+          index: index,
+          sender: sender),
     );
   }
 }

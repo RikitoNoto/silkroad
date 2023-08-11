@@ -47,7 +47,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     required this.platform,
     required AnimatedListItemModel<SendibleDevice> sendibleList,
   }) : _sendibleList = sendibleList {
-    fetchIpAddress();
+    fetchAndSearchAddresses();
     _sender = builder();
   }
 
@@ -72,6 +72,11 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   int get addressRangeCount => _addressRange.length;
   List<String> get addressRange => _addressRange;
   final List<String> _myAddresses = [];
+
+  Future fetchAndSearchAddresses() async {
+    await fetchIpAddress();
+    await searchDevices();
+  }
 
   Future fetchIpAddress() async {
     _addressRange.clear();
@@ -111,7 +116,8 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<void> searchDevices() async {
-    final port = OptionManager().get(Params.port.toString()) as int;
+    final port =
+        int.parse(OptionManager().get(Params.port.toString()).toString());
     final networkAddresses = <String>[];
     for (String address in _myAddresses) {
       final networkAddress =
