@@ -45,12 +45,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   SendProvider({
     this.builder = kSendRepositoryDefault,
     required this.platform,
-    GlobalKey<AnimatedListState>? listKey,
     required AnimatedListItemModel<SendibleDevice> sendibleList,
   }) : _sendibleList = sendibleList {
     fetchIpAddress();
     _sender = builder();
-    _listKey = listKey ?? GlobalKey<AnimatedListState>();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -62,7 +60,6 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final Platform platform;
   late final SendRepository _sender;
 
-  late final GlobalKey<AnimatedListState> _listKey;
   final AnimatedListItemModel<SendibleDevice> _sendibleList;
 
   String get filePath => _file?.path ?? '';

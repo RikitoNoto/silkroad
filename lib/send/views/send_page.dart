@@ -9,12 +9,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
+import 'package:silkroad/send/views/sendible_list_item.dart';
+import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/utils/views/wait_progress_dialog.dart';
 
+import '../entities/sendible_device.dart';
+
 class SendPage extends StatefulWidget {
-  const SendPage({super.key});
+  const SendPage({required this.platform, super.key});
+
+  final Platform platform;
 
   @override
   State<SendPage> createState() => _SendPageState();
@@ -30,11 +36,26 @@ class _SendPageState extends State<SendPage> {
     fontSize: 24,
   );
 
+  final _listKey = GlobalKey<AnimatedListState>();
+  late final AnimatedListItemModel<SendibleDevice> _sendibleDevices;
+
   @override
   void initState() {
     super.initState();
+    _sendibleDevices = AnimatedListItemModel(
+        listKey: _listKey, removedItemBuilder: _removeItem);
+    provider = SendProvider(
+        platform: const LocalPlatform(), sendibleList: _sendibleDevices);
+  }
 
-    provider = SendProvider(platform: const LocalPlatform());
+  Widget _removeItem(SendibleDevice item, int index, BuildContext context,
+      Animation<double> animation) {
+    return SendibleListItemRemoving(
+        platform: widget.platform,
+        index: index,
+        address: item.ipAddress,
+        sender: "",
+        animation: animation);
   }
 
   @override
