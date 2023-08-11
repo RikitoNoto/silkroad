@@ -112,10 +112,17 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   Future<void> searchDevices() async {
     final port = OptionManager().get(Params.port.toString()) as int;
+    final networkAddresses = <String>[];
     for (String address in _myAddresses) {
-      // subnet length is fixed 24.
-      final list = await _sender.sendible(
-          getNetworkAddress(address, 24), port, "$address:$port");
+      final networkAddress =
+          getNetworkAddress(address, 24); // subnet length is fixed 24.
+      if (networkAddresses.contains(networkAddress)) {
+        continue;
+      }
+
+      networkAddresses.add(networkAddress);
+      final list =
+          await _sender.sendible(networkAddress, port, "$address:$port");
       for (final device in list) {
         _sendibleList.append(device);
       }

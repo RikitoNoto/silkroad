@@ -413,5 +413,42 @@ void sendibleTest() {
       await provider.provider.searchDevices();
       verify(repoMock.sendible(any, any, any));
     });
+
+    test('should call sendible method twice if it has two addresses', () async {
+      final subnetList = ["192.168.0", "192.168.1"];
+      final portList = [32099, 32099];
+      final connectionPointList = ["192.168.0.1:32099", "192.168.1.1:32099"];
+      final repoMock = createRepositoryMock(
+          ret: [],
+          spyFunc: (invocation) {
+            final networkAddress = invocation.positionalArguments[0] as String;
+            final port = invocation.positionalArguments[1] as int;
+            final connectionPoint = invocation.positionalArguments[2] as String;
+
+            expect(networkAddress, subnetList[0]);
+            expect(port, portList[0]);
+            expect(connectionPoint, connectionPointList[0]);
+
+            subnetList.removeAt(0);
+            portList.removeAt(0);
+            connectionPointList.removeAt(0);
+          });
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      expect(verify(repoMock.sendible(any, any, any)).callCount, 2);
+    });
+
+    test('should not call same network addresses', () async {
+      final repoMock = createRepositoryMock(
+        ret: [],
+      );
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.0.2"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      expect(verify(repoMock.sendible(any, any, any)).callCount, 1);
+    });
   });
 }
