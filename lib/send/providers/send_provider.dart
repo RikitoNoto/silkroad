@@ -71,11 +71,14 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   int get addressRangeCount => _addressRange.length;
   List<String> get addressRange => _addressRange;
+  final List<String> _myAddresses = [];
 
   Future fetchIpAddress() async {
     _addressRange.clear();
+    _myAddresses.clear();
     Set<String> addressRangeSet = <String>{};
     for (String address in await fetchIpv4Addresses(platform)) {
+      _myAddresses.add(address);
       List<String> range = IpAddressUtility.getIpAddressRange(address);
       addressRangeSet.add('${range[0]}~${range[1]}');
     }
@@ -108,9 +111,14 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<void> searchDevices() async {
-    final list = await _sender.sendible("", 0, "");
-    for (final device in list) {
-      _sendibleList.append(device);
+    final port = OptionManager().get(Params.port.toString()) as int;
+    for (String address in _myAddresses) {
+      // subnet length is fixed 24.
+      final list = await _sender.sendible(
+          getNetworkAddress(address, 24), port, "$address:$port");
+      for (final device in list) {
+        _sendibleList.append(device);
+      }
     }
   }
 
