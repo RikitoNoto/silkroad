@@ -45,12 +45,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   SendProvider({
     this.builder = kSendRepositoryDefault,
     required this.platform,
-    GlobalKey<AnimatedListState>? listKey,
     required AnimatedListItemModel<SendibleDevice> sendibleList,
   }) : _sendibleList = sendibleList {
-    fetchIpAddress();
+    fetchAndSearchAddresses();
     _sender = builder();
-    _listKey = listKey ?? GlobalKey<AnimatedListState>();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -62,7 +60,6 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final Platform platform;
   late final SendRepository _sender;
 
-  late final GlobalKey<AnimatedListState> _listKey;
   final AnimatedListItemModel<SendibleDevice> _sendibleList;
 
   String get filePath => _file?.path ?? '';
@@ -74,11 +71,19 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   int get addressRangeCount => _addressRange.length;
   List<String> get addressRange => _addressRange;
+  final List<String> _myAddresses = [];
+
+  Future fetchAndSearchAddresses() async {
+    await fetchIpAddress();
+    await searchDevices();
+  }
 
   Future fetchIpAddress() async {
     _addressRange.clear();
+    _myAddresses.clear();
     Set<String> addressRangeSet = <String>{};
     for (String address in await fetchIpv4Addresses(platform)) {
+      _myAddresses.add(address);
       List<String> range = IpAddressUtility.getIpAddressRange(address);
       addressRangeSet.add('${range[0]}~${range[1]}');
     }
@@ -111,9 +116,23 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<void> searchDevices() async {
-    final list = await _sender.sendible("", 0, "");
-    for (final device in list) {
-      _sendibleList.append(device);
+    final port = int.parse(
+        OptionManager().get(Params.port.toString())?.toString() ??
+            kDefaultPort.toString());
+    final networkAddresses = <String>[];
+    for (String address in _myAddresses) {
+      final networkAddress =
+          getNetworkAddress(address, 24); // subnet length is fixed 24.
+      if (networkAddresses.contains(networkAddress)) {
+        continue;
+      }
+
+      networkAddresses.add(networkAddress);
+      final list =
+          await _sender.sendible(networkAddress, port, "$address:$port");
+      for (final device in list) {
+        _sendibleList.append(device);
+      }
     }
   }
 

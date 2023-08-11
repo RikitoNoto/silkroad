@@ -13,7 +13,7 @@ mixin _ListItemBuilderMobile {
     required Widget child,
     EdgeInsetsGeometry? padding,
     void Function(BuildContext context)? onDelete,
-    void Function(BuildContext context)? onSave,
+    void Function(BuildContext context)? onSelect,
     Color? backgroundColor,
   }) {
     return Container(
@@ -23,7 +23,7 @@ mixin _ListItemBuilderMobile {
       padding: padding ?? EdgeInsets.zero,
       child: Slidable(
         startActionPane: _buildStartAction(onDelete),
-        endActionPane: _buildEndAction(onSave),
+        endActionPane: _buildEndAction(onSelect),
         child:
             child, //_buildCardItem(name: name, size: size, sender: sender, iconData: iconData),
       ),
@@ -49,18 +49,19 @@ mixin _ListItemBuilderMobile {
   }
 
   static ActionPane _buildEndAction(
-      void Function(BuildContext context)? saveAction) {
+    void Function(BuildContext context)? action,
+  ) {
     return ActionPane(
       motion: const ScrollMotion(),
       children: [
         SlidableAction(
           // An action can be bigger than the others.
           flex: 2,
-          onPressed: saveAction,
+          onPressed: action,
           backgroundColor: Colors.green,
           foregroundColor: Colors.white,
-          icon: Icons.save,
-          label: 'Save',
+          icon: Icons.check,
+          label: 'Select',
         ),
       ],
     );
@@ -71,51 +72,14 @@ mixin _ListItemBuilderPc {
   Widget buildListItemPc(
     BuildContext context, {
     required Widget child,
+    required String ipAddress,
     EdgeInsetsGeometry? padding,
     void Function(BuildContext context)? onDelete,
-    void Function(BuildContext context)? onSave,
+    void Function(BuildContext context)? onSelect,
   }) {
     return ElevatedButton(
       onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text("name"),
-              children: <Widget>[
-                SimpleDialogOption(
-                  onPressed: () {
-                    if (onSave != null) onSave(context);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    child: Row(children: <Widget>[
-                      Expanded(
-                          child: Text(
-                        'Save',
-                      )),
-                    ]),
-                  ),
-                ),
-                SimpleDialogOption(
-                  onPressed: () {
-                    if (onDelete != null) onDelete(context);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    child: Row(children: <Widget>[
-                      Expanded(
-                          child: Text(
-                        'Delete',
-                        style: TextStyle(color: Colors.red),
-                      )),
-                    ]),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+        onSelect?.call(context);
       },
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
@@ -178,19 +142,20 @@ abstract class SendibleListItemBase extends StatelessWidget
     required Platform platform,
     required index,
     required sender,
+    required String ipAddress,
     void Function(BuildContext context)? onDelete,
-    void Function(BuildContext context)? onSave,
+    void Function(BuildContext context)? onSelect,
   }) {
     // is light mode.
     if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
       _itemForegroundColor =
-          Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+          Theme.of(context).textTheme.bodyLarge?.color ?? _itemForegroundColor;
       _itemBackgroundColor = _itemLightModeColor;
     }
     // is dark mode.
     else {
       _itemForegroundColor =
-          Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+          Theme.of(context).textTheme.bodyLarge?.color ?? _itemForegroundColor;
       _itemBackgroundColor = _itemDarkModeColor;
     }
 
@@ -199,28 +164,39 @@ abstract class SendibleListItemBase extends StatelessWidget
       case Platform.android:
         return buildListItemMobile(
           context,
-          onSave: onSave,
+          onSelect: onSelect,
           onDelete: onDelete,
           backgroundColor: _itemBackgroundColor,
           child: _buildCardItem(
             context,
+            platform,
             sender: sender,
+            ipAddress: ipAddress,
           ),
         );
 
       default:
         return buildListItemPc(
           context,
-          onSave: onSave,
+          onSelect: onSelect,
           onDelete: onDelete,
-          child: _buildCardItem(context, sender: sender),
+          ipAddress: ipAddress,
+          child: _buildCardItem(
+            context,
+            platform,
+            sender: sender,
+            ipAddress: ipAddress,
+          ),
         );
     }
   }
 
   Widget _buildCardItem(
-    BuildContext context, {
+    BuildContext context,
+    Platform platform, {
     required String sender,
+    required String ipAddress,
+    void Function(BuildContext context)? onDelete,
   }) {
     return Container(
       // decoration: _decorationItem,
@@ -231,8 +207,7 @@ abstract class SendibleListItemBase extends StatelessWidget
             Expanded(
               child: Row(
                 children: [
-                  // _buildIcon(iconData), // icon
-                  // _buildFileName(name), // file name
+                  _buildIpAddress(ipAddress),
                 ],
               ),
             ),
@@ -242,64 +217,32 @@ abstract class SendibleListItemBase extends StatelessWidget
                 padding: const EdgeInsets.only(right: 8),
                 child: Column(
                   children: <Widget>[
-                    // _buildFileSize(size), // file size
                     _buildSender(sender), // sender
                   ],
                 ),
               ),
             ),
+            if(platform.operatingSystem != Platform.android && platform.operatingSystem != Platform.iOS)
+              IconButton(
+                onPressed: () => onDelete?.call(context),
+                icon: const Icon(Icons.delete),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildIcon(IconData? iconData) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-      child: Container(
-        padding: const EdgeInsets.all(5.0),
-        decoration: const BoxDecoration(
-          // borderRadius: BorderRadius.circular(100),
-          shape: BoxShape.circle,
-          color: AppTheme.appIconColor2,
-        ),
-        child: Icon(
-          iconData,
-          color: Colors.white,
-          size: _iconSize,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFileName(String name) {
+  Widget _buildIpAddress(String ipAddress) {
     return Flexible(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Text(
-          name,
+          ipAddress,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: _fileNameTextStyle,
           textAlign: TextAlign.left,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFileSize(String size) {
-    return Flexible(
-      flex: 5,
-      child: Container(
-        padding: const EdgeInsets.only(bottom: 2),
-        alignment: Alignment.bottomRight,
-        child: Text(
-          size.toString(),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.right,
-          style: _sizeTextStyle,
         ),
       ),
     );
@@ -329,34 +272,28 @@ abstract class SendibleListItemBase extends StatelessWidget
 class SendibleListItem extends SendibleListItemBase {
   SendibleListItem({
     required this.platform,
-    required this.iconData,
-    required this.name,
-    required this.size,
     required this.sender,
+    required this.ipAddress,
     required this.animation,
     required this.index,
-    this.onSave,
+    this.onSelect,
     this.onDelete,
     super.key,
   });
 
   final int index;
-  final IconData iconData;
-
-  /// icon
-  final String name;
-
-  /// file name
-  final String size;
 
   /// file size
   final String sender;
+
+  /// ip address
+  final String ipAddress;
 
   /// sender name
   final Animation<double> animation;
 
   /// size animation
-  final void Function(BuildContext context)? onSave;
+  final void Function(BuildContext context)? onSelect;
   final void Function(BuildContext context)? onDelete;
   final Platform platform;
 
@@ -375,8 +312,9 @@ class SendibleListItem extends SendibleListItemBase {
         context,
         platform: platform,
         index: index,
+        ipAddress: ipAddress,
         sender: sender,
-        onSave: onSave,
+        onSelect: onSelect,
         onDelete: onDelete,
       ),
     );
@@ -389,7 +327,7 @@ class SendibleListItem extends SendibleListItemBase {
 class SendibleListItemRemoving extends SendibleListItemBase {
   const SendibleListItemRemoving({
     required this.platform,
-    required this.address,
+    required this.ipAddress,
     required this.sender,
     required this.animation,
     required this.index,
@@ -401,7 +339,7 @@ class SendibleListItemRemoving extends SendibleListItemBase {
   /// file size
   final String sender;
 
-  final String address;
+  final String ipAddress;
 
   /// sender name
   final Animation<double> animation;
@@ -414,7 +352,10 @@ class SendibleListItemRemoving extends SendibleListItemBase {
     return SizeTransition(
       sizeFactor: animation,
       child: _buildListItem(context,
-          platform: platform, index: index, sender: sender),
+          ipAddress: ipAddress,
+          platform: platform,
+          index: index,
+          sender: sender),
     );
   }
 }

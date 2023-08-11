@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:camel/camel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:platform/platform.dart';
@@ -9,12 +10,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
+import 'package:silkroad/send/views/sendible_list_item.dart';
+import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/utils/views/wait_progress_dialog.dart';
 
+import '../entities/sendible_device.dart';
+
 class SendPage extends StatefulWidget {
-  const SendPage({super.key});
+  const SendPage({required this.platform, super.key});
+
+  final Platform platform;
 
   @override
   State<SendPage> createState() => _SendPageState();
@@ -30,11 +37,71 @@ class _SendPageState extends State<SendPage> {
     fontSize: 24,
   );
 
+  final _listKey = GlobalKey<AnimatedListState>();
+  late final AnimatedListItemModel<SendibleDevice> _sendibleDevices;
+
   @override
   void initState() {
     super.initState();
+    _sendibleDevices = AnimatedListItemModel(
+        listKey: _listKey, removedItemBuilder: _removeItem);
+    provider = SendProvider(
+        platform: const LocalPlatform(), sendibleList: _sendibleDevices);
+  }
 
-    provider = SendProvider(platform: const LocalPlatform());
+  List<Widget> _getDebugActions() {
+    List<Widget> debugActions = [];
+    if (kDebugMode) {
+      debugActions.add(IconButton(
+        icon: const Icon(Icons.add_circle),
+        onPressed: _debugInsertItem,
+      ));
+
+      debugActions.add(
+        IconButton(
+          icon: const Icon(Icons.remove_circle),
+          onPressed: _debugRemoveItem,
+        ),
+      );
+    }
+
+    return debugActions;
+  }
+
+  void _debugInsertItem() {
+    _sendibleDevices.append(SendibleDevice(ipAddress: "ipAddress"));
+  }
+
+  void _debugRemoveItem() {
+    if (_sendibleDevices.length > 0) {
+      setState(() {
+        _sendibleDevices.removeAt(0);
+      });
+    }
+  }
+
+  Widget _buildItem(
+    BuildContext context,
+    int index,
+    Animation<double> animation,
+  ) {
+    return SendibleListItem(
+      sender: "",
+      ipAddress: _sendibleDevices[index].ipAddress,
+      platform: widget.platform,
+      index: index,
+      animation: animation,
+    );
+  }
+
+  Widget _removeItem(SendibleDevice item, int index, BuildContext context,
+      Animation<double> animation) {
+    return SendibleListItemRemoving(
+        platform: widget.platform,
+        index: index,
+        ipAddress: item.ipAddress,
+        sender: "",
+        animation: animation);
   }
 
   @override
@@ -47,23 +114,24 @@ class _SendPageState extends State<SendPage> {
           appBar: AppBar(
             title: Text(t.actions.send),
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(
-                  Icons.send,
-                  color: AppTheme.appIconColor1,
-                ),
-                onPressed: () async {
-                  WaitProgressDialog.show(
-                      context); // show wait progress dialog.
-                  String message = (await provider.send()).message; // send.
-                  if (!mounted) return;
-                  WaitProgressDialog.close(
-                      context); // close wait progress dialog.
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(message)));
-                },
-              )
-            ],
+                  IconButton(
+                    icon: const Icon(
+                      Icons.send,
+                      color: AppTheme.appIconColor1,
+                    ),
+                    onPressed: () async {
+                      WaitProgressDialog.show(
+                          context); // show wait progress dialog.
+                      String message = (await provider.send()).message; // send.
+                      if (!mounted) return;
+                      WaitProgressDialog.close(
+                          context); // close wait progress dialog.
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(message)));
+                    },
+                  )
+                ] +
+                _getDebugActions(),
           ),
           body: _buildBody(context),
         ),
@@ -75,14 +143,7 @@ class _SendPageState extends State<SendPage> {
     return Column(children: [
       _buildIpField(context), // ip address input field
       _buildFileSelector(), // file selector
-      const _SendibleList(),
-      ElevatedButton(
-        onPressed: () async {
-          print(await SendRepositoryCamel()
-              .sendible("192.168.12", 32099, "192.168.12.4:32099"));
-        },
-        child: Text("send"),
-      ),
+      _SendibleList(listKey: _listKey, builder: _buildItem),
     ]);
   }
 
@@ -220,10 +281,21 @@ class _SendPageState extends State<SendPage> {
 }
 
 class _SendibleList extends StatelessWidget {
-  const _SendibleList();
+  const _SendibleList({
+    required this.builder,
+    required this.listKey,
+  });
+
+  final Key listKey;
+  final Widget Function(BuildContext, int, Animation<double>) builder;
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Flexible(
+      child: AnimatedList(
+        key: listKey,
+        itemBuilder: builder,
+      ),
+    );
   }
 }

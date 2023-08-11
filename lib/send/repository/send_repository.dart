@@ -117,7 +117,7 @@ class SendRepositoryCamel implements SendRepository {
       SocketConnectionPoint connectionPoint) async {
     await for (final data in camel.listen(connectionPoint)) {
       responseList.add(
-        SendibleDevice(ipAddress: data.connection.address.address),
+        SendibleDevice(ipAddress: data.connection.remoteAddress.address),
       );
     }
   }

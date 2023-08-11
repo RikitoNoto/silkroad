@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camel/camel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -16,6 +17,7 @@ import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/send/entities/sendible_device.dart';
 import 'package:silkroad/option/params.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
+import 'package:silkroad/comm/ipaddress_utility.dart';
 
 import 'send_providers_test.mocks.dart';
 
@@ -50,7 +52,9 @@ void main() {
     await setParam(Params.port.toString(), 32099);
     await setParam(Params.name.toString(), '');
   });
-  tearDown(() async {});
+  tearDown(() async {
+    IpaddressFetcher.ipAddresListSpy = null;
+  });
   ipTest();
   fileSetTest();
   sendMessageTest();
@@ -300,18 +304,24 @@ void sendibleTest() {
   group('sendible test', () {
     MockSendRepository createRepositoryMock({
       List<SendibleDevice> ret = const <SendibleDevice>[],
+      Function(Invocation invocation)? spyFunc,
     }) {
       MockSendRepository mockRepo = MockSendRepository();
 
-      when(mockRepo.sendible(any, any, any))
-          .thenAnswer((_) => Future.value(ret));
+      when(mockRepo.sendible(any, any, any)).thenAnswer((v) {
+        spyFunc?.call(v);
+        return Future.value(ret);
+      });
       return mockRepo;
     }
 
-    ({AnimatedListItemModel<SendibleDevice> list, SendProvider provider})
-        constructProviderWithList({
+    Future<
+        ({
+          AnimatedListItemModel<SendibleDevice> list,
+          SendProvider provider
+        })> constructProviderWithList({
       SendRepository? repo,
-    }) {
+    }) async {
       final list = AnimatedListItemModel<SendibleDevice>(
         listKey: GlobalKey<AnimatedListState>(),
         removedItemBuilder: (address, index, context, animation) => Text(""),
@@ -319,12 +329,14 @@ void sendibleTest() {
       final provider = constructProvider(
           repository: repo ?? createRepositoryMock(ret: []), list: list);
 
+      await Future.delayed(
+          const Duration(milliseconds: 10)); // wait to fetch ip addresses
       return (list: list, provider: provider);
     }
 
     test('should be 0 length of animated list if return no devices', () async {
       final repoMock = createRepositoryMock(ret: []);
-      final provider = constructProviderWithList(repo: repoMock);
+      final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
       expect(provider.list.length, 0);
     });
@@ -334,7 +346,8 @@ void sendibleTest() {
       final repoMock = createRepositoryMock(ret: [
         device,
       ]);
-      final provider = constructProviderWithList(repo: repoMock);
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
       expect(provider.list.length, 1);
       expect(provider.list[0], device);
@@ -349,12 +362,93 @@ void sendibleTest() {
         );
       }
       final repoMock = createRepositoryMock(ret: devices);
-      final provider = constructProviderWithList(repo: repoMock);
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
       expect(provider.list.length, 100);
       for (int i = 0; i < 100; i++) {
         expect(provider.list[i].ipAddress, "192.168.1.$i");
       }
+    });
+
+    test('should pass the ipaddress itself', () async {
+      final repoMock = createRepositoryMock(
+          ret: [],
+          spyFunc: (invocation) {
+            final connectionPoint = invocation.positionalArguments[2] as String;
+            expect(connectionPoint, "192.168.0.1:32099");
+          });
+
+      await setParam(Params.port.toString(), 32099);
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      verify(repoMock.sendible(any, any, any));
+    });
+
+    test('should pass the network address itself', () async {
+      final repoMock = createRepositoryMock(
+          ret: [],
+          spyFunc: (invocation) {
+            final networkAddress = invocation.positionalArguments[0] as String;
+            expect(networkAddress, "192.168.0");
+          });
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      verify(repoMock.sendible(any, any, any));
+    });
+
+    test('should pass the send port that is same of itself', () async {
+      final repoMock = createRepositoryMock(
+          ret: [],
+          spyFunc: (invocation) {
+            final port = invocation.positionalArguments[1] as int;
+            expect(port, 32099);
+          });
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      verify(repoMock.sendible(any, any, any));
+    });
+
+    test('should call sendible method twice if it has two addresses', () async {
+      final subnetList = ["192.168.0", "192.168.1"];
+      final portList = [32099, 32099];
+      final connectionPointList = ["192.168.0.1:32099", "192.168.1.1:32099"];
+      final repoMock = createRepositoryMock(
+          ret: [],
+          spyFunc: (invocation) {
+            final networkAddress = invocation.positionalArguments[0] as String;
+            final port = invocation.positionalArguments[1] as int;
+            final connectionPoint = invocation.positionalArguments[2] as String;
+
+            expect(networkAddress, subnetList[0]);
+            expect(port, portList[0]);
+            expect(connectionPoint, connectionPointList[0]);
+
+            subnetList.removeAt(0);
+            portList.removeAt(0);
+            connectionPointList.removeAt(0);
+          });
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      expect(verify(repoMock.sendible(any, any, any)).callCount, 2);
+    });
+
+    test('should not call same network addresses', () async {
+      final repoMock = createRepositoryMock(
+        ret: [],
+      );
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.0.2"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      await provider.provider.searchDevices();
+      expect(verify(repoMock.sendible(any, any, any)).callCount, 1);
     });
   });
 }

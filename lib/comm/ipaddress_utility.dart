@@ -1,13 +1,22 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:platform/platform.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
 export 'package:lan_scanner/lan_scanner.dart' show Host;
 
 mixin IpaddressFetcher {
+  @visibleForTesting
+  static List<String>? ipAddresListSpy;
+
   Future<List<String>> fetchIpv4Addresses(Platform platform) async {
+    // if this call is for test, return the spy.
+    if (kDebugMode && ipAddresListSpy != null) {
+      return ipAddresListSpy!;
+    }
+
     if (platform.isAndroid) {
       return _fetchIpv4AddressesForAndroid();
     } else {
