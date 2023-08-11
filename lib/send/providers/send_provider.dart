@@ -9,6 +9,7 @@ import 'package:platform/platform.dart';
 import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/send/entities/sendible_device.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/send/views/sendible_list_item.dart';
@@ -41,25 +42,15 @@ extension SendResultMessage on SendResult {
 }
 
 class SendProvider with ChangeNotifier, IpaddressFetcher {
-  SendProvider(
-      {this.builder = kSendRepositoryDefault,
-      required this.platform,
-      GlobalKey<AnimatedListState>? listKey}) {
+  SendProvider({
+    this.builder = kSendRepositoryDefault,
+    required this.platform,
+    GlobalKey<AnimatedListState>? listKey,
+    required AnimatedListItemModel<SendibleDevice> sendibleList,
+  }) : _sendibleList = sendibleList {
     fetchIpAddress();
     _sender = builder();
     _listKey = listKey ?? GlobalKey<AnimatedListState>();
-
-    _sendibleList = AnimatedListItemModel<String>(
-      listKey: _listKey,
-      removedItemBuilder: (address, index, context, animation) =>
-          SendibleListItemRemoving(
-        platform: platform,
-        index: index,
-        animation: animation,
-        address: "a",
-        sender: "sender",
-      ),
-    );
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -72,7 +63,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   late final SendRepository _sender;
 
   late final GlobalKey<AnimatedListState> _listKey;
-  late final AnimatedListItemModel<String> _sendibleList;
+  final AnimatedListItemModel<SendibleDevice> _sendibleList;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -119,6 +110,13 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     return SendResult.success;
   }
 
+  Future<void> searchDevices() async {
+    final list = await _sender.sendible("", 0, "");
+    for (final device in list) {
+      _sendibleList.append(device);
+    }
+  }
+
   void setOctet(int octet, int value) {
     _ip[octet] = value;
   }
@@ -127,6 +125,4 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     _file = file;
     notifyListeners();
   }
-
-  Future<void> searchSendibleDevices() async {}
 }
