@@ -51,6 +51,16 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     _sender = builder();
   }
 
+  @visibleForTesting
+  SendProvider.noSearch({
+    this.builder = kSendRepositoryDefault,
+    required this.platform,
+    required AnimatedListItemModel<SendibleDevice> sendibleList,
+  }) : _sendibleList = sendibleList {
+    fetchIpAddress();
+    _sender = builder();
+  }
+
   static final String fileNameNoSelect = t.send.fileNone;
 
   final List<int> _ip = <int>[0, 0, 0, 0];
@@ -61,6 +71,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   late final SendRepository _sender;
 
   final AnimatedListItemModel<SendibleDevice> _sendibleList;
+  double _searchProgress = 0.0;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -71,6 +82,8 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   int get addressRangeCount => _addressRange.length;
   List<String> get addressRange => _addressRange;
+  double get searchProgress => _searchProgress;
+
   final List<String> _myAddresses = [];
 
   Future fetchAndSearchAddresses() async {
@@ -120,20 +133,33 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
         OptionManager().get(Params.port.toString())?.toString() ??
             kDefaultPort.toString());
     final networkAddresses = <String>[];
-    for (String address in _myAddresses) {
+    for (int i = 0; i < _myAddresses.length; i++) {
       final networkAddress =
-          getNetworkAddress(address, 24); // subnet length is fixed 24.
+          getNetworkAddress(_myAddresses[i], 24); // subnet length is fixed 24.
       if (networkAddresses.contains(networkAddress)) {
         continue;
       }
 
       networkAddresses.add(networkAddress);
-      final list =
-          await _sender.sendible(networkAddress, port, "$address:$port");
+      final list = await _sender.sendible(
+        networkAddress,
+        port,
+        "${_myAddresses[i]}:$port",
+        progressCallback: (progress) =>
+            _sendibleProgressCallback(progress, i + 1, _myAddresses.length),
+      );
       for (final device in list) {
         _sendibleList.append(device);
       }
     }
+  }
+
+  void _sendibleProgressCallback(double progress, int count, int length) {
+    final progressPercount = count / length;
+
+    _searchProgress =
+        progress * progressPercount + progressPercount * (count - 1);
+    notifyListeners();
   }
 
   void setOctet(int octet, int value) {

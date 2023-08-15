@@ -69,7 +69,7 @@ class _SendPageState extends State<SendPage> {
   }
 
   void _debugInsertItem() {
-    _sendibleDevices.append(SendibleDevice(ipAddress: "ipAddress"));
+    _sendibleDevices.append(const SendibleDevice(ipAddress: "ipAddress"));
   }
 
   void _debugRemoveItem() {
@@ -143,7 +143,16 @@ class _SendPageState extends State<SendPage> {
     return Column(children: [
       _buildIpField(context), // ip address input field
       _buildFileSelector(), // file selector
-      _SendibleList(listKey: _listKey, builder: _buildItem),
+      Consumer<SendProvider>(
+        builder: (context, provider, child) => LinearProgressIndicator(
+          value: provider.searchProgress,
+          color: Colors.lightBlue,
+        ),
+      ),
+      _SendibleList(
+        listKey: _listKey,
+        builder: _buildItem,
+      ),
     ]);
   }
 

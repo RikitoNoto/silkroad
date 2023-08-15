@@ -141,7 +141,7 @@ SendProvider constructProvider({
   File? file,
   AnimatedListItemModel<SendibleDevice>? list,
 }) {
-  SendProvider provider = SendProvider(
+  SendProvider provider = SendProvider.noSearch(
       platform: platform ?? const LocalPlatform(),
       builder: () {
         return repository ?? MockSendRepository();
@@ -308,7 +308,9 @@ void sendibleTest() {
     }) {
       MockSendRepository mockRepo = MockSendRepository();
 
-      when(mockRepo.sendible(any, any, any)).thenAnswer((v) {
+      when(mockRepo.sendible(any, any, any,
+              progressCallback: anyNamed("progressCallback")))
+          .thenAnswer((v) {
         spyFunc?.call(v);
         return Future.value(ret);
       });
@@ -383,7 +385,8 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any));
+      verify(repoMock.sendible(any, any, any,
+          progressCallback: anyNamed("progressCallback")));
     });
 
     test('should pass the network address itself', () async {
@@ -397,7 +400,8 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any));
+      verify(repoMock.sendible(any, any, any,
+          progressCallback: anyNamed("progressCallback")));
     });
 
     test('should pass the send port that is same of itself', () async {
@@ -411,7 +415,8 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any));
+      verify(repoMock.sendible(any, any, any,
+          progressCallback: anyNamed("progressCallback")));
     });
 
     test('should call sendible method twice if it has two addresses', () async {
@@ -437,7 +442,11 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      expect(verify(repoMock.sendible(any, any, any)).callCount, 2);
+      expect(
+          verify(repoMock.sendible(any, any, any,
+                  progressCallback: anyNamed("progressCallback")))
+              .callCount,
+          2);
     });
 
     test('should not call same network addresses', () async {
@@ -448,7 +457,64 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.0.2"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      expect(verify(repoMock.sendible(any, any, any)).callCount, 1);
+      expect(
+          verify(repoMock.sendible(any, any, any,
+                  progressCallback: anyNamed("progressCallback")))
+              .callCount,
+          1);
+    });
+
+    test('should get progress when did not call callback', () async {
+      void Function(double)? callback;
+      final repoMock = createRepositoryMock(
+        ret: [],
+        spyFunc: (invocation) {
+          callback = invocation.namedArguments[const Symbol("progressCallback")]
+              as void Function(double)?;
+        },
+      );
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      provider.provider.searchDevices();
+
+      expect(provider.provider.searchProgress, 0.0);
+    });
+
+    test('should get progress 0.5 when a called callback return 0.5', () async {
+      void Function(double)? callback;
+      final repoMock = createRepositoryMock(
+        ret: [],
+        spyFunc: (invocation) {
+          callback = invocation.namedArguments[const Symbol("progressCallback")]
+              as void Function(double)?;
+        },
+      );
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      provider.provider.searchDevices();
+      callback?.call(0.5);
+
+      expect(provider.provider.searchProgress, 0.5);
+    });
+
+    test('should get progress 0.5 if a callback will call twice', () async {
+      void Function(double)? callback;
+      final repoMock = createRepositoryMock(
+        ret: [],
+        spyFunc: (invocation) {
+          callback = invocation.namedArguments[const Symbol("progressCallback")]
+              as void Function(double)?;
+        },
+      );
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      provider.provider.searchDevices();
+      callback?.call(1.0);
+
+      expect(provider.provider.searchProgress, 0.5);
     });
   });
 }
