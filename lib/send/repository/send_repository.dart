@@ -9,7 +9,12 @@ abstract class SendRepository {
   // Future<String?> connect(String connectionPoint);  // return connection's identifier
   Future send(String connectionPoint, Map<String, String> data);
   Future<List<SendibleDevice>> sendible(
-      String subnet, int sendPort, String bindPoint);
+    String subnet,
+    int sendPort,
+    String bindPoint, {
+    timeout = const Duration(seconds: 3),
+    void Function(double)? progressCallback,
+  });
   void close();
 }
 
@@ -55,8 +60,12 @@ class SendRepositoryCamel implements SendRepository {
   /// 3. return existed response devices.
   @override
   Future<List<SendibleDevice>> sendible(
-      String subnet, int sendPort, String bindPoint,
-      {timeout = const Duration(seconds: 3)}) async {
+    String subnet,
+    int sendPort,
+    String bindPoint, {
+    timeout = const Duration(seconds: 3),
+    void Function(double)? progressCallback,
+  }) async {
     Tcp tcpReceive = Tcp();
     Camel<Socket, SocketConnectionPoint> camelReceive = Camel(tcpReceive);
 
@@ -64,7 +73,10 @@ class SendRepositoryCamel implements SendRepository {
     final bind = _createConnectionPoint(bindPoint);
     _listenSendibleResponse(sendibleList, camelReceive, bind);
 
-    await for (final host in fetchLocalDevices(subnet)) {
+    await for (final host
+        in fetchLocalDevices(subnet, progressCallback: (progress) {
+      progressCallback?.call(progress * 0.98);
+    })) {
       if (host.internetAddress.address == bind.address) {
         continue;
       }
@@ -78,6 +90,7 @@ class SendRepositoryCamel implements SendRepository {
 
     await Future.delayed(timeout);
     camelReceive.close();
+    progressCallback?.call(1);
     return sendibleList;
   }
 
@@ -122,11 +135,15 @@ class SendRepositoryCamel implements SendRepository {
     }
   }
 
-  Stream<Host> fetchLocalDevices(String subnet) {
+  Stream<Host> fetchLocalDevices(
+    String subnet, {
+    void Function(double)? progressCallback,
+  }) {
     final scanner = LanScanner();
     return scanner.icmpScan(
       subnet,
       scanThreads: 20,
+      progressCallback: progressCallback,
     );
   }
 
