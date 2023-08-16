@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 
 import 'package:camel/camel.dart';
@@ -19,6 +20,9 @@ abstract class SendRepository {
 }
 
 class SendRepositoryCamel implements SendRepository {
+  StreamSubscription<Host>? _searchStream;
+  bool _searchEnd = false;
+
   String? _convertAddress(String addressStr) {
     RegExpMatch? match =
         RegExp("(([0-9]+\.)+[0-9]+):([0-9]+)").firstMatch(addressStr);
@@ -73,11 +77,39 @@ class SendRepositoryCamel implements SendRepository {
     final bind = _createConnectionPoint(bindPoint);
     _listenSendibleResponse(sendibleList, camelReceive, bind);
 
+    _searchEnd = false;
+    _searchDevices(subnet, sendPort, bind.address,
+        progressCallback: progressCallback);
+
+    // on Android, it do not through [await for] loop.
+    // because do polling.
+    while (true) {
+      if (_searchEnd) {
+        break;
+      }
+      await Future.delayed(const Duration(microseconds: 1));
+    }
+
+    await Future.delayed(timeout);
+    camelReceive.close();
+    progressCallback?.call(1);
+    return sendibleList;
+  }
+
+  Future<void> _searchDevices(
+    String subnet,
+    int sendPort,
+    String myAddress, {
+    void Function(double)? progressCallback,
+  }) async {
     await for (final host
         in fetchLocalDevices(subnet, progressCallback: (progress) {
+      if (progress >= 1.0) {
+        _searchEnd = true;
+      }
       progressCallback?.call(progress * 0.98);
     })) {
-      if (host.internetAddress.address == bind.address) {
+      if (host.internetAddress.address == myAddress) {
         continue;
       }
 
@@ -87,11 +119,6 @@ class SendRepositoryCamel implements SendRepository {
         const Duration(seconds: 1),
       ]);
     }
-
-    await Future.delayed(timeout);
-    camelReceive.close();
-    progressCallback?.call(1);
-    return sendibleList;
   }
 
   /// Send a Sendible command for receives the response.
