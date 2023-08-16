@@ -7,7 +7,6 @@ import 'package:lan_scanner/lan_scanner.dart';
 import 'package:silkroad/send/entities/sendible_device.dart';
 
 abstract class SendRepository {
-  // Future<String?> connect(String connectionPoint);  // return connection's identifier
   Future send(String connectionPoint, Map<String, String> data);
   Future<List<SendibleDevice>> sendible(
     String subnet,
@@ -20,7 +19,6 @@ abstract class SendRepository {
 }
 
 class SendRepositoryCamel implements SendRepository {
-  StreamSubscription<Host>? _searchStream;
   bool _searchEnd = false;
 
   String? _convertAddress(String addressStr) {
