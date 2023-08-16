@@ -4,22 +4,18 @@ import 'package:platform/platform.dart';
 
 import 'package:silkroad/app_theme.dart';
 
-
 ///
 /// receive item builder
 ///
-mixin _ListItemBuilderMobile{
-
+mixin _ListItemBuilderMobile {
   Widget buildListItemMobile(
-      BuildContext context,
-      {
-        required Widget child,
-        EdgeInsetsGeometry? padding,
-        void Function(BuildContext context)? onDelete,
-        void Function(BuildContext context)? onSave,
-        Color? backgroundColor,
-      })
-  {
+    BuildContext context, {
+    required Widget child,
+    EdgeInsetsGeometry? padding,
+    void Function(BuildContext context)? onDelete,
+    void Function(BuildContext context)? onSave,
+    Color? backgroundColor,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -28,12 +24,14 @@ mixin _ListItemBuilderMobile{
       child: Slidable(
         startActionPane: _buildStartAction(onDelete),
         endActionPane: _buildEndAction(onSave),
-        child: child,//_buildCardItem(name: name, size: size, sender: sender, iconData: iconData),
+        child:
+            child, //_buildCardItem(name: name, size: size, sender: sender, iconData: iconData),
       ),
     );
   }
 
-  static ActionPane _buildStartAction(void Function(BuildContext context)? deleteAction){
+  static ActionPane _buildStartAction(
+      void Function(BuildContext context)? deleteAction) {
     return ActionPane(
       motion: const ScrollMotion(),
       children: [
@@ -50,7 +48,8 @@ mixin _ListItemBuilderMobile{
     );
   }
 
-  static ActionPane _buildEndAction(void Function(BuildContext context)? saveAction){
+  static ActionPane _buildEndAction(
+      void Function(BuildContext context)? saveAction) {
     return ActionPane(
       motion: const ScrollMotion(),
       children: [
@@ -74,60 +73,55 @@ mixin _ListItemBuilderMobile{
       ],
     );
   }
-
 }
 
 mixin _ListItemBuilderPc {
-
   Widget buildListItemPc(
-      BuildContext context,
-      {
-        required Widget child,
-        required String name,
-        EdgeInsetsGeometry? padding,
-        void Function(BuildContext context)? onDelete,
-        void Function(BuildContext context)? onSave,
-      })
-  {
+    BuildContext context, {
+    required Widget child,
+    required String name,
+    EdgeInsetsGeometry? padding,
+    void Function(BuildContext context)? onDelete,
+    void Function(BuildContext context)? onSave,
+  }) {
     return ElevatedButton(
-      onPressed: (){
+      onPressed: () {
         showDialog(
           context: context,
           builder: (context) {
             return SimpleDialog(
-                title: Text(name),
-                children: <Widget>[
-                  SimpleDialogOption(
-                    onPressed: () {
-                      if(onSave != null) onSave(context);
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text('Save',)
-                          ),
-                        ]
-                      ),
-                    ),
+              title: Text(name),
+              children: <Widget>[
+                SimpleDialogOption(
+                  onPressed: () {
+                    if (onSave != null) onSave(context);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Row(children: <Widget>[
+                      Expanded(
+                          child: Text(
+                        'Save',
+                      )),
+                    ]),
                   ),
-                  SimpleDialogOption(
-                    onPressed: () {
-                      if(onDelete != null) onDelete(context);
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      child: Row(
-                          children: <Widget>[
-                            Expanded(
-                                child: Text('Delete', style: TextStyle(color: Colors.red),)
-                            ),
-                          ]
-                      ),
-                    ),
+                ),
+                SimpleDialogOption(
+                  onPressed: () {
+                    if (onDelete != null) onDelete(context);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Row(children: <Widget>[
+                      Expanded(
+                          child: Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      )),
+                    ]),
                   ),
-                ],
+                ),
+              ],
             );
           },
         );
@@ -135,36 +129,50 @@ mixin _ListItemBuilderPc {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: MaterialStateProperty.all<Color>(AppTheme.getBackgroundColor(context)),
+        backgroundColor: MaterialStateProperty.all<Color>(
+            AppTheme.getBackgroundColor(context)),
       ),
       child: child,
     );
   }
 }
 
-abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilderPc, _ListItemBuilderMobile{
+abstract class ReceiveListItemBase extends StatelessWidget
+    with _ListItemBuilderPc, _ListItemBuilderMobile {
   const ReceiveListItemBase({super.key});
-  static const double _iconSize = 30.0;                     /// icon size
-  static const double _sizeAndSenderWidth = 64.0;           /// size and sender column width
+  static const double _iconSize = 30.0;
 
-  static const Color _itemLightModeColor = Colors.white;      /// white mode item color
-  static const Color _itemDarkModeColor = Colors.black54;     /// dark mode item color
+  /// icon size
+  static const double _sizeAndSenderWidth = 64.0;
 
-  static Color _itemBackgroundColor = Colors.white;   /// item back ground color
-  static Color _itemForegroundColor = Colors.black;   /// item font color
+  /// size and sender column width
+
+  static const Color _itemLightModeColor = Colors.white;
+
+  /// white mode item color
+  static const Color _itemDarkModeColor = Colors.black54;
+
+  /// dark mode item color
+
+  static Color _itemBackgroundColor = Colors.white;
+
+  /// item back ground color
+  static Color _itemForegroundColor = Colors.black;
+
+  /// item font color
 
   /// text style： file name
   static TextStyle get _fileNameTextStyle => TextStyle(
-    color: _itemForegroundColor,
-    fontSize: 20,
-    // fontWeight: FontWeight.bold,
-  );
+        color: _itemForegroundColor,
+        fontSize: 20,
+        // fontWeight: FontWeight.bold,
+      );
 
   /// text style： sender
   static TextStyle get _senderTextStyle => TextStyle(
-    color: _itemForegroundColor,
-    fontSize: 12,
-  );
+        color: _itemForegroundColor,
+        fontSize: 12,
+      );
 
   /// text style： file size
   static TextStyle get _sizeTextStyle => _senderTextStyle;
@@ -174,31 +182,31 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
   //   color: _itemBackgroundColor,
   // );
 
-  Widget _buildListItem(BuildContext context,
-                      {
-                        required Platform platform,
-                        required index,
-                        required iconData,
-                        required name,
-                        required size,
-                        required sender,
-                        void Function(BuildContext context)? onDelete,
-                        void Function(BuildContext context)? onSave,
-                      })
-  {
-
+  Widget _buildListItem(
+    BuildContext context, {
+    required Platform platform,
+    required index,
+    required iconData,
+    required name,
+    required size,
+    required sender,
+    void Function(BuildContext context)? onDelete,
+    void Function(BuildContext context)? onSave,
+  }) {
     // is light mode.
-    if(MediaQuery.platformBrightnessOf(context) == Brightness.light){
-      _itemForegroundColor = Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+    if (MediaQuery.platformBrightnessOf(context) == Brightness.light) {
+      _itemForegroundColor =
+          Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
       _itemBackgroundColor = _itemLightModeColor;
     }
     // is dark mode.
-    else{
-      _itemForegroundColor = Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
+    else {
+      _itemForegroundColor =
+          Theme.of(context).textTheme.bodyText1?.color ?? _itemForegroundColor;
       _itemBackgroundColor = _itemDarkModeColor;
     }
 
-    switch(platform.operatingSystem){
+    switch (platform.operatingSystem) {
       case Platform.iOS:
       case Platform.android:
         return buildListItemMobile(
@@ -206,7 +214,13 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
           onSave: onSave,
           onDelete: onDelete,
           backgroundColor: _itemBackgroundColor,
-          child: _buildCardItem(context, iconData: iconData, name: name, size: size, sender: sender,),
+          child: _buildCardItem(
+            context,
+            iconData: iconData,
+            name: name,
+            size: size,
+            sender: sender,
+          ),
         );
 
       default:
@@ -215,21 +229,19 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
           name: name,
           onSave: onSave,
           onDelete: onDelete,
-          child: _buildCardItem(context, iconData: iconData, name: name, size: size, sender: sender),
+          child: _buildCardItem(context,
+              iconData: iconData, name: name, size: size, sender: sender),
         );
     }
   }
 
   Widget _buildCardItem(
-    BuildContext context,
-    {
-      required String name,
-      IconData? iconData,
-      required String size,
-      required String sender,
-    })
-  {
-
+    BuildContext context, {
+    required String name,
+    IconData? iconData,
+    required String size,
+    required String sender,
+  }) {
     return Container(
       // decoration: _decorationItem,
       child: IntrinsicHeight(
@@ -239,8 +251,8 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
             Expanded(
               child: Row(
                 children: [
-                  _buildIcon(iconData),     // icon
-                  _buildFileName(name),     // file name
+                  _buildIcon(iconData), // icon
+                  _buildFileName(name), // file name
                 ],
               ),
             ),
@@ -250,8 +262,8 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
                 padding: const EdgeInsets.only(right: 8),
                 child: Column(
                   children: <Widget>[
-                    _buildFileSize(size),   // file size
-                    _buildSender(sender),   // sender
+                    _buildFileSize(size), // file size
+                    _buildSender(sender), // sender
                   ],
                 ),
               ),
@@ -262,8 +274,7 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
     );
   }
 
-  Widget _buildIcon(IconData? iconData)
-  {
+  Widget _buildIcon(IconData? iconData) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       child: Container(
@@ -273,17 +284,16 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
           shape: BoxShape.circle,
           color: AppTheme.appIconColor2,
         ),
-        child: Icon(iconData,
+        child: Icon(
+          iconData,
           color: Colors.white,
           size: _iconSize,
-
         ),
       ),
     );
   }
 
-  Widget _buildFileName(String name)
-  {
+  Widget _buildFileName(String name) {
     return Flexible(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -298,14 +308,14 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
     );
   }
 
-  Widget _buildFileSize(String size)
-  {
+  Widget _buildFileSize(String size) {
     return Flexible(
       flex: 5,
       child: Container(
         padding: const EdgeInsets.only(bottom: 2),
         alignment: Alignment.bottomRight,
-        child: Text(size.toString(),
+        child: Text(
+          size.toString(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.right,
@@ -315,14 +325,14 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
     );
   }
 
-  Widget _buildSender(String sender)
-  {
+  Widget _buildSender(String sender) {
     return Flexible(
       flex: 5,
       child: Container(
         padding: const EdgeInsets.only(top: 2),
         alignment: Alignment.topRight,
-        child: Text(sender,
+        child: Text(
+          sender,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.right,
@@ -336,7 +346,7 @@ abstract class ReceiveListItemBase extends StatelessWidget with _ListItemBuilder
 ///
 /// Receive list item for add.
 ///
-class ReceiveListItem extends ReceiveListItemBase{
+class ReceiveListItem extends ReceiveListItemBase {
   ReceiveListItem({
     required this.platform,
     required this.iconData,
@@ -351,11 +361,21 @@ class ReceiveListItem extends ReceiveListItemBase{
   });
 
   final int index;
-  final IconData iconData;            /// icon
-  final String name;                  /// file name
-  final String size;                  /// file size
-  final String sender;                /// sender name
-  final Animation<double> animation;  /// size animation
+  final IconData iconData;
+
+  /// icon
+  final String name;
+
+  /// file name
+  final String size;
+
+  /// file size
+  final String sender;
+
+  /// sender name
+  final Animation<double> animation;
+
+  /// size animation
   final void Function(BuildContext context)? onSave;
   final void Function(BuildContext context)? onDelete;
   final Platform platform;
@@ -364,12 +384,11 @@ class ReceiveListItem extends ReceiveListItemBase{
     end: Offset.zero,
     begin: const Offset(1.5, 0.0),
   ).chain(CurveTween(
-    curve: Curves.bounceOut,
+    curve: Curves.bounceIn,
   ));
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return SlideTransition(
       position: animation.drive(_offsetAnimation),
       child: _buildListItem(
@@ -390,7 +409,7 @@ class ReceiveListItem extends ReceiveListItemBase{
 ///
 /// Receive list item for remove.
 ///
-class ReceiveListItemRemoving extends ReceiveListItemBase{
+class ReceiveListItemRemoving extends ReceiveListItemBase {
   const ReceiveListItemRemoving({
     required this.platform,
     required this.iconData,
@@ -403,28 +422,34 @@ class ReceiveListItemRemoving extends ReceiveListItemBase{
   });
 
   final int index;
-  final IconData iconData;            /// icon
-  final String name;                  /// file name
-  final String size;                  /// file size
-  final String sender;                /// sender name
-  final Animation<double> animation;  /// size animation
+  final IconData iconData;
+
+  /// icon
+  final String name;
+
+  /// file name
+  final String size;
+
+  /// file size
+  final String sender;
+
+  /// sender name
+  final Animation<double> animation;
+
+  /// size animation
   final Platform platform;
 
-
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return SizeTransition(
       sizeFactor: animation,
-      child: _buildListItem(
-        context,
-        platform: platform,
-        index: index,
-        iconData: iconData,
-        name: name,
-        size: size,
-        sender: sender
-      ),
+      child: _buildListItem(context,
+          platform: platform,
+          index: index,
+          iconData: iconData,
+          name: name,
+          size: size,
+          sender: sender),
     );
   }
 }

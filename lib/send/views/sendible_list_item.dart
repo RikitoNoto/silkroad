@@ -222,7 +222,8 @@ abstract class SendibleListItemBase extends StatelessWidget
                 ),
               ),
             ),
-            if(platform.operatingSystem != Platform.android && platform.operatingSystem != Platform.iOS)
+            if (platform.operatingSystem != Platform.android &&
+                platform.operatingSystem != Platform.iOS)
               IconButton(
                 onPressed: () => onDelete?.call(context),
                 icon: const Icon(Icons.delete),
@@ -301,7 +302,7 @@ class SendibleListItem extends SendibleListItemBase {
     end: Offset.zero,
     begin: const Offset(1.5, 0.0),
   ).chain(CurveTween(
-    curve: Curves.bounceOut,
+    curve: Curves.bounceIn,
   ));
 
   @override
