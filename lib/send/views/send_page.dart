@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:camel/camel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
-import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/send/views/sendible_list_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
@@ -246,9 +244,6 @@ class _SendPageState extends State<SendPage> {
           key: key,
           controller: _octetTextControllers[octetNumber],
           keyboardType: TextInputType.number,
-          // onChanged: (String value) {
-          //   provider.setOctet(octetNumber, int.parse(value));
-          // },
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textInputAction: textInputAction,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),

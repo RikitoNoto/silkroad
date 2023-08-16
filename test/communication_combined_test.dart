@@ -50,8 +50,8 @@ Future _setUp() async {
     removedItemBuilder: (device, index, context, animation) => Text(""),
   );
 
-  kSendProvider =
-      SendProvider(platform: const LocalPlatform(), sendibleList: sendList);
+  kSendProvider = SendProvider.noSearch(
+      platform: const LocalPlatform(), sendibleList: sendList);
   kReceiveProvider = ReceiveProvider(
       platform: const LocalPlatform(), receiveList: kReceiveList);
   kParamMap = <String, Object>{};
