@@ -40,6 +40,9 @@ class _SendPageState extends State<SendPage> {
   final _listKey = GlobalKey<AnimatedListState>();
   late final AnimatedListItemModel<SendibleDevice> _sendibleDevices;
 
+  final List<TextEditingController> _octetTextControllers =
+      List.generate(4, (_) => TextEditingController());
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +94,13 @@ class _SendPageState extends State<SendPage> {
       platform: widget.platform,
       index: index,
       animation: animation,
+      onSelect: (context) {
+        for (int i = 0; i < _octetTextControllers.length; i++) {
+          _octetTextControllers[i].text =
+              _sendibleDevices[index].ipAddress.split(".")[i];
+        }
+        provider.setOctet(0, 100);
+      },
     );
   }
 
@@ -122,6 +132,11 @@ class _SendPageState extends State<SendPage> {
                     onPressed: () async {
                       WaitProgressDialog.show(
                           context); // show wait progress dialog.
+                      for (int i = 0; i < _octetTextControllers.length; i++) {
+                        provider.setOctet(
+                            i, int.parse(_octetTextControllers[i].text));
+                      }
+
                       String message = (await provider.send()).message; // send.
                       if (!mounted) return;
                       WaitProgressDialog.close(
@@ -229,10 +244,11 @@ class _SendPageState extends State<SendPage> {
         height: 30,
         child: ThemeInputField(
           key: key,
+          controller: _octetTextControllers[octetNumber],
           keyboardType: TextInputType.number,
-          onChanged: (String value) {
-            provider.setOctet(octetNumber, int.parse(value));
-          },
+          // onChanged: (String value) {
+          //   provider.setOctet(octetNumber, int.parse(value));
+          // },
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textInputAction: textInputAction,
           contentPadding: const EdgeInsets.symmetric(horizontal: 10),
