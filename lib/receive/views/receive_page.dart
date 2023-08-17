@@ -9,7 +9,6 @@ import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/global.dart';
 import 'package:silkroad/utils/views/theme_animated_list_item.dart';
-import 'receive_list_item.dart';
 import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/i18n/translations.g.dart';
