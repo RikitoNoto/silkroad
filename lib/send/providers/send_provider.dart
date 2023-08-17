@@ -140,7 +140,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
       }
 
       networkAddresses.add(networkAddress);
-      final list = await _sender.sendible(
+      final list = await _sender.seachDevices(
         networkAddress,
         port,
         "${_myAddresses[i]}:$port",
@@ -176,5 +176,6 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   void close() {
     _sender.close();
+    dispose();
   }
 }
