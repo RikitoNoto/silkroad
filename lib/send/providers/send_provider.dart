@@ -166,6 +166,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     _ip[octet] = value;
   }
 
+  void sendibleListRemoveAt(int index) {
+    _sendibleList.removeAt(index);
+  }
+
   set file(File? file) {
     _file = file;
     notifyListeners();

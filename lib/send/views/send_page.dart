@@ -14,6 +14,7 @@ import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/utils/views/wait_progress_dialog.dart';
 
+import '../../utils/views/theme_animated_list_item.dart';
 import '../entities/sendible_device.dart';
 
 class SendPage extends StatefulWidget {
@@ -70,7 +71,7 @@ class _SendPageState extends State<SendPage> {
   }
 
   void _debugInsertItem() {
-    _sendibleDevices.append(const SendibleDevice(ipAddress: "ipAddress"));
+    _sendibleDevices.append(const SendibleDevice(ipAddress: "127.0.0.1"));
   }
 
   void _debugRemoveItem() {
@@ -86,9 +87,16 @@ class _SendPageState extends State<SendPage> {
     int index,
     Animation<double> animation,
   ) {
-    return SendibleListItem(
-      sender: "",
-      ipAddress: _sendibleDevices[index].ipAddress,
+    return AddListItem(
+      title: Text(
+        _sendibleDevices[index].ipAddress,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontSize: 20,
+        ),
+        textAlign: TextAlign.left,
+      ),
       platform: widget.platform,
       index: index,
       animation: animation,
@@ -97,19 +105,27 @@ class _SendPageState extends State<SendPage> {
           _octetTextControllers[i].text =
               _sendibleDevices[index].ipAddress.split(".")[i];
         }
-        provider.setOctet(0, 100);
       },
+      onDelete: (context) => provider.sendibleListRemoveAt(index),
     );
   }
 
   Widget _removeItem(SendibleDevice item, int index, BuildContext context,
       Animation<double> animation) {
-    return SendibleListItemRemoving(
-        platform: widget.platform,
-        index: index,
-        ipAddress: item.ipAddress,
-        sender: "",
-        animation: animation);
+    return RemoveListItem(
+      platform: widget.platform,
+      index: index,
+      title: Text(
+        item.ipAddress,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontSize: 20,
+        ),
+        textAlign: TextAlign.left,
+      ),
+      animation: animation,
+    );
   }
 
   @override
