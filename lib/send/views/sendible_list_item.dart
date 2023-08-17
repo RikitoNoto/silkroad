@@ -222,7 +222,8 @@ abstract class SendibleListItemBase extends StatelessWidget
                 ),
               ),
             ),
-            if(platform.operatingSystem != Platform.android && platform.operatingSystem != Platform.iOS)
+            if (platform.operatingSystem != Platform.android &&
+                platform.operatingSystem != Platform.iOS)
               IconButton(
                 onPressed: () => onDelete?.call(context),
                 icon: const Icon(Icons.delete),
