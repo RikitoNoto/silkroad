@@ -8,7 +8,7 @@ import 'package:silkroad/send/entities/sendible_device.dart';
 
 abstract class SendRepository {
   Future send(String connectionPoint, Map<String, String> data);
-  Future<List<SendibleDevice>> seachDevices(
+  Stream<SendibleDevice> seachDevices(
     String subnet,
     int sendPort,
     String bindPoint, {
@@ -20,7 +20,6 @@ abstract class SendRepository {
 
 class SendRepositoryCamel implements SendRepository {
   Isolate? _icpmScanIsolate;
-  bool _searchEnd = false;
   Camel<Socket, SocketConnectionPoint>? _receiveSocket;
 
   String? _convertAddress(String addressStr) {
@@ -63,13 +62,13 @@ class SendRepositoryCamel implements SendRepository {
   /// 2. Send Sendible command to existed response device.
   /// 3. return existed response devices.
   @override
-  Future<List<SendibleDevice>> seachDevices(
+  Stream<SendibleDevice> seachDevices(
     String subnet,
     int sendPort,
     String bindPoint, {
     timeout = const Duration(seconds: 3),
     void Function(double)? progressCallback,
-  }) async {
+  }) async* {
     Tcp tcpReceive = Tcp();
     _receiveSocket = Camel(tcpReceive);
 
@@ -93,24 +92,25 @@ class SendRepositoryCamel implements SendRepository {
 
     receivePort.listen((message) {
       progress = message;
-      if (progress >= 1.0) {
-        _searchEnd = true;
-      }
       progressCallback?.call(progress * 0.98);
     });
 
     // on Android, it do not end [await for] loop.
     // because do polling.
     while (progress < 1.0) {
+      if (sendibleList.isNotEmpty) {
+        yield sendibleList.first;
+        sendibleList.removeAt(0);
+      }
       await Future.delayed(const Duration(microseconds: 1));
     }
-    // _icpmScanIsolate?.kill();
 
     await Future.delayed(timeout);
-    // _receiveSocket?.close();
     close();
     progressCallback?.call(1); // call the callback as 100%
-    return sendibleList;
+    for (final device in sendibleList) {
+      yield device;
+    }
   }
 
   void _isolateIcmpScan(List<Object> args) async {
@@ -121,9 +121,6 @@ class SendRepositoryCamel implements SendRepository {
 
     await for (final host
         in fetchLocalDevices(subnet, progressCallback: (progress) {
-      if (progress >= 1.0) {
-        _searchEnd = true;
-      }
       sendPipe.send(progress);
     })) {
       if (host.internetAddress.address == myAddress) {
@@ -169,13 +166,9 @@ class SendRepositoryCamel implements SendRepository {
   }
 
   Stream<SendibleDevice> _listenSendibleResponse(
-      // List<SendibleDevice> responseList,
       Camel<Socket, SocketConnectionPoint> camel,
       SocketConnectionPoint connectionPoint) async* {
     await for (final data in camel.listen(connectionPoint)) {
-      // responseList.add(
-      //   SendibleDevice(ipAddress: data.connection.remoteAddress.address),
-      // );
       yield SendibleDevice(ipAddress: data.connection.remoteAddress.address);
     }
   }
