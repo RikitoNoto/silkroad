@@ -176,6 +176,5 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   void close() {
     _sender.close();
-    dispose();
   }
 }

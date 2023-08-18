@@ -19,8 +19,9 @@ abstract class SendRepository {
 }
 
 class SendRepositoryCamel implements SendRepository {
-  Isolate? _icpmScanIsolate = null;
+  Isolate? _icpmScanIsolate;
   bool _searchEnd = false;
+  Camel<Socket, SocketConnectionPoint>? _receiveSocket;
 
   String? _convertAddress(String addressStr) {
     RegExpMatch? match =
@@ -70,12 +71,14 @@ class SendRepositoryCamel implements SendRepository {
     void Function(double)? progressCallback,
   }) async {
     Tcp tcpReceive = Tcp();
-    Camel<Socket, SocketConnectionPoint> camelReceive = Camel(tcpReceive);
+    _receiveSocket = Camel(tcpReceive);
 
     final sendibleList = <SendibleDevice>[];
     final bind = _createConnectionPoint(bindPoint);
-    _listenSendibleResponse(sendibleList, camelReceive,
-        bind); // create the port to receive the message from devices.
+    // create the port to receive the message from devices.
+    _listenSendibleResponse(_receiveSocket!, bind).listen((device) {
+      sendibleList.add(device);
+    });
 
     double progress = 0.0;
 
@@ -101,11 +104,12 @@ class SendRepositoryCamel implements SendRepository {
     while (progress < 1.0) {
       await Future.delayed(const Duration(microseconds: 1));
     }
-    _icpmScanIsolate?.kill();
+    // _icpmScanIsolate?.kill();
 
     await Future.delayed(timeout);
-    camelReceive.close();
-    progressCallback?.call(1);
+    // _receiveSocket?.close();
+    close();
+    progressCallback?.call(1); // call the callback as 100%
     return sendibleList;
   }
 
@@ -164,14 +168,15 @@ class SendRepositoryCamel implements SendRepository {
     Isolate.exit(); // kill the process itself.
   }
 
-  Future<void> _listenSendibleResponse(
-      List<SendibleDevice> responseList,
+  Stream<SendibleDevice> _listenSendibleResponse(
+      // List<SendibleDevice> responseList,
       Camel<Socket, SocketConnectionPoint> camel,
-      SocketConnectionPoint connectionPoint) async {
+      SocketConnectionPoint connectionPoint) async* {
     await for (final data in camel.listen(connectionPoint)) {
-      responseList.add(
-        SendibleDevice(ipAddress: data.connection.remoteAddress.address),
-      );
+      // responseList.add(
+      //   SendibleDevice(ipAddress: data.connection.remoteAddress.address),
+      // );
+      yield SendibleDevice(ipAddress: data.connection.remoteAddress.address);
     }
   }
 
@@ -201,5 +206,6 @@ class SendRepositoryCamel implements SendRepository {
   @override
   void close() {
     _icpmScanIsolate?.kill();
+    _receiveSocket?.close();
   }
 }
