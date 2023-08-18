@@ -8,7 +8,6 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
-import 'package:silkroad/send/views/sendible_list_item.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
@@ -26,7 +25,7 @@ class SendPage extends StatefulWidget {
   State<SendPage> createState() => _SendPageState();
 }
 
-class _SendPageState extends State<SendPage> {
+class _SendPageState extends State<SendPage> with RouteAware {
   late final SendProvider provider;
 
   static final String _ipFieldLabelText = t.send.receiverAddress;
@@ -49,6 +48,22 @@ class _SendPageState extends State<SendPage> {
         listKey: _listKey, removedItemBuilder: _removeItem);
     provider = SendProvider(
         platform: const LocalPlatform(), sendibleList: _sendibleDevices);
+  }
+
+  @override
+  void dispose() {
+    provider.close();
+    super.dispose();
+  }
+
+  @override
+  void didPop() {
+    provider.close();
+  }
+
+  @override
+  void didPushNext() {
+    provider.close();
   }
 
   List<Widget> _getDebugActions() {

@@ -12,7 +12,6 @@ import 'package:silkroad/parameter.dart';
 import 'package:silkroad/send/entities/sendible_device.dart';
 import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/i18n/translations.g.dart';
-import 'package:silkroad/send/views/sendible_list_item.dart';
 
 import '../../utils/models/animated_list_item_model.dart';
 
@@ -141,7 +140,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
       }
 
       networkAddresses.add(networkAddress);
-      final list = await _sender.sendible(
+      final list = await _sender.seachDevices(
         networkAddress,
         port,
         "${_myAddresses[i]}:$port",
@@ -173,5 +172,9 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   set file(File? file) {
     _file = file;
     notifyListeners();
+  }
+
+  void close() {
+    _sender.close();
   }
 }
