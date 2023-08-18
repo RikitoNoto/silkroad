@@ -308,11 +308,13 @@ void sendibleTest() {
     }) {
       MockSendRepository mockRepo = MockSendRepository();
 
-      when(mockRepo.sendible(any, any, any,
+      when(mockRepo.seachDevices(any, any, any,
               progressCallback: anyNamed("progressCallback")))
-          .thenAnswer((v) {
+          .thenAnswer((v) async* {
         spyFunc?.call(v);
-        return Future.value(ret);
+        for (final d in ret) {
+          yield d;
+        }
       });
       return mockRepo;
     }
@@ -385,7 +387,7 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any,
+      verify(repoMock.seachDevices(any, any, any,
           progressCallback: anyNamed("progressCallback")));
     });
 
@@ -400,7 +402,7 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any,
+      verify(repoMock.seachDevices(any, any, any,
           progressCallback: anyNamed("progressCallback")));
     });
 
@@ -415,7 +417,7 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
-      verify(repoMock.sendible(any, any, any,
+      verify(repoMock.seachDevices(any, any, any,
           progressCallback: anyNamed("progressCallback")));
     });
 
@@ -443,7 +445,7 @@ void sendibleTest() {
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
       expect(
-          verify(repoMock.sendible(any, any, any,
+          verify(repoMock.seachDevices(any, any, any,
                   progressCallback: anyNamed("progressCallback")))
               .callCount,
           2);
@@ -458,7 +460,7 @@ void sendibleTest() {
       final provider = await constructProviderWithList(repo: repoMock);
       await provider.provider.searchDevices();
       expect(
-          verify(repoMock.sendible(any, any, any,
+          verify(repoMock.seachDevices(any, any, any,
                   progressCallback: anyNamed("progressCallback")))
               .callCount,
           1);
@@ -494,6 +496,7 @@ void sendibleTest() {
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       provider.provider.searchDevices();
+      await Future.delayed(const Duration(microseconds: 10));
       callback?.call(0.5);
 
       expect(provider.provider.searchProgress, 0.5);
@@ -508,10 +511,18 @@ void sendibleTest() {
               as void Function(double)?;
         },
       );
+      when(repoMock.seachDevices(any, any, any,
+              progressCallback: anyNamed("progressCallback")))
+          .thenAnswer((v) async* {
+        callback = v.namedArguments[const Symbol("progressCallback")] as void
+            Function(double)?;
+        await Future.delayed(const Duration(microseconds: 50));
+      });
 
       IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
       final provider = await constructProviderWithList(repo: repoMock);
       provider.provider.searchDevices();
+      await Future.delayed(const Duration(microseconds: 10));
       callback?.call(1.0);
 
       expect(provider.provider.searchProgress, 0.5);

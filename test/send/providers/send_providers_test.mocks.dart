@@ -169,7 +169,7 @@ class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
         returnValueForMissingStub: _i4.Future<dynamic>.value(),
       ) as _i4.Future<dynamic>);
   @override
-  _i4.Future<List<_i6.SendibleDevice>> sendible(
+  _i4.Stream<_i6.SendibleDevice> seachDevices(
     String? subnet,
     int? sendPort,
     String? bindPoint, {
@@ -178,7 +178,7 @@ class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
   }) =>
       (super.noSuchMethod(
         Invocation.method(
-          #sendible,
+          #seachDevices,
           [
             subnet,
             sendPort,
@@ -189,11 +189,9 @@ class MockSendRepository extends _i1.Mock implements _i5.SendRepository {
             #progressCallback: progressCallback,
           },
         ),
-        returnValue:
-            _i4.Future<List<_i6.SendibleDevice>>.value(<_i6.SendibleDevice>[]),
-        returnValueForMissingStub:
-            _i4.Future<List<_i6.SendibleDevice>>.value(<_i6.SendibleDevice>[]),
-      ) as _i4.Future<List<_i6.SendibleDevice>>);
+        returnValue: _i4.Stream<_i6.SendibleDevice>.empty(),
+        returnValueForMissingStub: _i4.Stream<_i6.SendibleDevice>.empty(),
+      ) as _i4.Stream<_i6.SendibleDevice>);
   @override
   void close() => super.noSuchMethod(
         Invocation.method(

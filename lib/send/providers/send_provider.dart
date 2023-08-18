@@ -140,14 +140,14 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
       }
 
       networkAddresses.add(networkAddress);
-      final list = await _sender.seachDevices(
+
+      await for (final device in _sender.seachDevices(
         networkAddress,
         port,
         "${_myAddresses[i]}:$port",
         progressCallback: (progress) =>
             _sendibleProgressCallback(progress, i + 1, _myAddresses.length),
-      );
-      for (final device in list) {
+      )) {
         _sendibleList.append(device);
       }
     }
