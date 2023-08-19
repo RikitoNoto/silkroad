@@ -133,6 +133,7 @@ class SendRepositoryCamel implements SendRepository {
         const Duration(seconds: 1),
       ]);
     }
+    Isolate.exit();
   }
 
   /// Send a Sendible command for receives the response.
@@ -200,5 +201,7 @@ class SendRepositoryCamel implements SendRepository {
   void close() {
     _icpmScanIsolate?.kill();
     _receiveSocket?.close();
+    _icpmScanIsolate = null;
+    _receiveSocket = null;
   }
 }

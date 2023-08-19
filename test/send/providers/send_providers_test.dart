@@ -527,5 +527,33 @@ void sendibleTest() {
 
       expect(provider.provider.searchProgress, 0.5);
     });
+
+    test('should get progress 0.75 if a callback will call twice', () async {
+      void Function(double)? callback;
+      final repoMock = createRepositoryMock(
+        ret: [],
+        spyFunc: (invocation) {
+          callback = invocation.namedArguments[const Symbol("progressCallback")]
+              as void Function(double)?;
+        },
+      );
+      when(repoMock.seachDevices(any, any, any,
+              progressCallback: anyNamed("progressCallback")))
+          .thenAnswer((v) async* {
+        callback = v.namedArguments[const Symbol("progressCallback")] as void
+            Function(double)?;
+        await Future.delayed(const Duration(microseconds: 50));
+      });
+
+      IpaddressFetcher.ipAddresListSpy = ["192.168.0.1", "192.168.1.1"];
+      final provider = await constructProviderWithList(repo: repoMock);
+      provider.provider.searchDevices();
+      await Future.delayed(const Duration(microseconds: 10));
+      callback?.call(1.0);
+      await Future.delayed(const Duration(microseconds: 10));
+      callback?.call(0.5);
+
+      expect(provider.provider.searchProgress, 0.75);
+    });
   });
 }

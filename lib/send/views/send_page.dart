@@ -153,6 +153,29 @@ class _SendPageState extends State<SendPage> with RouteAware {
           appBar: AppBar(
             title: Text(t.actions.send),
             actions: <Widget>[
+                  // research button
+                  Consumer<SendProvider>(
+                    builder: (context, value, child) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (provider.searchProgress >= 1.0)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.autorenew,
+                              ),
+                              onPressed: () => provider.searchDevices(),
+                            ),
+                          if (provider.searchProgress < 1.0)
+                            const Icon(
+                              Icons.autorenew,
+                              color: Colors.grey,
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                  // send button
                   IconButton(
                     icon: const Icon(
                       Icons.send,
