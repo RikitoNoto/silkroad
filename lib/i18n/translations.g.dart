@@ -5,7 +5,7 @@
  * Locales: 2
  * Strings: 26 (13.0 per locale)
  *
- * Built on 2022-11-06 at 13:18 UTC
+ * Built on 2023-08-18 at 12:05 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -335,7 +335,7 @@ class _TranslationsSendEn {
 	String get receiverAddress => 'Receiver Ipaddress';
 	String get selectFile => 'select file';
 	String get fileNone => 'No select';
-	String get sendableAddress => 'Sendable Destination';
+	String get sendibleAddress => 'Sendible Destination';
 	late final _TranslationsSendSendResultEn sendResult = _TranslationsSendSendResultEn._(_root);
 }
 
@@ -406,7 +406,7 @@ class _TranslationsSendJa implements _TranslationsSendEn {
 	@override String get receiverAddress => '受信者のIPアドレス';
 	@override String get selectFile => 'ファイルを選択';
 	@override String get fileNone => 'ファイル無し';
-	@override String get sendableAddress => '送信可能アドレス';
+	@override String get sendibleAddress => '送信可能アドレス';
 	@override late final _TranslationsSendSendResultJa sendResult = _TranslationsSendSendResultJa._(_root);
 }
 
@@ -446,7 +446,7 @@ extension on _TranslationsEn {
 			'send.receiverAddress': 'Receiver Ipaddress',
 			'send.selectFile': 'select file',
 			'send.fileNone': 'No select',
-			'send.sendableAddress': 'Sendable Destination',
+			'send.sendibleAddress': 'Sendible Destination',
 			'send.sendResult.success': 'send complete',
 			'send.sendResult.connectionFail': 'send failed. please check the devices are in same network.',
 			'send.sendResult.lostFile': 'did not find the file.',
@@ -466,7 +466,7 @@ extension on _TranslationsJa {
 			'send.receiverAddress': '受信者のIPアドレス',
 			'send.selectFile': 'ファイルを選択',
 			'send.fileNone': 'ファイル無し',
-			'send.sendableAddress': '送信可能アドレス',
+			'send.sendibleAddress': '送信可能アドレス',
 			'send.sendResult.success': '送信完了しました',
 			'send.sendResult.connectionFail': '送信失敗しました。同じネットワーク内にいることを確認してください。',
 			'send.sendResult.lostFile': 'ファイルがありません。',

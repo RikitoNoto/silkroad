@@ -11,6 +11,7 @@ class ThemeInputField extends StatefulWidget {
     this.inputFormatters,
     this.keyboardType,
     this.initialValue,
+    this.controller,
   });
 
   final String? labelText;
@@ -20,17 +21,22 @@ class ThemeInputField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
   final String? initialValue;
+  final TextEditingController? controller;
 
   @override
   State<ThemeInputField> createState() => _ThemeInputFieldState();
 }
 
 class _ThemeInputFieldState extends State<ThemeInputField> {
-
   bool _isFocus = false;
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+    final controller = widget.controller ??
+        (widget.initialValue != null
+            ? TextEditingController(text: widget.initialValue)
+            : null);
+
     return Focus(
       onFocusChange: (isFocus) {
         setState(() {
@@ -42,19 +48,20 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
         inputFormatters: widget.inputFormatters,
         keyboardType: widget.keyboardType,
         cursorColor: _getFocusColor(context),
-        controller: widget.initialValue != null ? TextEditingController(text: widget.initialValue) : null,
+        controller: controller,
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(
-            color: _isFocus ? _getFocusColor(context) : _getThemeBorderColor(context),
+            color: _isFocus
+                ? _getFocusColor(context)
+                : _getThemeBorderColor(context),
           ),
           contentPadding: widget.contentPadding,
           border: const OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: _getFocusColor(context)!,
-            )
-          ),
+              borderSide: BorderSide(
+            color: _getFocusColor(context)!,
+          )),
         ),
         textInputAction: widget.textInputAction,
         maxLines: 1,
@@ -62,12 +69,11 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
     );
   }
 
-  Color? _getThemeBorderColor(BuildContext context){
+  Color? _getThemeBorderColor(BuildContext context) {
     return Theme.of(context).primaryTextTheme.labelSmall?.decorationColor;
   }
 
-  Color? _getFocusColor(BuildContext context){
+  Color? _getFocusColor(BuildContext context) {
     return Colors.blue;
   }
-
 }

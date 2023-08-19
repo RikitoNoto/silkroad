@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -8,18 +9,22 @@ import 'package:platform/platform.dart';
 import 'package:silkroad/global.dart';
 import 'package:silkroad/comm/comm.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/send/entities/sendible_device.dart';
+import 'package:silkroad/send/repository/send_repository.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 
-enum SendResult{
+import '../../utils/models/animated_list_item_model.dart';
+
+enum SendResult {
   success,
   lostFile,
   connectionFail,
   sendFail,
 }
 
-extension SendResultMessage on SendResult{
-  String get message{
-    switch(this){
+extension SendResultMessage on SendResult {
+  String get message {
+    switch (this) {
       case SendResult.success:
         return t.send.sendResult.success;
 
@@ -35,10 +40,24 @@ extension SendResultMessage on SendResult{
   }
 }
 
-
 class SendProvider with ChangeNotifier, IpaddressFetcher {
-  SendProvider({this.builder = kCommunicationFactory, required this.platform}) {
+  SendProvider({
+    this.builder = kSendRepositoryDefault,
+    required this.platform,
+    required AnimatedListItemModel<SendibleDevice> sendibleList,
+  }) : _sendibleList = sendibleList {
+    fetchAndSearchAddresses();
+    _sender = builder();
+  }
+
+  @visibleForTesting
+  SendProvider.noSearch({
+    this.builder = kSendRepositoryDefault,
+    required this.platform,
+    required AnimatedListItemModel<SendibleDevice> sendibleList,
+  }) : _sendibleList = sendibleList {
     fetchIpAddress();
+    _sender = builder();
   }
 
   static final String fileNameNoSelect = t.send.fileNone;
@@ -46,8 +65,12 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   final List<int> _ip = <int>[0, 0, 0, 0];
   final List<String> _addressRange = <String>[];
   File? _file;
-  final CommunicationFactoryFunc<Socket> builder;
+  final SimpleFactoryFunc<SendRepository> builder;
   final Platform platform;
+  late final SendRepository _sender;
+
+  final AnimatedListItemModel<SendibleDevice> _sendibleList;
+  double _searchProgress = 0.0;
 
   String get filePath => _file?.path ?? '';
   String get ip => _ip.join('.');
@@ -58,11 +81,21 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   int get addressRangeCount => _addressRange.length;
   List<String> get addressRange => _addressRange;
+  double get searchProgress => _searchProgress;
 
-  Future fetchIpAddress() async{
+  final List<String> _myAddresses = [];
+
+  Future fetchAndSearchAddresses() async {
+    await fetchIpAddress();
+    await searchDevices();
+  }
+
+  Future fetchIpAddress() async {
     _addressRange.clear();
+    _myAddresses.clear();
     Set<String> addressRangeSet = <String>{};
-    for(String address in await fetchIpv4Addresses(platform)){
+    for (String address in await fetchIpv4Addresses(platform)) {
+      _myAddresses.add(address);
       List<String> range = IpAddressUtility.getIpAddressRange(address);
       addressRangeSet.add('${range[0]}~${range[1]}');
     }
@@ -70,55 +103,83 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     notifyListeners();
   }
 
-  Future<SendResult> send() async{
-
-    SendResult sendResult = SendResult.success;
+  Future<SendResult> send() async {
     File? file = _file;
-    CommunicationIF<Socket>? communicator = builder();
-    Socket? socket;
+    if (file == null) return SendResult.lostFile;
+    if (!(await file.exists())) return SendResult.lostFile;
+
+    // send
     try {
-      socket = await communicator.connect(
-          '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}');
+      await _sender.send(
+          '$ip:${OptionManager().get(Params.port.toString()) ?? kDefaultPort}',
+          <String, String>{
+            "title": p.basename(file.path),
+            //FIXME: this should not do here what split data to list.(should be do in repository)
+            "data": (await file.readAsBytes())
+                .map<String>((int value) => value.toString())
+                .join(','),
+          });
+    } catch (e) {
+      _sender.close();
+      return SendResult.sendFail;
     }
-    catch(e){
-      sendResult = SendResult.connectionFail;
-    }
-
-    // connection is success
-    if(socket != null){
-      // file is exist
-      if( (file != null) && (await file.exists())) {
-        Object? sender = OptionManager().get(Params.name.toString());
-        try {
-          await communicator.send(socket, SendFile.send(
-              name: p.basename(file.path),
-              sender: sender?.toString() ?? '',
-              fileData: await file.readAsBytes()));
-          // sendResult = true;
-        }catch(e){
-          sendResult = SendResult.sendFail;
-        }
-
-      }
-      else{
-        sendResult = SendResult.lostFile;
-      }
-
-      await communicator.close();
-    }
-    else{
-      sendResult = SendResult.connectionFail;
-    }
-
-    return sendResult;
+    _sender.close();
+    return SendResult.success;
   }
 
-  void setOctet(int octet, int value){
+  Future<void> searchDevices() async {
+    _searchProgress = 0.0;
+    _sendibleList.clear();
+    notifyListeners();
+    final port = int.parse(
+        OptionManager().get(Params.port.toString())?.toString() ??
+            kDefaultPort.toString());
+    final networkAddresses = <String>[];
+    for (int i = 0; i < _myAddresses.length; i++) {
+      final networkAddress =
+          getNetworkAddress(_myAddresses[i], 24); // subnet length is fixed 24.
+      if (networkAddresses.contains(networkAddress)) {
+        continue;
+      }
+
+      networkAddresses.add(networkAddress);
+
+      await for (final device in _sender.seachDevices(
+        networkAddress,
+        port,
+        "${_myAddresses[i]}:$port",
+        progressCallback: (progress) =>
+            _sendibleProgressCallback(progress, i + 1, _myAddresses.length),
+      )) {
+        _sendibleList.append(device);
+      }
+    }
+
+    _sender.close();
+  }
+
+  void _sendibleProgressCallback(double progress, int count, int length) {
+    final progressPercount = 1 / length;
+
+    _searchProgress =
+        progress * progressPercount + progressPercount * (count - 1);
+    notifyListeners();
+  }
+
+  void setOctet(int octet, int value) {
     _ip[octet] = value;
+  }
+
+  void sendibleListRemoveAt(int index) {
+    _sendibleList.removeAt(index);
   }
 
   set file(File? file) {
     _file = file;
     notifyListeners();
+  }
+
+  void close() {
+    _sender.close();
   }
 }
