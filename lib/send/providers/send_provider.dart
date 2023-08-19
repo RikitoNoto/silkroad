@@ -128,6 +128,9 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
   }
 
   Future<void> searchDevices() async {
+    _searchProgress = 0.0;
+    _sendibleList.clear();
+    notifyListeners();
     final port = int.parse(
         OptionManager().get(Params.port.toString())?.toString() ??
             kDefaultPort.toString());
@@ -151,10 +154,12 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
         _sendibleList.append(device);
       }
     }
+
+    _sender.close();
   }
 
   void _sendibleProgressCallback(double progress, int count, int length) {
-    final progressPercount = count / length;
+    final progressPercount = 1 / length;
 
     _searchProgress =
         progress * progressPercount + progressPercount * (count - 1);
