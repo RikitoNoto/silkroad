@@ -17,10 +17,9 @@ import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/parameter.dart';
 import '../../spy/path_provider_spy.dart';
 
-
-
-Future setPort(int port) async{
-  SharedPreferences.setMockInitialValues(<String, Object>{Params.port.toString(): port});
+Future setPort(int port) async {
+  SharedPreferences.setMockInitialValues(
+      <String, Object>{Params.port.toString(): port});
   await OptionManager.initialize();
 }
 
@@ -28,15 +27,15 @@ Future setPort(int port) async{
 @GenerateMocks([ReceiveItem])
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  setUpAll((){
+  setUpAll(() {
     PathProviderPlatformSpy.temporaryPath = kTempDir.path;
   });
 
-  setUp(() async{
+  setUp(() async {
     await pathProviderSetUp();
   });
 
-  tearDown(() async{
+  tearDown(() async {
     await pathProviderTearDown();
   });
 
@@ -46,7 +45,7 @@ void main() {
   portTest();
 }
 
-void ipAddressTest(){
+void ipAddressTest() {
   group('ip address test', () {
     test('should be not set ip address when the ip list is empty', () {
       ReceiveProvider provider = constructProvider();
@@ -62,7 +61,9 @@ void ipAddressTest(){
       expect(provider.currentIp, '192.168.1.100');
     });
 
-    test('should be return false when the ip is not include in the ip list(empty)', () {
+    test(
+        'should be return false when the ip is not include in the ip list(empty)',
+        () {
       ReceiveProvider provider = constructProvider();
       provider.overwriteAddressList(<String>[]);
       expect(provider.isEnableIp('192.168.1.100'), isFalse);
@@ -81,16 +82,14 @@ Future checkOpenPort(
   ReceiveProvider provider,
   String ip,
   int port,
-  List<ReceiveItem> receiveSpy,
-  {
-    StreamController<ReceiveItem>? streamController,
-  }
-) async{
+  List<ReceiveItem> receiveSpy, {
+  StreamController<ReceiveItem>? streamController,
+}) async {
   streamController ??= StreamController<ReceiveItem>();
 
   // construct listen mock.
   when(repo.listen(any)).thenAnswer((_) {
-    for(ReceiveItem item in receiveSpy){
+    for (ReceiveItem item in receiveSpy) {
       streamController!.sink.add(item);
     }
     return streamController!.stream;
@@ -110,23 +109,26 @@ ReceiveProvider constructProvider({
   AnimatedListItemModel? receiveList,
   Platform? platform,
   ReceiveRepository? repository,
-}){
+}) {
   return ReceiveProvider(
     receiveList: receiveList ?? constructListItem([]),
     platform: platform ?? const LocalPlatform(),
-    builder: (){
+    builder: () {
       return repository ?? MockReceiveRepository();
     },
   );
 }
 
-AnimatedListItemModel<ReceiveItem> constructListItem(List<ReceiveItem> items){
-  AnimatedListItemModel<ReceiveItem> itemList = AnimatedListItemModel<ReceiveItem>(
+AnimatedListItemModel<ReceiveItem> constructListItem(List<ReceiveItem> items) {
+  AnimatedListItemModel<ReceiveItem> itemList =
+      AnimatedListItemModel<ReceiveItem>(
     listKey: GlobalKey<AnimatedListState>(),
-    removedItemBuilder: (ReceiveItem item, int index, BuildContext context, Animation<double> animation) => const Text(''),
+    removedItemBuilder: (ReceiveItem item, int index, BuildContext context,
+            Animation<double> animation) =>
+        const Text(''),
   );
 
-  for(ReceiveItem item in items){
+  for (ReceiveItem item in items) {
     itemList.append(item);
   }
   return itemList;
@@ -134,28 +136,27 @@ AnimatedListItemModel<ReceiveItem> constructListItem(List<ReceiveItem> items){
 
 void portTest() {
   group('port open and close test', () {
-
-    test('should be open port when call the open method', () async{
+    test('should be open port when call the open method', () async {
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, []);
     });
 
-    test('should be open port when call the open method [1000]', () async{
+    test('should be open port when call the open method [1000]', () async {
       await setPort(1000);
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 1000, []);
     });
 
-    test('should be open port when parameter is null', () async{
+    test('should be open port when parameter is null', () async {
       (await SharedPreferences.getInstance()).remove(Params.port.toString());
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
       checkOpenPort(mockRepo, provider, "192.168.1.1", 32099, []);
     });
 
-    test('should be close port when call the close method', () async{
+    test('should be close port when call the close method', () async {
       MockReceiveRepository mockRepo = MockReceiveRepository();
       ReceiveProvider provider = constructProvider(repository: mockRepo);
       when(mockRepo.close());
@@ -165,12 +166,20 @@ void portTest() {
   });
 }
 
-Future<AnimatedListItemModel<ReceiveItem>> setupAfterReceiveTest(List<ReceiveItem> receiveItems) async{
+Future<AnimatedListItemModel<ReceiveItem>> setupAfterReceiveTest(
+    List<ReceiveItem> receiveItems) async {
   MockReceiveRepository mockRepo = MockReceiveRepository();
-  StreamController<ReceiveItem> streamController = StreamController<ReceiveItem>();
+  StreamController<ReceiveItem> streamController =
+      StreamController<ReceiveItem>();
   AnimatedListItemModel<ReceiveItem> itemList = constructListItem([]);
-  ReceiveProvider provider = constructProvider(repository: mockRepo, receiveList: itemList);
-  checkOpenPort(mockRepo, provider, "127.0.0.1", 32099, receiveItems,
+  ReceiveProvider provider =
+      constructProvider(repository: mockRepo, receiveList: itemList);
+  checkOpenPort(
+    mockRepo,
+    provider,
+    "127.0.0.1",
+    32099,
+    receiveItems,
     streamController: streamController,
   );
   await Future.delayed(const Duration(milliseconds: 10));
@@ -179,12 +188,13 @@ Future<AnimatedListItemModel<ReceiveItem>> setupAfterReceiveTest(List<ReceiveIte
   return itemList;
 }
 
-void afterReceiveTest(){
+void afterReceiveTest() {
   group('after receive data test', () {
-    test('should be increase item list after received item.', () async{
+    test('should be increase item list after received item.', () async {
       MockReceiveItem itemMock1 = MockReceiveItem();
       MockReceiveItem itemMock2 = MockReceiveItem();
-      AnimatedListItemModel<ReceiveItem> itemList = await setupAfterReceiveTest([
+      AnimatedListItemModel<ReceiveItem> itemList =
+          await setupAfterReceiveTest([
         itemMock1,
         itemMock2,
       ]);
@@ -197,8 +207,8 @@ void afterReceiveTest(){
 }
 
 void itemActionTest() {
-  group('delete display by item action test', (){
-    test('should be able to delete item.', () async{
+  group('delete display by item action test', () {
+    test('should be able to delete item.', () async {
       AnimatedListItemModel<ReceiveItem> itemList = constructListItem([
         ReceiveItem(name: 'name', data: Uint8List(0), sender: 'sender'),
       ]);
@@ -207,7 +217,7 @@ void itemActionTest() {
       expect(itemList.length, 0);
     });
 
-    test('should be able to delete selected item.', () async{
+    test('should be able to delete selected item.', () async {
       AnimatedListItemModel<ReceiveItem> itemList = constructListItem([
         ReceiveItem(name: 'no target', data: Uint8List(0), sender: 'sender'),
         ReceiveItem(name: 'target', data: Uint8List(0), sender: 'sender'),
@@ -219,6 +229,5 @@ void itemActionTest() {
       expect(itemList[0].name, 'no target');
       expect(itemList[1].name, 'no target');
     });
-
   });
 }
