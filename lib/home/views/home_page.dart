@@ -5,6 +5,8 @@ import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/parameter.dart';
 import 'package:silkroad/utils/views/character_logo.dart';
 import 'package:silkroad/i18n/translations.g.dart';
+import 'package:silkroad/ads/ad_helper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,6 +15,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  BannerAd? _bannerAd;
+  @override
+  void initState() {
+    super.initState();
+    AdHelper.initGoogleMobileAds();
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+      ),
+    ).load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +53,8 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: CharacterLogo(),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
+        body: Stack(children: [
+          Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: SizedBox(
@@ -38,7 +67,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -67,27 +95,41 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-
-          ]
-        ),
+          ]),
+          if (_bannerAd != null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                width: _bannerAd!.size.width.toDouble(),
+                height: _bannerAd!.size.height.toDouble(),
+                child: AdWidget(ad: _bannerAd!),
+              ),
+            ),
+        ]),
       ),
     );
   }
 
-
-  Widget _buildActionSelectButton(BuildContext context, {required String label, String? svgPath, IconData? iconData, required Color iconColor, void Function()? onPressed}){
-    if( ((svgPath == null) && (iconData == null)) ||
-        ((svgPath != null) && (iconData != null)) ) throw ArgumentError('there is no icon data. set svgPath or iconData which one.');
+  Widget _buildActionSelectButton(BuildContext context,
+      {required String label,
+      String? svgPath,
+      IconData? iconData,
+      required Color iconColor,
+      void Function()? onPressed}) {
+    if (((svgPath == null) && (iconData == null)) ||
+        ((svgPath != null) && (iconData != null)))
+      throw ArgumentError(
+          'there is no icon data. set svgPath or iconData which one.');
 
     Widget icon;
-    if(svgPath != null){
-      icon =SvgPicture.asset(
+    if (svgPath != null) {
+      icon = SvgPicture.asset(
         svgPath,
         fit: BoxFit.scaleDown,
         color: Colors.white,
       );
-    }
-    else{ // if(iconData != null){
+    } else {
+      // if(iconData != null){
       icon = Icon(
         iconData,
         color: Colors.white,
@@ -100,7 +142,8 @@ class _HomePageState extends State<HomePage> {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: MaterialStateProperty.all<Color>(AppTheme.getBackgroundColor(context)),
+        backgroundColor: MaterialStateProperty.all<Color>(
+            AppTheme.getBackgroundColor(context)),
       ),
       child: SizedBox(
         height: 40,
@@ -116,7 +159,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: icon,
               ),
-              const SizedBox(width: 10,),
+              const SizedBox(
+                width: 10,
+              ),
               Expanded(
                 child: Text(
                   label,
