@@ -1,14 +1,22 @@
 import 'dart:io';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:platform/platform.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdHelper {
-  static Future<InitializationStatus> initGoogleMobileAds() {
+  AdHelper({
+    required this.platform,
+  });
+
+  final Platform platform;
+
+  Future<InitializationStatus> initGoogleMobileAds() {
     return MobileAds.instance.initialize();
   }
 
-  static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
+  String get bannerAdUnitId {
+    if (platform.isAndroid) {
       if (kDebugMode) {
         return 'ca-app-pub-3940256099942544/2934735716';
       } else {
@@ -18,7 +26,23 @@ class AdHelper {
       //   return '<YOUR_IOS_BANNER_AD_UNIT_ID>';
     } else {
       return '';
-      throw UnsupportedError('Unsupported platform');
+    }
+  }
+
+  void initBannerAd({void Function(Ad)? onAdLoaded}) {
+    if (platform.isAndroid) {
+      initGoogleMobileAds();
+      BannerAd(
+        adUnitId: bannerAdUnitId,
+        request: const AdRequest(),
+        size: AdSize.banner,
+        listener: BannerAdListener(
+          onAdLoaded: onAdLoaded,
+          onAdFailedToLoad: (ad, err) {
+            ad.dispose();
+          },
+        ),
+      ).load();
     }
   }
 }

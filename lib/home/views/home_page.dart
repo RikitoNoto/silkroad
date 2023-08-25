@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:platform/platform.dart';
+import 'package:silkroad/ads/platform_banner_ad.dart';
 import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/parameter.dart';
@@ -9,7 +12,10 @@ import 'package:silkroad/ads/ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({required this.platform, super.key});
+
+  final Platform platform;
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -19,22 +25,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    AdHelper.initGoogleMobileAds();
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          ad.dispose();
-        },
-      ),
-    ).load();
+    AdHelper(platform: widget.platform).initBannerAd(
+        onAdLoaded: (ad) => setState(() {
+              _bannerAd = ad as BannerAd;
+            }));
   }
 
   @override
@@ -96,15 +90,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ]),
-          if (_bannerAd != null)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SizedBox(
-                width: _bannerAd!.size.width.toDouble(),
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            ),
+          PlatformBannerAd(
+            platform: widget.platform,
+            bannerAd: _bannerAd,
+          ),
         ]),
       ),
     );

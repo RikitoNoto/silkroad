@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:platform/platform.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
@@ -12,6 +13,8 @@ import 'package:silkroad/utils/views/theme_animated_list_item.dart';
 import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/receive/providers/receive_provider.dart';
 import 'package:silkroad/i18n/translations.g.dart';
+import 'package:silkroad/ads/platform_banner_ad.dart';
+import 'package:silkroad/ads/ad_helper.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({
@@ -29,6 +32,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   final _listKey = GlobalKey<AnimatedListState>();
   late AnimatedListItemModel<ReceiveItem> _receiveList;
   late final ReceiveProvider provider;
+  BannerAd? _bannerAd;
 
   final List<ReceiveItem> _debugReceiveItems = [
     ReceiveItem(
@@ -82,6 +86,11 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
     );
     provider =
         ReceiveProvider(platform: widget.platform, receiveList: _receiveList);
+
+    AdHelper(platform: widget.platform).initBannerAd(
+        onAdLoaded: (ad) => setState(() {
+              _bannerAd = ad as BannerAd;
+            }));
   }
 
   @override
@@ -226,6 +235,10 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
             itemBuilder: _buildItem,
           ),
         ),
+      ),
+      PlatformBannerAd(
+        platform: widget.platform,
+        bannerAd: _bannerAd,
       ),
     ]);
   }
