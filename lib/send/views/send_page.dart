@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:platform/platform.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -12,6 +13,8 @@ import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/utils/views/wait_progress_dialog.dart';
+import 'package:silkroad/ads/platform_banner_ad.dart';
+import 'package:silkroad/ads/ad_helper.dart';
 
 import '../../utils/views/theme_animated_list_item.dart';
 import '../entities/sendible_device.dart';
@@ -28,6 +31,7 @@ class SendPage extends StatefulWidget {
 class _SendPageState extends State<SendPage> with RouteAware {
   late final SendProvider provider;
 
+  BannerAd? _bannerAd;
   static final String _ipFieldLabelText = t.send.receiverAddress;
   static const double _ipFieldOutPadding = 10.0;
   static const TextStyle _ipFieldCommaTextStyle = TextStyle(
@@ -48,6 +52,11 @@ class _SendPageState extends State<SendPage> with RouteAware {
         listKey: _listKey, removedItemBuilder: _removeItem);
     provider = SendProvider(
         platform: const LocalPlatform(), sendibleList: _sendibleDevices);
+
+    AdHelper(platform: widget.platform).initBannerAd(
+        onAdLoaded: (ad) => setState(() {
+              _bannerAd = ad as BannerAd;
+            }));
   }
 
   @override
@@ -219,6 +228,10 @@ class _SendPageState extends State<SendPage> with RouteAware {
       _SendibleList(
         listKey: _listKey,
         builder: _buildItem,
+      ),
+      PlatformBannerAd(
+        platform: widget.platform,
+        bannerAd: _bannerAd,
       ),
     ]);
   }
