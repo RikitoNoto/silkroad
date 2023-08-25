@@ -22,8 +22,12 @@ class AdHelper {
       } else {
         return 'ca-app-pub-9865959999329879/8255171291';
       }
-      // } else if (Platform.isIOS) {
-      //   return '<YOUR_IOS_BANNER_AD_UNIT_ID>';
+    } else if (platform.isIOS) {
+      if (kDebugMode) {
+        return 'ca-app-pub-3940256099942544/2934735716';
+      } else {
+        return 'ca-app-pub-9865959999329879/3977062661';
+      }
     } else {
       return '';
     }
