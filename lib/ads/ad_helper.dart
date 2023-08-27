@@ -32,7 +32,7 @@ class AdHelper {
   }
 
   void initBannerAd({void Function(Ad)? onAdLoaded}) {
-    if (platform.isAndroid) {
+    if (platform.isAndroid || platform.isIOS) {
       initGoogleMobileAds();
       BannerAd(
         adUnitId: bannerAdUnitId,

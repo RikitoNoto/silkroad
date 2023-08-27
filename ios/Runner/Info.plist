@@ -57,6 +57,6 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>GADApplicationIdentifier</key>
-	<string>${ADMOB_ID}</string>
+	<string>${ADMOD_ID}</string>
 </dict>
 </plist>
