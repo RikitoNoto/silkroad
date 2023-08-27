@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:platform/platform.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdHelper {
   AdHelper({
@@ -22,15 +20,19 @@ class AdHelper {
       } else {
         return 'ca-app-pub-9865959999329879/8255171291';
       }
-      // } else if (Platform.isIOS) {
-      //   return '<YOUR_IOS_BANNER_AD_UNIT_ID>';
+    } else if (platform.isIOS) {
+      if (kDebugMode) {
+        return 'ca-app-pub-3940256099942544/2934735716';
+      } else {
+        return 'ca-app-pub-9865959999329879/3977062661';
+      }
     } else {
       return '';
     }
   }
 
   void initBannerAd({void Function(Ad)? onAdLoaded}) {
-    if (platform.isAndroid) {
+    if (platform.isAndroid || platform.isIOS) {
       initGoogleMobileAds();
       BannerAd(
         adUnitId: bannerAdUnitId,
