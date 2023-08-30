@@ -30,7 +30,7 @@ class SilkRoadApp extends StatelessWidget {
             case '/':
               {
                 return PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const HomePage(),
+                  pageBuilder: (_, __, ___) => HomePage(platform: platform),
                 );
               }
             case '/send':
@@ -79,7 +79,7 @@ class SilkRoadApp extends StatelessWidget {
             default:
               {
                 return MaterialPageRoute(
-                    builder: (context) => const HomePage());
+                    builder: (context) => HomePage(platform: platform));
               }
           }
         });

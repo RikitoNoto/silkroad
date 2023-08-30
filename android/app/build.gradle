@@ -27,6 +27,14 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def loadProperties(filename) {
+    def props = new Properties()
+    file(filename).withInputStream {
+        props.load(it)
+    }
+    return props
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
@@ -53,7 +61,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion 21// flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 33//flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -68,11 +76,17 @@ android {
     }
 
     buildTypes {
+        debug {
+            def props = loadProperties("$rootDir/app/gradle.properties")
+            manifestPlaceholders = [admob_app_id: props.admobAppIdDebug]
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
 //            signingConfig signingConfigs.debug
             signingConfig signingConfigs.release
+            def props = loadProperties("$rootDir/app/gradle.properties")
+            manifestPlaceholders = [admob_app_id: props.admobAppIdRelease]
         }
     }
 }
