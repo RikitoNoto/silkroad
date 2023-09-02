@@ -10,11 +10,13 @@ import 'package:silkroad/utils/views/character_logo.dart';
 import 'package:silkroad/i18n/translations.g.dart';
 import 'package:silkroad/ads/ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:silkroad/version/version.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({required this.platform, super.key});
+  const HomePage({required this.platform, required this.version, super.key});
 
   final Platform platform;
+  final Version version;
 
   @override
   State<HomePage> createState() => _HomePageState();
