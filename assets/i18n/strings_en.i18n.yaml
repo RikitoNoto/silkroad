@@ -17,3 +17,8 @@ send:
 params:
   name: "Your name"
   port: "Port number"
+
+version:
+  oldVersionDialogTitle: "Please version up"
+  oldVersionDialogContent: "This app version is old.\nPlease version up."
+

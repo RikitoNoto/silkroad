@@ -3,9 +3,9 @@
  * Generated file. Do not edit.
  *
  * Locales: 2
- * Strings: 26 (13.0 per locale)
+ * Strings: 30 (15.0 per locale)
  *
- * Built on 2023-08-18 at 12:05 UTC
+ * Built on 2023-09-02 at 15:04 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -311,6 +311,7 @@ class _TranslationsEn {
 	late final _TranslationsActionsEn actions = _TranslationsActionsEn._(_root);
 	late final _TranslationsSendEn send = _TranslationsSendEn._(_root);
 	late final _TranslationsParamsEn params = _TranslationsParamsEn._(_root);
+	late final _TranslationsVersionEn version = _TranslationsVersionEn._(_root);
 }
 
 // Path: actions
@@ -350,6 +351,17 @@ class _TranslationsParamsEn {
 	String get port => 'Port number';
 }
 
+// Path: version
+class _TranslationsVersionEn {
+	_TranslationsVersionEn._(this._root);
+
+	final _TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	String get oldVersionDialogTitle => 'Please version up';
+	String get oldVersionDialogContent => 'This app version is old.\nPlease version up.';
+}
+
 // Path: send.sendResult
 class _TranslationsSendSendResultEn {
 	_TranslationsSendSendResultEn._(this._root);
@@ -382,6 +394,7 @@ class _TranslationsJa implements _TranslationsEn {
 	@override late final _TranslationsActionsJa actions = _TranslationsActionsJa._(_root);
 	@override late final _TranslationsSendJa send = _TranslationsSendJa._(_root);
 	@override late final _TranslationsParamsJa params = _TranslationsParamsJa._(_root);
+	@override late final _TranslationsVersionJa version = _TranslationsVersionJa._(_root);
 }
 
 // Path: actions
@@ -421,6 +434,17 @@ class _TranslationsParamsJa implements _TranslationsParamsEn {
 	@override String get port => 'ポート番号';
 }
 
+// Path: version
+class _TranslationsVersionJa implements _TranslationsVersionEn {
+	_TranslationsVersionJa._(this._root);
+
+	@override final _TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get oldVersionDialogTitle => 'バージョンアップ';
+	@override String get oldVersionDialogContent => '使用しているアプリのバージョンが古くなっています。\nバージョンアップしてください。';
+}
+
 // Path: send.sendResult
 class _TranslationsSendSendResultJa implements _TranslationsSendSendResultEn {
 	_TranslationsSendSendResultJa._(this._root);
@@ -453,6 +477,8 @@ extension on _TranslationsEn {
 			'send.sendResult.sendFail': 'did not send the file to the connected device.',
 			'params.name': 'Your name',
 			'params.port': 'Port number',
+			'version.oldVersionDialogTitle': 'Please version up',
+			'version.oldVersionDialogContent': 'This app version is old.\nPlease version up.',
 		};
 	}
 }
@@ -473,6 +499,8 @@ extension on _TranslationsJa {
 			'send.sendResult.sendFail': '接続先のデバイスに送信できません。',
 			'params.name': '名前',
 			'params.port': 'ポート番号',
+			'version.oldVersionDialogTitle': 'バージョンアップ',
+			'version.oldVersionDialogContent': '使用しているアプリのバージョンが古くなっています。\nバージョンアップしてください。',
 		};
 	}
 }
