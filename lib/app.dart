@@ -85,7 +85,10 @@ class SilkRoadApp extends StatelessWidget {
             default:
               {
                 return MaterialPageRoute(
-                    builder: (context) => HomePage(platform: platform));
+                    builder: (context) => HomePage(
+                          platform: platform,
+                          version: version,
+                        ));
               }
           }
         });

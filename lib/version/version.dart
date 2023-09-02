@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -24,14 +25,36 @@ class VersionWithGithubApi implements Version {
     fetchVersion();
   }
 
+  @visibleForTesting
+  VersionWithGithubApi.forTest({
+    this.url = "",
+    this.branch = "",
+  });
+
   final String url;
   final String branch;
 
+  @override
   final List<int> current = [];
 
-  List<int> get required => [];
+  @override
+  final List<int> required = [];
 
+  @override
   bool isNeedUpdate() {
+    if (current.isEmpty || required.isEmpty) {
+      return false;
+    }
+
+    for (var i = 0; i < required.length; i++) {
+      if (current[i] < required[i]) {
+        return true;
+      }
+
+      if (current[i] > required[i]) {
+        return false;
+      }
+    }
     return false;
   }
 

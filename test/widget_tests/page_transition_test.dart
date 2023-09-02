@@ -17,23 +17,32 @@ import 'package:silkroad/app.dart';
 import 'package:silkroad/send/send.dart';
 import 'package:silkroad/receive/receive.dart';
 import 'package:silkroad/parameter.dart';
+import 'package:silkroad/version/version.dart';
 
-void main() async{
+void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   Map<String, Object> map = <String, Object>{};
   map[Params.name.toString()] = '';
   SharedPreferences.setMockInitialValues(map);
   await OptionManager.initialize();
 
-  testWidgets('display the home page when start application', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform(),));
+  testWidgets('display the home page when start application',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(SilkRoadApp(
+      platform: const LocalPlatform(),
+      version: VersionWithGithubApi.forTest(),
+    ));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomePage), findsOneWidget);
   });
 
-  testWidgets('transition to the send page when push send button', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform()));
+  testWidgets('transition to the send page when push send button',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(SilkRoadApp(
+      platform: const LocalPlatform(),
+      version: VersionWithGithubApi.forTest(),
+    ));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('Send')));
@@ -42,8 +51,12 @@ void main() async{
     expect(find.byType(SendPage), findsOneWidget);
   });
 
-  testWidgets('transition to the receive page when push receive button', (WidgetTester tester) async {
-    await tester.pumpWidget(const SilkRoadApp(platform: LocalPlatform()));
+  testWidgets('transition to the receive page when push receive button',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(SilkRoadApp(
+      platform: const LocalPlatform(),
+      version: VersionWithGithubApi.forTest(),
+    ));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('Receive')));
@@ -51,5 +64,4 @@ void main() async{
 
     expect(find.byType(ReceivePage), findsOneWidget);
   });
-
 }
