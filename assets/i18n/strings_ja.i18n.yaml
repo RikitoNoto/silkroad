@@ -17,3 +17,7 @@ send:
 params:
   name: "名前"
   port: "ポート番号"
+
+version:
+  oldVersionDialogTitle: "バージョンアップ"
+  oldVersionDialogContent: "使用しているアプリのバージョンが古くなっています。\nバージョンアップしてください。"

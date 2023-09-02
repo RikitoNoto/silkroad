@@ -10,6 +10,8 @@ import 'package:silkroad/i18n/translations.g.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final version = Version();
+  await version.fetchVersion();
+
   DartPingIOS.register();
   await initialize();
   LocaleSettings.useDeviceLocale();

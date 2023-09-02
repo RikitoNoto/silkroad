@@ -14,6 +14,7 @@ abstract class Version {
   List<int> get current;
   List<int> get required;
 
+  Future<void> fetchVersion();
   bool isNeedUpdate();
 }
 
@@ -21,9 +22,7 @@ class VersionWithGithubApi implements Version {
   VersionWithGithubApi({
     required this.url,
     this.branch = "main",
-  }) {
-    fetchVersion();
-  }
+  });
 
   @visibleForTesting
   VersionWithGithubApi.forTest({
@@ -58,9 +57,10 @@ class VersionWithGithubApi implements Version {
     return false;
   }
 
+  @override
   Future<void> fetchVersion() async {
-    fetchCurrentVersion();
-    fetchRequiredVersion();
+    await fetchCurrentVersion();
+    await fetchRequiredVersion();
   }
 
   Future<void> fetchCurrentVersion() async {
@@ -72,6 +72,10 @@ class VersionWithGithubApi implements Version {
 
   Future<void> fetchRequiredVersion() async {
     final response = await http.get(Uri.parse("$url?ref=$branch"));
+    if (response.statusCode != 200) {
+      return;
+    }
+
     final body = jsonDecode(response.body);
     final contentString = body["content"] as String;
 

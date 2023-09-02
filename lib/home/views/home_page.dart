@@ -31,6 +31,17 @@ class _HomePageState extends State<HomePage> {
         onAdLoaded: (ad) => setState(() {
               _bannerAd = ad as BannerAd;
             }));
+
+    if (widget.version.isNeedUpdate()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
+          context: context,
+          builder: (context) => WillPopScope(
+              child: AlertDialog(
+                title: Text(t.version.oldVersionDialogTitle),
+                content: Text(t.version.oldVersionDialogContent),
+              ),
+              onWillPop: () async => false)));
+    }
   }
 
   @override
