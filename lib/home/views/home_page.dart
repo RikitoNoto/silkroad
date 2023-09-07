@@ -144,8 +144,8 @@ class _HomePageState extends State<HomePage> {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: MaterialStateProperty.all<Color>(
-            AppTheme.getBackgroundColor(context)),
+        // backgroundColor: MaterialStateProperty.all<Color>(
+        //     AppTheme.getBackgroundColor(context)),
       ),
       child: SizedBox(
         height: 40,

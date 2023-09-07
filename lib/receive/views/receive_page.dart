@@ -212,8 +212,8 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
               enabled: provider.isEnableIp(provider.currentIp),
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,
-              progressIndicatorColor: Colors.blue,
-              iconColor: AppTheme.getForegroundColor(context),
+              // progressIndicatorColor: Colors.blue,
+              // iconColor: AppTheme.getForegroundColor(context),
               onTap: (state) {
                 if (state == AlternateActionStatus.active) {
                   provider.open();
@@ -229,7 +229,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       // receive list
       Flexible(
         child: Container(
-          color: AppTheme.getSecondaryBackgroundColor(context),
+          // color: AppTheme.getSecondaryBackgroundColor(context),
           child: AnimatedList(
             key: _listKey,
             itemBuilder: _buildItem,
@@ -260,8 +260,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   Widget _buildIpListForAndroidPc(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Consumer<ReceiveProvider>(
@@ -284,8 +283,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   Widget _buildIpListForIos(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: CupertinoButton(
@@ -295,15 +293,15 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
               return Text(
                 provider.currentIp,
                 style: TextStyle(
-                  color: AppTheme.getForegroundColor(context),
-                ),
+                    // color: AppTheme.getForegroundColor(context),
+                    ),
               );
             }),
             Align(
                 alignment: Alignment.centerRight,
                 child: Icon(
                   Icons.arrow_drop_down,
-                  color: AppTheme.getForegroundColor(context),
+                  // color: AppTheme.getForegroundColor(context),
                 )),
           ],
         ),

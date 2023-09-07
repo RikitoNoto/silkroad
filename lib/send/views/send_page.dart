@@ -188,7 +188,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
                   IconButton(
                     icon: const Icon(
                       Icons.send,
-                      color: AppTheme.appIconColor1,
+                      // color: AppTheme.appIconColor1,
                     ),
                     onPressed: () async {
                       WaitProgressDialog.show(
@@ -222,7 +222,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
       Consumer<SendProvider>(
         builder: (context, provider, child) => LinearProgressIndicator(
           value: provider.searchProgress,
-          color: Colors.lightBlue,
+          // color: Colors.lightBlue,
         ),
       ),
       _SendibleList(

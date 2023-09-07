@@ -35,8 +35,8 @@ class _ThemeAnimatedListItemBase extends StatelessWidget {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: MaterialStateProperty.all<Color>(
-            AppTheme.getBackgroundColor(context)),
+        // backgroundColor: MaterialStateProperty.all<Color>(
+        //     AppTheme.getBackgroundColor(context)),
       ),
       child: IntrinsicHeight(
         child: Padding(
