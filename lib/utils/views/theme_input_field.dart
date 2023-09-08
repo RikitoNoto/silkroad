@@ -47,21 +47,21 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
         onChanged: widget.onChanged,
         inputFormatters: widget.inputFormatters,
         keyboardType: widget.keyboardType,
-        cursorColor: _getFocusColor(context),
+        // cursorColor: _getFocusColor(context),
         controller: controller,
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(
-            color: _isFocus
-                ? _getFocusColor(context)
-                : _getThemeBorderColor(context),
-          ),
+              // color: _isFocus
+              //     ? _getFocusColor(context)
+              //     : _getThemeBorderColor(context),
+              ),
           contentPadding: widget.contentPadding,
           border: const OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
-            color: _getFocusColor(context)!,
-          )),
+                  // color: _getFocusColor(context)!,
+                  )),
         ),
         textInputAction: widget.textInputAction,
         maxLines: 1,
@@ -69,11 +69,11 @@ class _ThemeInputFieldState extends State<ThemeInputField> {
     );
   }
 
-  Color? _getThemeBorderColor(BuildContext context) {
-    return Theme.of(context).primaryTextTheme.labelSmall?.decorationColor;
-  }
+  // Color? _getThemeBorderColor(BuildContext context) {
+  //   return Theme.of(context).primaryTextTheme.labelSmall?.decorationColor;
+  // }
 
-  Color? _getFocusColor(BuildContext context) {
-    return Colors.blue;
-  }
+  // Color? _getFocusColor(BuildContext context) {
+  //   return Colors.blue;
+  // }
 }

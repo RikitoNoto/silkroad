@@ -7,7 +7,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 
-import 'package:silkroad/app_theme.dart';
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
 import 'package:silkroad/utils/views/theme_input_field.dart';
@@ -188,7 +187,6 @@ class _SendPageState extends State<SendPage> with RouteAware {
                   IconButton(
                     icon: const Icon(
                       Icons.send,
-                      color: AppTheme.appIconColor1,
                     ),
                     onPressed: () async {
                       WaitProgressDialog.show(
@@ -222,7 +220,6 @@ class _SendPageState extends State<SendPage> with RouteAware {
       Consumer<SendProvider>(
         builder: (context, provider, child) => LinearProgressIndicator(
           value: provider.searchProgress,
-          color: Colors.lightBlue,
         ),
       ),
       _SendibleList(

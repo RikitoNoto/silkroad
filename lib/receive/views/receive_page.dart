@@ -212,8 +212,6 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
               enabled: provider.isEnableIp(provider.currentIp),
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,
-              progressIndicatorColor: Colors.blue,
-              iconColor: AppTheme.getForegroundColor(context),
               onTap: (state) {
                 if (state == AlternateActionStatus.active) {
                   provider.open();
@@ -228,12 +226,9 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
 
       // receive list
       Flexible(
-        child: Container(
-          color: AppTheme.getSecondaryBackgroundColor(context),
-          child: AnimatedList(
-            key: _listKey,
-            itemBuilder: _buildItem,
-          ),
+        child: AnimatedList(
+          key: _listKey,
+          itemBuilder: _buildItem,
         ),
       ),
       PlatformBannerAd(
@@ -260,32 +255,30 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   Widget _buildIpListForAndroidPc(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Consumer<ReceiveProvider>(
-          builder: (context, provider, child) => DropdownButton(
-                value: provider.currentIp,
-                icon: const Icon(Icons.arrow_drop_down),
-                iconSize: 30,
-                isExpanded: true,
-                underline: DropdownButtonHideUnderline(child: Container()),
-                elevation: 0,
-                onChanged: (address) => provider.selectIp(address),
-                items: provider.ipList
-                    .map((address) =>
-                        DropdownMenuItem(value: address, child: Text(address)))
-                    .toList(),
-              )),
+        builder: (context, provider, child) => DropdownButton(
+          value: provider.currentIp,
+          icon: const Icon(Icons.arrow_drop_down),
+          iconSize: 30,
+          isExpanded: true,
+          underline: DropdownButtonHideUnderline(child: Container()),
+          onChanged: (address) => provider.selectIp(address),
+          items: provider.ipList
+              .map((address) =>
+                  DropdownMenuItem(value: address, child: Text(address)))
+              .toList(),
+        ),
+      ),
     );
   }
 
   Widget _buildIpListForIos(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: CupertinoButton(
@@ -294,17 +287,14 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
             Consumer<ReceiveProvider>(builder: (context, provider, child) {
               return Text(
                 provider.currentIp,
-                style: TextStyle(
-                  color: AppTheme.getForegroundColor(context),
-                ),
               );
             }),
-            Align(
-                alignment: Alignment.centerRight,
-                child: Icon(
-                  Icons.arrow_drop_down,
-                  color: AppTheme.getForegroundColor(context),
-                )),
+            const Align(
+              alignment: Alignment.centerRight,
+              child: Icon(
+                Icons.arrow_drop_down,
+              ),
+            ),
           ],
         ),
         onPressed: () {
@@ -352,19 +342,16 @@ class _ListItemTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-          child: Container(
-            padding: const EdgeInsets.all(5.0),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.appIconColor2,
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 30.0,
-            ),
+        Container(
+          // padding: const EdgeInsets.all(5.0),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            // color: AppTheme.appIconColor2,
+          ),
+          child: Icon(
+            icon,
+            // color: Colors.white,
+            size: 30.0,
           ),
         ),
         Flexible(
