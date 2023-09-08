@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:platform/platform.dart';
 import 'package:silkroad/ads/platform_banner_ad.dart';
@@ -33,14 +32,16 @@ class _HomePageState extends State<HomePage> {
             }));
 
     if (widget.version.isNeedUpdate()) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
-          context: context,
-          builder: (context) => WillPopScope(
-              child: AlertDialog(
-                title: Text(t.version.oldVersionDialogTitle),
-                content: Text(t.version.oldVersionDialogContent),
-              ),
-              onWillPop: () async => false)));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => showDialog(
+            context: context,
+            builder: (context) => WillPopScope(
+                child: AlertDialog(
+                  title: Text(t.version.oldVersionDialogTitle),
+                  content: Text(t.version.oldVersionDialogContent),
+                ),
+                onWillPop: () async => false)),
+      );
     }
   }
 
@@ -58,56 +59,66 @@ class _HomePageState extends State<HomePage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: CharacterLogo(),
+          title: const CharacterLogo(),
         ),
-        body: Stack(children: [
-          Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-              child: SizedBox(
-                height: 50,
-                child: ThemeInputField(
-                  labelText: t.params.name,
-                  initialValue: name is String ? name : null,
-                  onChanged: OptionInput.createCallbackForInput(Params.name),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        body: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  child: SizedBox(
+                    height: 50,
+                    child: ThemeInputField(
+                      labelText: t.params.name,
+                      initialValue: name is String ? name : null,
+                      onChanged:
+                          OptionInput.createCallbackForInput(Params.name),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      _buildActionSelectButton(
+                        context,
+                        label: t.actions.send,
+                        svgPath: 'assets/svg_icons/transfer-out.svg',
+                        iconColor: AppTheme.appIconColor1,
+                        onPressed: () => Navigator.pushNamed(context, '/send'),
+                      ),
+                      _buildActionSelectButton(
+                        context,
+                        label: t.actions.receive,
+                        svgPath: 'assets/svg_icons/transfer-in.svg',
+                        iconColor: AppTheme.appIconColor2,
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/receive'),
+                      ),
+                      _buildActionSelectButton(
+                        context,
+                        label: t.actions.option,
+                        iconData: Icons.settings,
+                        iconColor: Colors.grey,
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/option'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  _buildActionSelectButton(
-                    context,
-                    label: t.actions.send,
-                    svgPath: 'assets/svg_icons/transfer-out.svg',
-                    iconColor: AppTheme.appIconColor1,
-                    onPressed: () => Navigator.pushNamed(context, '/send'),
-                  ),
-                  _buildActionSelectButton(
-                    context,
-                    label: t.actions.receive,
-                    svgPath: 'assets/svg_icons/transfer-in.svg',
-                    iconColor: AppTheme.appIconColor2,
-                    onPressed: () => Navigator.pushNamed(context, '/receive'),
-                  ),
-                  _buildActionSelectButton(
-                    context,
-                    label: t.actions.option,
-                    iconData: Icons.settings,
-                    iconColor: Colors.grey,
-                    onPressed: () => Navigator.pushNamed(context, '/option'),
-                  ),
-                ],
-              ),
+            PlatformBannerAd(
+              platform: widget.platform,
+              bannerAd: _bannerAd,
             ),
-          ]),
-          PlatformBannerAd(
-            platform: widget.platform,
-            bannerAd: _bannerAd,
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -119,9 +130,10 @@ class _HomePageState extends State<HomePage> {
       required Color iconColor,
       void Function()? onPressed}) {
     if (((svgPath == null) && (iconData == null)) ||
-        ((svgPath != null) && (iconData != null)))
+        ((svgPath != null) && (iconData != null))) {
       throw ArgumentError(
           'there is no icon data. set svgPath or iconData which one.');
+    }
 
     Widget icon;
     if (svgPath != null) {
@@ -131,7 +143,6 @@ class _HomePageState extends State<HomePage> {
         color: Colors.white,
       );
     } else {
-      // if(iconData != null){
       icon = Icon(
         iconData,
         color: Colors.white,
@@ -144,8 +155,6 @@ class _HomePageState extends State<HomePage> {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all<double>(0.0),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        // backgroundColor: MaterialStateProperty.all<Color>(
-        //     AppTheme.getBackgroundColor(context)),
       ),
       child: SizedBox(
         height: 40,
