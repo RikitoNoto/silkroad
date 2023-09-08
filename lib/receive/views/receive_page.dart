@@ -342,19 +342,16 @@ class _ListItemTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-          child: Container(
-            padding: const EdgeInsets.all(5.0),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.appIconColor2,
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 30.0,
-            ),
+        Container(
+          // padding: const EdgeInsets.all(5.0),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            // color: AppTheme.appIconColor2,
+          ),
+          child: Icon(
+            icon,
+            // color: Colors.white,
+            size: 30.0,
           ),
         ),
         Flexible(
