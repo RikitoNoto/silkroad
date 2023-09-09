@@ -13,10 +13,24 @@ send:
     connectionFail: "send failed. please check the devices are in same network."
     lostFile: "did not find the file."
     sendFail: "did not send the file to the connected device."
+  tutorial:
+    ipAddressField: "Input an IP address, or select the discovered receive device,"
+    fileSelectButton: "Then select the file you want to send,"
+    sendButton: "After, you can send the file by push this send button."
+    researchButton: "And you can re-search receive devices by this re-search button."
+
+receive:
+  tutorial:
+    ipAddressSelector: "Select an IP address for receive.\nIt generally select the nearest address with sender.\n(Basically, the first three are the same, separated by commas.)"
+    openButton: "Push this button, you allow search your device and begin to receive data."
+
 
 params:
   name: "Your name"
   port: "Port number"
+
+tutorial:
+  skip: "Skip"
 
 version:
   oldVersionDialogTitle: "Please version up"

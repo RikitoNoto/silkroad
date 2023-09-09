@@ -28,40 +28,49 @@ void main() async {
 
   testWidgets('display the home page when start application',
       (WidgetTester tester) async {
-    await tester.pumpWidget(SilkRoadApp(
-      platform: const LocalPlatform(),
-      version: VersionWithGithubApi.forTest(),
-    ));
-    await tester.pumpAndSettle();
+    // Since Future processing is performed in initState, runAsync.
+    await tester.runAsync(() async {
+      await tester.pumpWidget(SilkRoadApp(
+        platform: const LocalPlatform(),
+        version: VersionWithGithubApi.forTest(),
+      ));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(HomePage), findsOneWidget);
+    });
   });
 
   testWidgets('transition to the send page when push send button',
       (WidgetTester tester) async {
-    await tester.pumpWidget(SilkRoadApp(
-      platform: const LocalPlatform(),
-      version: VersionWithGithubApi.forTest(),
-    ));
-    await tester.pumpAndSettle();
+    // Since Future processing is performed in initState, runAsync.
+    await tester.runAsync(() async {
+      await tester.pumpWidget(SilkRoadApp(
+        platform: const LocalPlatform(),
+        version: VersionWithGithubApi.forTest(),
+      ));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('Send')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('Send')));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(SendPage), findsOneWidget);
+      expect(find.byType(SendPage), findsOneWidget);
+    });
   });
 
   testWidgets('transition to the receive page when push receive button',
       (WidgetTester tester) async {
-    await tester.pumpWidget(SilkRoadApp(
-      platform: const LocalPlatform(),
-      version: VersionWithGithubApi.forTest(),
-    ));
-    await tester.pumpAndSettle();
+    // Since Future processing is performed in initState, runAsync.
+    await tester.runAsync(() async {
+      await tester.pumpWidget(SilkRoadApp(
+        platform: const LocalPlatform(),
+        version: VersionWithGithubApi.forTest(),
+      ));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('Receive')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('Receive')));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(ReceivePage), findsOneWidget);
+      expect(find.byType(ReceivePage), findsOneWidget);
+    });
   });
 }

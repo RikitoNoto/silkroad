@@ -15,35 +15,31 @@ class OptionPage extends StatefulWidget {
 }
 
 class _OptionPageState extends State<OptionPage> {
-
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              floating: true,
-              pinned: false,
-              snap: false,
-              title: Text(t.actions.option),
-            ),
-
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return Container(
-                    child: OptionInput.construct(Params.values[index]),
-                  );
-                },
-                childCount: Params.values.length,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                floating: true,
+                pinned: false,
+                snap: false,
+                title: Text(t.actions.option),
               ),
-            ),
-          ],
-        ),
-      )
-    );
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      child: OptionInput.construct(userInputParams[index]),
+                    );
+                  },
+                  childCount: userInputParams.length,
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }

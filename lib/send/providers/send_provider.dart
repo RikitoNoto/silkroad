@@ -158,6 +158,10 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
     _sender.close();
   }
 
+  Future<void> endTutorial() async {
+    await OptionManager().set(Params.isShowTutorialSend.toString(), true);
+  }
+
   void _sendibleProgressCallback(double progress, int count, int length) {
     final progressPercount = 1 / length;
 
