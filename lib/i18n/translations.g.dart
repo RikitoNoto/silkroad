@@ -3,9 +3,9 @@
  * Generated file. Do not edit.
  *
  * Locales: 2
- * Strings: 30 (15.0 per locale)
+ * Strings: 40 (20.0 per locale)
  *
- * Built on 2023-09-02 at 15:04 UTC
+ * Built on 2023-09-09 at 04:27 UTC
  */
 
 import 'package:flutter/widgets.dart';
@@ -311,6 +311,7 @@ class _TranslationsEn {
 	late final _TranslationsActionsEn actions = _TranslationsActionsEn._(_root);
 	late final _TranslationsSendEn send = _TranslationsSendEn._(_root);
 	late final _TranslationsParamsEn params = _TranslationsParamsEn._(_root);
+	late final _TranslationsTutorialEn tutorial = _TranslationsTutorialEn._(_root);
 	late final _TranslationsVersionEn version = _TranslationsVersionEn._(_root);
 }
 
@@ -338,6 +339,7 @@ class _TranslationsSendEn {
 	String get fileNone => 'No select';
 	String get sendibleAddress => 'Sendible Destination';
 	late final _TranslationsSendSendResultEn sendResult = _TranslationsSendSendResultEn._(_root);
+	late final _TranslationsSendTutorialEn tutorial = _TranslationsSendTutorialEn._(_root);
 }
 
 // Path: params
@@ -349,6 +351,16 @@ class _TranslationsParamsEn {
 	// Translations
 	String get name => 'Your name';
 	String get port => 'Port number';
+}
+
+// Path: tutorial
+class _TranslationsTutorialEn {
+	_TranslationsTutorialEn._(this._root);
+
+	final _TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	String get skip => 'Skip';
 }
 
 // Path: version
@@ -375,6 +387,19 @@ class _TranslationsSendSendResultEn {
 	String get sendFail => 'did not send the file to the connected device.';
 }
 
+// Path: send.tutorial
+class _TranslationsSendTutorialEn {
+	_TranslationsSendTutorialEn._(this._root);
+
+	final _TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	String get sendButton => 'You can send the file by push this send button.';
+	String get researchButton => 'And you can re-search receive devices by this re-search button.';
+	String get fileSelectButton => 'Then select the file you want to send,';
+	String get ipAddressField => 'Input an IP address, or select the discovered receive device,';
+}
+
 // Path: <root>
 class _TranslationsJa implements _TranslationsEn {
 
@@ -394,6 +419,7 @@ class _TranslationsJa implements _TranslationsEn {
 	@override late final _TranslationsActionsJa actions = _TranslationsActionsJa._(_root);
 	@override late final _TranslationsSendJa send = _TranslationsSendJa._(_root);
 	@override late final _TranslationsParamsJa params = _TranslationsParamsJa._(_root);
+	@override late final _TranslationsTutorialJa tutorial = _TranslationsTutorialJa._(_root);
 	@override late final _TranslationsVersionJa version = _TranslationsVersionJa._(_root);
 }
 
@@ -421,6 +447,7 @@ class _TranslationsSendJa implements _TranslationsSendEn {
 	@override String get fileNone => 'ファイル無し';
 	@override String get sendibleAddress => '送信可能アドレス';
 	@override late final _TranslationsSendSendResultJa sendResult = _TranslationsSendSendResultJa._(_root);
+	@override late final _TranslationsSendTutorialJa tutorial = _TranslationsSendTutorialJa._(_root);
 }
 
 // Path: params
@@ -432,6 +459,16 @@ class _TranslationsParamsJa implements _TranslationsParamsEn {
 	// Translations
 	@override String get name => '名前';
 	@override String get port => 'ポート番号';
+}
+
+// Path: tutorial
+class _TranslationsTutorialJa implements _TranslationsTutorialEn {
+	_TranslationsTutorialJa._(this._root);
+
+	@override final _TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get skip => 'スキップ';
 }
 
 // Path: version
@@ -458,6 +495,19 @@ class _TranslationsSendSendResultJa implements _TranslationsSendSendResultEn {
 	@override String get sendFail => '接続先のデバイスに送信できません。';
 }
 
+// Path: send.tutorial
+class _TranslationsSendTutorialJa implements _TranslationsSendTutorialEn {
+	_TranslationsSendTutorialJa._(this._root);
+
+	@override final _TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get sendButton => '送信ボタンを押すことでデータを送信できます。';
+	@override String get researchButton => 'また、更新ボタンで送信先の再検索を行えます。';
+	@override String get fileSelectButton => '送信したいファイルを選択し、';
+	@override String get ipAddressField => 'IPアドレスを入力、もしくは検索で出てきた送信先を押して、\n送信先を選択してください。';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -475,8 +525,13 @@ extension on _TranslationsEn {
 			'send.sendResult.connectionFail': 'send failed. please check the devices are in same network.',
 			'send.sendResult.lostFile': 'did not find the file.',
 			'send.sendResult.sendFail': 'did not send the file to the connected device.',
+			'send.tutorial.sendButton': 'You can send the file by push this send button.',
+			'send.tutorial.researchButton': 'And you can re-search receive devices by this re-search button.',
+			'send.tutorial.fileSelectButton': 'Then select the file you want to send,',
+			'send.tutorial.ipAddressField': 'Input an IP address, or select the discovered receive device,',
 			'params.name': 'Your name',
 			'params.port': 'Port number',
+			'tutorial.skip': 'Skip',
 			'version.oldVersionDialogTitle': 'Please version up',
 			'version.oldVersionDialogContent': 'This app version is old.\nPlease version up.',
 		};
@@ -497,8 +552,13 @@ extension on _TranslationsJa {
 			'send.sendResult.connectionFail': '送信失敗しました。同じネットワーク内にいることを確認してください。',
 			'send.sendResult.lostFile': 'ファイルがありません。',
 			'send.sendResult.sendFail': '接続先のデバイスに送信できません。',
+			'send.tutorial.sendButton': '送信ボタンを押すことでデータを送信できます。',
+			'send.tutorial.researchButton': 'また、更新ボタンで送信先の再検索を行えます。',
+			'send.tutorial.fileSelectButton': '送信したいファイルを選択し、',
+			'send.tutorial.ipAddressField': 'IPアドレスを入力、もしくは検索で出てきた送信先を押して、\n送信先を選択してください。',
 			'params.name': '名前',
 			'params.port': 'ポート番号',
+			'tutorial.skip': 'スキップ',
 			'version.oldVersionDialogTitle': 'バージョンアップ',
 			'version.oldVersionDialogContent': '使用しているアプリのバージョンが古くなっています。\nバージョンアップしてください。',
 		};

@@ -31,6 +31,7 @@ dependencies:
   google_mobile_ads: ^3.0.0
   package_info_plus: ^4.1.0
   http: ^1.1.0
+  tutorial_coach_mark: ^1.2.9
 
 dependency_overrides:
   http: ^1.1.0

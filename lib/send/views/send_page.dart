@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:platform/platform.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:silkroad/app_theme.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'package:silkroad/send/providers/send_provider.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
@@ -44,6 +47,12 @@ class _SendPageState extends State<SendPage> with RouteAware {
   final List<TextEditingController> _octetTextControllers =
       List.generate(4, (_) => TextEditingController());
 
+  late final TutorialCoachMark _tutorialCoachMark;
+  final GlobalKey _keySendButton = GlobalKey();
+  final GlobalKey _keyResearchButton = GlobalKey();
+  final GlobalKey _keyFileSelectButton = GlobalKey();
+  final GlobalKey _keyIpAddressField = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +65,9 @@ class _SendPageState extends State<SendPage> with RouteAware {
         onAdLoaded: (ad) => setState(() {
               _bannerAd = ad as BannerAd;
             }));
+
+    _createTutorial();
+    Future.delayed(Duration.zero, _showTutorial);
   }
 
   @override
@@ -72,6 +84,101 @@ class _SendPageState extends State<SendPage> with RouteAware {
   @override
   void didPushNext() {
     provider.close();
+  }
+
+  void _showTutorial() {
+    _tutorialCoachMark.show(context: context);
+  }
+
+  void _createTutorial() {
+    _tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: AppTheme.appIconColor1,
+      textSkip: t.tutorial.skip,
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onFinish: () {
+        print("finish");
+      },
+    );
+  }
+
+  TargetFocus _createTarget({
+    required GlobalKey<State<StatefulWidget>> key,
+    AlignmentGeometry alignSkip = Alignment.bottomRight,
+    ContentAlign align = ContentAlign.bottom,
+    required String text,
+    ShapeLightFocus? shape,
+    double? radius,
+  }) {
+    return TargetFocus(
+      identify: key.toString(),
+      keyTarget: key,
+      alignSkip: alignSkip,
+      enableOverlayTab: true,
+      shape: shape,
+      radius: radius,
+      contents: [
+        TargetContent(
+          align: align,
+          builder: (context, controller) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    // ip address field
+    targets.add(
+      _createTarget(
+        key: _keyIpAddressField,
+        text: t.send.tutorial.ipAddressField,
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    // file select field
+    targets.add(
+      _createTarget(
+        key: _keyFileSelectButton,
+        text: t.send.tutorial.fileSelectButton,
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    // send button
+    targets.add(
+      _createTarget(
+        key: _keySendButton,
+        text: t.send.tutorial.sendButton,
+      ),
+    );
+
+    // re-search button
+    targets.add(
+      _createTarget(
+        key: _keyResearchButton,
+        text: t.send.tutorial.researchButton,
+      ),
+    );
+    return targets;
   }
 
   List<Widget> _getDebugActions() {
@@ -166,6 +273,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
                     builder: (context, value, child) {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        key: _keyResearchButton,
                         children: [
                           if (provider.searchProgress >= 1.0)
                             IconButton(
@@ -185,7 +293,8 @@ class _SendPageState extends State<SendPage> with RouteAware {
                   ),
                   // send button
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
+                      key: _keySendButton,
                       Icons.send,
                     ),
                     onPressed: () async {
@@ -246,6 +355,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           IntrinsicHeight(
             child: Row(
+              key: _keyIpAddressField,
               children: [
                 //FIXME: input action next does not work, because input field is in other state.
                 _buildOctetField(
@@ -349,6 +459,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: ElevatedButton.icon(
+            key: _keyFileSelectButton,
             label: Text(t.send.selectFile),
             icon: const Icon(Icons.search),
             onPressed: () async {
