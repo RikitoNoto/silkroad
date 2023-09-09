@@ -62,6 +62,18 @@ class _SendPageState extends State<SendPage> with RouteAware {
     provider = SendProvider(
         platform: const LocalPlatform(), sendibleList: _sendibleDevices);
 
+    for (var i = 0; i < _octetTextControllers.length; i++) {
+      _octetTextControllers[i].addListener(() {
+        // if the inputted text be able to parse to number, set the value to provider.
+        try {
+          final value = int.parse(_octetTextControllers[i].text);
+          provider.setOctet(i, value);
+        } catch (e) {
+          return;
+        }
+      });
+    }
+
     AdHelper(platform: widget.platform).initBannerAd(
         onAdLoaded: (ad) => setState(() {
               _bannerAd = ad as BannerAd;
@@ -94,6 +106,19 @@ class _SendPageState extends State<SendPage> with RouteAware {
 
   void _showTutorial() {
     _tutorialCoachMark.show(context: context);
+  }
+
+  bool _isEnableSendButton() {
+    if (provider.filePath == "") {
+      return false;
+    }
+
+    for (var i = 0; i < _octetTextControllers.length; i++) {
+      if (_octetTextControllers[i].text == "") {
+        return false;
+      }
+    }
+    return true;
   }
 
   void _createTutorial() {
@@ -284,49 +309,41 @@ class _SendPageState extends State<SendPage> with RouteAware {
                       _showTutorial();
                     },
                   ),
-                  // research button
+                  // Research button
                   Consumer<SendProvider>(
                     builder: (context, value, child) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        key: _keyResearchButton,
-                        children: [
-                          if (provider.searchProgress >= 1.0)
-                            IconButton(
-                              icon: const Icon(
-                                Icons.autorenew,
-                              ),
-                              onPressed: () => provider.searchDevices(),
-                            ),
-                          if (provider.searchProgress < 1.0)
-                            const Icon(
-                              Icons.autorenew,
-                              color: Colors.grey,
-                            ),
-                        ],
+                      return _AlternateIconButton(
+                        icon: Icon(
+                          key: _keyResearchButton,
+                          Icons.autorenew,
+                        ),
+                        onPressed: () => provider.searchDevices(),
+                        enable: provider.searchProgress >= 1.0,
                       );
                     },
                   ),
-                  // send button
-                  IconButton(
-                    icon: Icon(
-                      key: _keySendButton,
-                      Icons.send,
-                    ),
-                    onPressed: () async {
-                      WaitProgressDialog.show(
-                          context); // show wait progress dialog.
-                      for (int i = 0; i < _octetTextControllers.length; i++) {
-                        provider.setOctet(
-                            i, int.parse(_octetTextControllers[i].text));
-                      }
+                  // Send button
+                  Consumer<SendProvider>(
+                    builder: (context, value, child) {
+                      return _AlternateIconButton(
+                        icon: Icon(
+                          key: _keySendButton,
+                          Icons.send,
+                        ),
+                        enable: _isEnableSendButton(),
+                        onPressed: () async {
+                          WaitProgressDialog.show(
+                              context); // show wait progress dialog.
 
-                      String message = (await provider.send()).message; // send.
-                      if (!mounted) return;
-                      WaitProgressDialog.close(
-                          context); // close wait progress dialog.
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(message)));
+                          String message =
+                              (await provider.send()).message; // send.
+                          if (!mounted) return;
+                          WaitProgressDialog.close(
+                              context); // close wait progress dialog.
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(message)));
+                        },
+                      );
                     },
                   ),
                 ] +
@@ -507,6 +524,36 @@ class _SendibleList extends StatelessWidget {
         key: listKey,
         itemBuilder: builder,
       ),
+    );
+  }
+}
+
+/// This is [IconButton] that can switch to enable and disable.
+/// If [enable] is true and this button pressed, call [onPressed] method.
+/// But when [enable] is false, it won't call [onPressed] method.
+class _AlternateIconButton extends StatelessWidget {
+  const _AlternateIconButton({
+    required this.icon,
+    this.onPressed,
+    this.enable = true,
+  });
+
+  /// Function called when this button is pressed.
+  final void Function()? onPressed;
+
+  /// This button's icon.
+  final Widget icon;
+
+  /// A value that determines wheter this button is enabled or disabled
+  final bool enable;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: icon,
+      // The function and icon color chang depending on whether the value of [enable].
+      color: enable ? null : Colors.grey,
+      onPressed: enable ? onPressed : null,
     );
   }
 }
