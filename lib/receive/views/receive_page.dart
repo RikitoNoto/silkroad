@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:platform/platform.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
@@ -33,6 +36,10 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   late AnimatedListItemModel<ReceiveItem> _receiveList;
   late final ReceiveProvider provider;
   BannerAd? _bannerAd;
+
+  late final TutorialCoachMark _tutorialCoachMark;
+  final GlobalKey _keyIpAddressSelector = GlobalKey();
+  final GlobalKey _keyOpenButton = GlobalKey();
 
   final List<ReceiveItem> _debugReceiveItems = [
     ReceiveItem(
@@ -91,6 +98,9 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
         onAdLoaded: (ad) => setState(() {
               _bannerAd = ad as BannerAd;
             }));
+
+    _createTutorial();
+    Future.delayed(Duration.zero, _showTutorial);
   }
 
   @override
@@ -113,6 +123,83 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   @override
   void didPushNext() {
     provider.close();
+  }
+
+  void _showTutorial() {
+    _tutorialCoachMark.show(context: context);
+  }
+
+  void _createTutorial() {
+    _tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: AppTheme.appIconColor2,
+      textSkip: t.tutorial.skip,
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onFinish: () {
+        print("finish");
+      },
+    );
+  }
+
+  TargetFocus _createTarget({
+    required GlobalKey<State<StatefulWidget>> key,
+    AlignmentGeometry alignSkip = Alignment.bottomRight,
+    ContentAlign align = ContentAlign.bottom,
+    required String text,
+    ShapeLightFocus? shape,
+    double? radius,
+  }) {
+    return TargetFocus(
+      identify: key.toString(),
+      keyTarget: key,
+      alignSkip: alignSkip,
+      enableOverlayTab: true,
+      shape: shape,
+      radius: radius,
+      contents: [
+        TargetContent(
+          align: align,
+          builder: (context, controller) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    // ip address field
+    targets.add(
+      _createTarget(
+        key: _keyIpAddressSelector,
+        text: t.receive.tutorial.ipAddressSelector,
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    // file select field
+    targets.add(
+      _createTarget(
+        key: _keyOpenButton,
+        text: t.receive.tutorial.openButton,
+      ),
+    );
+    return targets;
   }
 
   @override
@@ -202,6 +289,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       Row(
         children: [
           Expanded(
+            key: _keyIpAddressSelector,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: _buildIpDisplay(context),
@@ -209,6 +297,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
           ),
           Consumer<ReceiveProvider>(
             builder: (context, provider, child) => AlternateActionButton(
+              key: _keyOpenButton,
               enabled: provider.isEnableIp(provider.currentIp),
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,

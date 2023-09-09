@@ -19,6 +19,11 @@ send:
     fileSelectButton: "送信したいファイルを選択し、"
     ipAddressField: "IPアドレスを入力、もしくは検索で出てきた送信先を押して、\n送信先を選択してください。"
 
+receive:
+  tutorial:
+    ipAddressSelector: "受信するIPアドレスを選択してください。\n選択するアドレスは送信者と一番近いものを選んでください。\n(基本的にはカンマ区切りで頭3つは同じもの)"
+    openButton: "受信開始ボタンで、ほかのデバイスからの検索を許可し、受信を行います。"
+
 params:
   name: "名前"
   port: "ポート番号"
