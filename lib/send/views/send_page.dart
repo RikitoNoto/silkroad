@@ -8,6 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:silkroad/app_theme.dart';
+import 'package:silkroad/parameter.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'package:silkroad/send/providers/send_provider.dart';
@@ -66,8 +67,13 @@ class _SendPageState extends State<SendPage> with RouteAware {
               _bannerAd = ad as BannerAd;
             }));
 
-    _createTutorial();
-    Future.delayed(Duration.zero, _showTutorial);
+    // if the tutorial has never been displayed, show the tutorial.
+    final isShowed =
+        OptionManager().get(Params.isShowTutorialSend.toString()) as bool?;
+    if (isShowed == null || !isShowed) {
+      _createTutorial();
+      Future.delayed(Duration.zero, _showTutorial);
+    }
   }
 
   @override
@@ -99,7 +105,8 @@ class _SendPageState extends State<SendPage> with RouteAware {
       opacityShadow: 0.5,
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
-        print("finish");
+        // Notify provider that it viewed the tutorial.
+        provider.endTutorial();
       },
     );
   }

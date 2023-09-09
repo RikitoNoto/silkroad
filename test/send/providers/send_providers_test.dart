@@ -60,6 +60,7 @@ void main() {
   sendMessageTest();
   fileNameTest();
   sendibleTest();
+  tutorialTest();
 }
 
 void fileSetTest() {
@@ -554,6 +555,17 @@ void sendibleTest() {
       callback?.call(0.5);
 
       expect(provider.provider.searchProgress, 0.75);
+    });
+  });
+}
+
+void tutorialTest() {
+  group('end tutorial test', () {
+    test('should turn to true when call the endTutorial method', () async {
+      await setParam(Params.isShowTutorialSend.toString(), false);
+      final provider = constructProvider();
+      await provider.endTutorial();
+      expect(OptionManager().get(Params.isShowTutorialSend.toString()), true);
     });
   });
 }
