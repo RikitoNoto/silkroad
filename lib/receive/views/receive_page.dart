@@ -101,11 +101,11 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
               _bannerAd = ad as BannerAd;
             }));
 
+    _createTutorial();
     // if the tutorial has never been displayed, show the tutorial.
     final isShowed =
         OptionManager().get(Params.isShowTutorialReceive.toString()) as bool?;
     if (isShowed == null || !isShowed) {
-      _createTutorial();
       Future.delayed(Duration.zero, _showTutorial);
     }
   }
@@ -217,7 +217,18 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       child: Scaffold(
           appBar: AppBar(
             title: Text(t.actions.receive),
-            actions: _getDebugActions(),
+            actions: <Widget>[
+                  // Hint button
+                  IconButton(
+                    icon: const Icon(
+                      Icons.lightbulb,
+                    ),
+                    onPressed: () async {
+                      _showTutorial();
+                    },
+                  ),
+                ] +
+                _getDebugActions(),
           ),
           body: _buildBody(context)),
     );

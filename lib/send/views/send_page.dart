@@ -67,11 +67,11 @@ class _SendPageState extends State<SendPage> with RouteAware {
               _bannerAd = ad as BannerAd;
             }));
 
+    _createTutorial();
     // if the tutorial has never been displayed, show the tutorial.
     final isShowed =
         OptionManager().get(Params.isShowTutorialSend.toString()) as bool?;
     if (isShowed == null || !isShowed) {
-      _createTutorial();
       Future.delayed(Duration.zero, _showTutorial);
     }
   }
@@ -275,6 +275,15 @@ class _SendPageState extends State<SendPage> with RouteAware {
           appBar: AppBar(
             title: Text(t.actions.send),
             actions: <Widget>[
+                  // Hint button
+                  IconButton(
+                    icon: const Icon(
+                      Icons.lightbulb,
+                    ),
+                    onPressed: () async {
+                      _showTutorial();
+                    },
+                  ),
                   // research button
                   Consumer<SendProvider>(
                     builder: (context, value, child) {
@@ -319,7 +328,7 @@ class _SendPageState extends State<SendPage> with RouteAware {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(message)));
                     },
-                  )
+                  ),
                 ] +
                 _getDebugActions(),
           ),
