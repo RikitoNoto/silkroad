@@ -36,6 +36,7 @@ enum Params {
   name,
   port,
   isShowTutorialSend,
+  isShowTutorialReceive,
 }
 
 const userInputParams = [

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:platform/platform.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:silkroad/option/option_manager.dart';
+import 'package:silkroad/option/params.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'package:silkroad/utils/views/alternate_action_button.dart';
@@ -99,8 +101,13 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
               _bannerAd = ad as BannerAd;
             }));
 
-    _createTutorial();
-    Future.delayed(Duration.zero, _showTutorial);
+    // if the tutorial has never been displayed, show the tutorial.
+    final isShowed =
+        OptionManager().get(Params.isShowTutorialReceive.toString()) as bool?;
+    if (isShowed == null || !isShowed) {
+      _createTutorial();
+      Future.delayed(Duration.zero, _showTutorial);
+    }
   }
 
   @override
@@ -138,7 +145,8 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       opacityShadow: 0.5,
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () {
-        print("finish");
+        // Notify provider that it viewed the tutorial.
+        provider.endTutorial();
       },
     );
   }

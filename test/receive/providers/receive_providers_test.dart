@@ -17,9 +17,17 @@ import 'package:silkroad/receive/entity/receive_item.dart';
 import 'package:silkroad/parameter.dart';
 import '../../spy/path_provider_spy.dart';
 
+late Map<String, Object> kParamMap;
+
 Future setPort(int port) async {
   SharedPreferences.setMockInitialValues(
       <String, Object>{Params.port.toString(): port});
+  await OptionManager.initialize();
+}
+
+Future setParam(String key, Object value) async {
+  kParamMap[key] = value;
+  SharedPreferences.setMockInitialValues(kParamMap);
   await OptionManager.initialize();
 }
 
@@ -32,6 +40,7 @@ void main() {
   });
 
   setUp(() async {
+    kParamMap = <String, Object>{};
     await pathProviderSetUp();
   });
 
@@ -43,6 +52,7 @@ void main() {
   ipAddressTest();
   itemActionTest();
   portTest();
+  tutorialTest();
 }
 
 void ipAddressTest() {
@@ -228,6 +238,18 @@ void itemActionTest() {
       expect(itemList.length, 2);
       expect(itemList[0].name, 'no target');
       expect(itemList[1].name, 'no target');
+    });
+  });
+}
+
+void tutorialTest() {
+  group('end tutorial test', () {
+    test('should turn to true when call the endTutorial method', () async {
+      await setParam(Params.isShowTutorialReceive.toString(), false);
+      final provider = constructProvider();
+      await provider.endTutorial();
+      expect(
+          OptionManager().get(Params.isShowTutorialReceive.toString()), true);
     });
   });
 }
