@@ -1,9 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:platform/platform.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:silkroad/option/option_manager.dart';
+import 'package:silkroad/option/params.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import 'package:silkroad/utils/views/alternate_action_button.dart';
 import 'package:silkroad/utils/models/animated_list_item_model.dart';
@@ -33,6 +38,10 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   late AnimatedListItemModel<ReceiveItem> _receiveList;
   late final ReceiveProvider provider;
   BannerAd? _bannerAd;
+
+  late final TutorialCoachMark _tutorialCoachMark;
+  final GlobalKey _keyIpAddressSelector = GlobalKey();
+  final GlobalKey _keyOpenButton = GlobalKey();
 
   final List<ReceiveItem> _debugReceiveItems = [
     ReceiveItem(
@@ -91,6 +100,14 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
         onAdLoaded: (ad) => setState(() {
               _bannerAd = ad as BannerAd;
             }));
+
+    _createTutorial();
+    // if the tutorial has never been displayed, show the tutorial.
+    final isShowed =
+        OptionManager().get(Params.isShowTutorialReceive.toString()) as bool?;
+    if (isShowed == null || !isShowed) {
+      Future.delayed(Duration.zero, _showTutorial);
+    }
   }
 
   @override
@@ -115,6 +132,84 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
     provider.close();
   }
 
+  void _showTutorial() {
+    _tutorialCoachMark.show(context: context);
+  }
+
+  void _createTutorial() {
+    _tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: AppTheme.appIconColor2,
+      textSkip: t.tutorial.skip,
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onFinish: () {
+        // Notify provider that it viewed the tutorial.
+        provider.endTutorial();
+      },
+    );
+  }
+
+  TargetFocus _createTarget({
+    required GlobalKey<State<StatefulWidget>> key,
+    AlignmentGeometry alignSkip = Alignment.bottomRight,
+    ContentAlign align = ContentAlign.bottom,
+    required String text,
+    ShapeLightFocus? shape,
+    double? radius,
+  }) {
+    return TargetFocus(
+      identify: key.toString(),
+      keyTarget: key,
+      alignSkip: alignSkip,
+      enableOverlayTab: true,
+      shape: shape,
+      radius: radius,
+      contents: [
+        TargetContent(
+          align: align,
+          builder: (context, controller) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    // ip address field
+    targets.add(
+      _createTarget(
+        key: _keyIpAddressSelector,
+        text: t.receive.tutorial.ipAddressSelector,
+        shape: ShapeLightFocus.RRect,
+        radius: 5,
+      ),
+    );
+
+    // file select field
+    targets.add(
+      _createTarget(
+        key: _keyOpenButton,
+        text: t.receive.tutorial.openButton,
+      ),
+    );
+    return targets;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -122,7 +217,18 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       child: Scaffold(
           appBar: AppBar(
             title: Text(t.actions.receive),
-            actions: _getDebugActions(),
+            actions: <Widget>[
+                  // Hint button
+                  IconButton(
+                    icon: const Icon(
+                      Icons.lightbulb,
+                    ),
+                    onPressed: () async {
+                      _showTutorial();
+                    },
+                  ),
+                ] +
+                _getDebugActions(),
           ),
           body: _buildBody(context)),
     );
@@ -202,6 +308,7 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
       Row(
         children: [
           Expanded(
+            key: _keyIpAddressSelector,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: _buildIpDisplay(context),
@@ -209,11 +316,10 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
           ),
           Consumer<ReceiveProvider>(
             builder: (context, provider, child) => AlternateActionButton(
+              key: _keyOpenButton,
               enabled: provider.isEnableIp(provider.currentIp),
               startIcon: Icons.play_arrow,
               endIcon: Icons.pause,
-              progressIndicatorColor: Colors.blue,
-              iconColor: AppTheme.getForegroundColor(context),
               onTap: (state) {
                 if (state == AlternateActionStatus.active) {
                   provider.open();
@@ -228,12 +334,9 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
 
       // receive list
       Flexible(
-        child: Container(
-          color: AppTheme.getSecondaryBackgroundColor(context),
-          child: AnimatedList(
-            key: _listKey,
-            itemBuilder: _buildItem,
-          ),
+        child: AnimatedList(
+          key: _listKey,
+          itemBuilder: _buildItem,
         ),
       ),
       PlatformBannerAd(
@@ -260,32 +363,30 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
   Widget _buildIpListForAndroidPc(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Consumer<ReceiveProvider>(
-          builder: (context, provider, child) => DropdownButton(
-                value: provider.currentIp,
-                icon: const Icon(Icons.arrow_drop_down),
-                iconSize: 30,
-                isExpanded: true,
-                underline: DropdownButtonHideUnderline(child: Container()),
-                elevation: 0,
-                onChanged: (address) => provider.selectIp(address),
-                items: provider.ipList
-                    .map((address) =>
-                        DropdownMenuItem(value: address, child: Text(address)))
-                    .toList(),
-              )),
+        builder: (context, provider, child) => DropdownButton(
+          value: provider.currentIp,
+          icon: const Icon(Icons.arrow_drop_down),
+          iconSize: 30,
+          isExpanded: true,
+          underline: DropdownButtonHideUnderline(child: Container()),
+          onChanged: (address) => provider.selectIp(address),
+          items: provider.ipList
+              .map((address) =>
+                  DropdownMenuItem(value: address, child: Text(address)))
+              .toList(),
+        ),
+      ),
     );
   }
 
   Widget _buildIpListForIos(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: AppTheme.getSecondaryBackgroundColor(context)),
+        border: Border.all(),
         borderRadius: BorderRadius.circular(5),
       ),
       child: CupertinoButton(
@@ -294,17 +395,14 @@ class ReceivePageState extends State<ReceivePage> with RouteAware {
             Consumer<ReceiveProvider>(builder: (context, provider, child) {
               return Text(
                 provider.currentIp,
-                style: TextStyle(
-                  color: AppTheme.getForegroundColor(context),
-                ),
               );
             }),
-            Align(
-                alignment: Alignment.centerRight,
-                child: Icon(
-                  Icons.arrow_drop_down,
-                  color: AppTheme.getForegroundColor(context),
-                )),
+            const Align(
+              alignment: Alignment.centerRight,
+              child: Icon(
+                Icons.arrow_drop_down,
+              ),
+            ),
           ],
         ),
         onPressed: () {
@@ -352,19 +450,16 @@ class _ListItemTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-          child: Container(
-            padding: const EdgeInsets.all(5.0),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.appIconColor2,
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 30.0,
-            ),
+        Container(
+          // padding: const EdgeInsets.all(5.0),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            // color: AppTheme.appIconColor2,
+          ),
+          child: Icon(
+            icon,
+            // color: Colors.white,
+            size: 30.0,
           ),
         ),
         Flexible(

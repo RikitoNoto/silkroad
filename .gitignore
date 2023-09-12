@@ -60,7 +60,6 @@ doc/api/
 /dev/integration_tests/**/xcuserdata
 /dev/integration_tests/**/Pods
 /packages/flutter/coverage/
-version
 analysis_benchmark.json
 
 # packages file containing multi-root paths
@@ -128,6 +127,7 @@ unlinked_spec.ds
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/ephemeral
 **/xcuserdata/
+**/macos/DerivedData/
 
 # Windows
 **/windows/flutter/generated_plugin_registrant.cc

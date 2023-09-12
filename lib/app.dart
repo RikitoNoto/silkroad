@@ -6,23 +6,33 @@ import 'package:silkroad/home/views/home_page.dart';
 import 'package:silkroad/send/views/send_page.dart';
 import 'package:silkroad/receive/views/receive_page.dart';
 import 'package:silkroad/option/views/option_page.dart';
+import 'color_schemes.g.dart';
 import 'package:silkroad/app_theme.dart';
+import 'package:silkroad/version/version.dart';
 import 'global.dart';
 
 class SilkRoadApp extends StatelessWidget {
   const SilkRoadApp({
     super.key,
     required this.platform,
+    required this.version,
   });
 
   final Platform platform;
+  final Version version;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Silk road',
-        theme: AppTheme.appThemeLight,
-        darkTheme: AppTheme.appThemeDark,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: lightColorScheme,
+        ),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: darkColorScheme,
+        ),
         navigatorObservers: [kRouteObserver],
         initialRoute: '/',
         onGenerateRoute: (settings) {
@@ -30,7 +40,10 @@ class SilkRoadApp extends StatelessWidget {
             case '/':
               {
                 return PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => HomePage(platform: platform),
+                  pageBuilder: (_, __, ___) => HomePage(
+                    platform: platform,
+                    version: version,
+                  ),
                 );
               }
             case '/send':
@@ -79,7 +92,10 @@ class SilkRoadApp extends StatelessWidget {
             default:
               {
                 return MaterialPageRoute(
-                    builder: (context) => HomePage(platform: platform));
+                    builder: (context) => HomePage(
+                          platform: platform,
+                          version: version,
+                        ));
               }
           }
         });

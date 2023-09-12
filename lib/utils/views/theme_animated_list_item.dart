@@ -32,11 +32,11 @@ class _ThemeAnimatedListItemBase extends StatelessWidget {
       onPressed: () {
         onSelect?.call(context);
       },
-      style: ButtonStyle(
-        elevation: MaterialStateProperty.all<double>(0.0),
+      style: ElevatedButton.styleFrom(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: MaterialStateProperty.all<Color>(
-            AppTheme.getBackgroundColor(context)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0), // 0に設定して四角形にする
+        ),
       ),
       child: IntrinsicHeight(
         child: Padding(

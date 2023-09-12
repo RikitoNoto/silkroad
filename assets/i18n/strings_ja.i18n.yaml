@@ -13,7 +13,25 @@ send:
     connectionFail: "送信失敗しました。同じネットワーク内にいることを確認してください。"
     lostFile: "ファイルがありません。"
     sendFail: "接続先のデバイスに送信できません。"
+  tutorial:
+    sendButton: "送信ボタンを押すことでデータを送信できます。"
+    researchButton: "また、更新ボタンで送信先の再検索を行えます。"
+    fileSelectButton: "送信したいファイルを選択し、"
+    ipAddressField: "IPアドレスを入力、もしくは検索で出てきた送信先を押して、\n送信先を選択してください。"
+
+receive:
+  tutorial:
+    ipAddressSelector: "受信するIPアドレスを選択してください。\n選択するアドレスは送信者と一番近いものを選んでください。\n(基本的にはカンマ区切りで頭3つは同じもの)"
+    openButton: "受信開始ボタンで、ほかのデバイスからの検索を許可し、受信を行います。"
 
 params:
   name: "名前"
   port: "ポート番号"
+
+tutorial:
+  skip: "スキップ"
+
+version:
+  oldVersionDialogTitle: "バージョンアップ"
+  oldVersionDialogContent: "使用しているアプリのバージョンが古くなっています。\nバージョンアップしてください。"
+

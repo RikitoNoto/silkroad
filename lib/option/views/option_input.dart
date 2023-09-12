@@ -4,37 +4,51 @@ import 'package:flutter/services.dart';
 import 'package:silkroad/option/params.dart';
 import 'package:silkroad/option/option_manager.dart';
 
-abstract class OptionInput extends StatelessWidget{
+abstract class OptionInput extends StatelessWidget {
   const OptionInput({super.key});
 
-  static void Function(String) createCallbackForInput(Params param){
-    return (value){
+  static void Function(String) createCallbackForInput(Params param) {
+    return (value) {
       OptionManager().set(param.toString(), value);
     };
   }
 
-  static OptionInput construct(Params param, {Key? key}){
+  static OptionInput construct(Params param, {Key? key}) {
     Object? value = OptionManager().get(param.toString());
 
-    switch(param.inputType){
+    switch (param.inputType) {
       case InputType.numberText:
-        return OptionNumberInput(label: param.label, key: key, onChanged: createCallbackForInput(param), initialValue: value is String ? value : null,);
+        return OptionNumberInput(
+          label: param.label,
+          key: key,
+          onChanged: createCallbackForInput(param),
+          initialValue: value is String ? value : null,
+        );
       case InputType.text:
-        return OptionInputText(label: param.label, key: key, onChanged: createCallbackForInput(param), initialValue: value is String ? value : null,);
+        return OptionInputText(
+          label: param.label,
+          key: key,
+          onChanged: createCallbackForInput(param),
+          initialValue: value is String ? value : null,
+        );
+      default:
+        throw ArgumentError(
+            "$param don't define InputType. Did you forget to define to ParamInputType?");
     }
   }
 }
 
-abstract class OptionInputBase extends OptionInput{
+abstract class OptionInputBase extends OptionInput {
   const OptionInputBase({super.key});
 
-  Widget constructInputField(BuildContext context, {
+  Widget constructInputField(
+    BuildContext context, {
     required String label,
     void Function(String)? onChanged,
     String? initialValue,
     List<TextInputFormatter>? inputFormatters,
-    TextInputType? keyboardType,}
-  ) {
+    TextInputType? keyboardType,
+  }) {
     Size screenSize = MediaQuery.of(context).size;
     return Card(
       borderOnForeground: false,
@@ -48,8 +62,8 @@ abstract class OptionInputBase extends OptionInput{
               child: Text(
                 label,
                 style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                  fontSize: 16,
-                ),
+                      fontSize: 16,
+                    ),
               ),
             ),
             Expanded(
@@ -65,10 +79,9 @@ abstract class OptionInputBase extends OptionInput{
       ),
     );
   }
-
 }
 
-class OptionInputText extends OptionInputBase{
+class OptionInputText extends OptionInputBase {
   const OptionInputText({
     required this.label,
     this.onChanged,
@@ -80,14 +93,14 @@ class OptionInputText extends OptionInputBase{
   final void Function(String)? onChanged;
   final String? initialValue;
 
-
   @override
   Widget build(BuildContext context) {
-    return super.constructInputField(context, label: label, onChanged: onChanged, initialValue: initialValue);
+    return super.constructInputField(context,
+        label: label, onChanged: onChanged, initialValue: initialValue);
   }
 }
 
-class OptionNumberInput extends OptionInputBase{
+class OptionNumberInput extends OptionInputBase {
   const OptionNumberInput({
     required this.label,
     this.onChanged,
@@ -99,7 +112,6 @@ class OptionNumberInput extends OptionInputBase{
   final void Function(String)? onChanged;
   final String? initialValue;
 
-
   @override
   Widget build(BuildContext context) {
     return super.constructInputField(
@@ -109,7 +121,6 @@ class OptionNumberInput extends OptionInputBase{
       initialValue: initialValue,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
-
     );
   }
 }
