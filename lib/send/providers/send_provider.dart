@@ -172,6 +172,7 @@ class SendProvider with ChangeNotifier, IpaddressFetcher {
 
   void setOctet(int octet, int value) {
     _ip[octet] = value;
+    notifyListeners();
   }
 
   void sendibleListRemoveAt(int index) {
